@@ -6630,10 +6630,13 @@ GameBoyCore.prototype.initSound = function () {
         8192
       ) << 1,
       null,
+      null,
+      null,
       this.opts.volume,
       function () {
         self.opts.sound = false
-      }
+      },
+      this.canvas
     )
     this.initAudioBuffer()
   } else if (this.audioHandle) {
