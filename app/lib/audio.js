@@ -1,6 +1,7 @@
 /**
  * Modern Web Audio API wrapper for GameBoy emulator
  * Simpler replacement for XAudioJS
+ * @see https://raw.githubusercontent.com/taisel/XAudioJS/master/XAudioServer.js
  */
 
 class GameBoyAudio {

@@ -11,8 +11,8 @@ const nextFont = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Pocket GB",
-  description: "A Game Boy emulator built with modern web technologies.",
+  title: "Retro Boy",
+  description: "Nostalgic Gaming on the Go",
 }
 
 export default function RootLayout({

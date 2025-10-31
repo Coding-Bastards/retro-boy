@@ -249,15 +249,15 @@ export default function Game() {
   }
 
   return (
-    <div className="flex flex-col items-center p-8 min-h-screen bg-gradient-to-b from-gray-100 to-gray-200">
+    <div className="flex flex-col items-center p-8 min-h-screen bg-linear-to-b from-gray-100 to-gray-200">
       <h1 className="text-4xl font-bold text-gray-800 mb-8 font-mono">
-        🎮 Pocket GameBoy
+        🎮 Retro Boy
       </h1>
 
       {!isLoaded && (
         <div className="text-center mb-8 p-6 bg-white rounded-lg shadow-md">
           <h2 className="text-xl font-semibold text-gray-700 mb-4">
-            Load a GameBoy ROM
+            Load game ROM
           </h2>
           <input
             ref={fileInputRef}
