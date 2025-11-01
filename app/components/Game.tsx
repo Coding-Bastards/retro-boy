@@ -2,6 +2,10 @@
 
 import { useRef, useEffect, useState } from "react"
 import { Joystick } from "react-joystick-component"
+
+import { cn } from "@/app/lib/utils"
+import { RiArrowUpWideLine } from "react-icons/ri"
+
 import MechanicalButton from "./MechanicalButton"
 
 export default function Game() {
@@ -201,32 +205,63 @@ export default function Game() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between h-[80vh] p-4">
+    <div className="flex flex-col h-[80vh] p-4">
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".gb,.gbc"
+        onChange={handleFileSelect}
+        disabled={!gameboy}
+        className="hidden"
+      />
+
       {/* Header */}
       <div className="text-center py-4">
         <h1 className="text-3xl italic font-bold text-white mb-2">RETRO BOY</h1>
       </div>
 
       {/* Screen */}
-      <div className="flex-1 flex items-center justify-center">
+      <button
+        onClick={() => {
+          fileInputRef.current?.click()
+        }}
+        className="flex-1 w-full flex items-center justify-center"
+      >
         <canvas
           ref={canvasRef}
           width={160}
           height={144}
-          className="border-4 border-black/45 rounded-xl shadow-2xl bg-[#8b956d]"
+          className={cn(
+            isLoaded ? "border-black/75" : "border-black/45",
+            "border-[3px] rounded-xl bg-[#8b956d] w-full h-auto"
+          )}
           style={{
             imageRendering: "pixelated",
-            width: "min(90vw, 320px)",
-            height: "min(81vw, 288px)",
+            aspectRatio: "160 / 144",
           }}
         />
-      </div>
+      </button>
 
       {/* Controls */}
-      <div className="w-full max-w-md pb-4">
-        <div className="flex justify-between items-center mb-4">
+      <div className="w-full mt-8 max-w-md pb-4">
+        <div className="flex justify-between items-center">
           {/* Joystick */}
-          <div className="flex bg-black/10 rounded-full joy-container items-center justify-center relative">
+          <div className="flex bg-white/1 border border-black/15 shadow-inner rounded-full joy-container items-center justify-center relative">
+            <div className="absolute pointer-events-none text-white/5 text-xl grid grid-cols-2 p-1 inset-0">
+              <div className="col-span-2 flex items-start justify-center">
+                <RiArrowUpWideLine />
+              </div>
+              <div className="flex items-center justify-start">
+                <RiArrowUpWideLine className="-rotate-90" />
+              </div>
+              <div className="flex items-center justify-end">
+                <RiArrowUpWideLine className="rotate-90" />
+              </div>
+              <div className="col-span-2 flex items-end justify-center">
+                <RiArrowUpWideLine className="rotate-180" />
+              </div>
+            </div>
+
             <style scoped>{`
               .joy-container button {
                 width: 100% !important;
@@ -239,12 +274,14 @@ export default function Game() {
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
-                width: 70%;
-                height: 70%;
+                width: 58%;
+                height: 58%;
                 border-radius: 100%;
-                background: #1a1a1a;
+                background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
+                box-shadow: 0 0px 4px 2px rgba(0,0,0,0.1), 0 0px 12px 0 rgba(0,0,0,0.4);
               }
             `}</style>
+
             <Joystick
               size={120}
               baseColor="transparent"
@@ -256,9 +293,9 @@ export default function Game() {
           </div>
 
           {/* A/B Buttons */}
-          <div className="flex gap-3">
+          <div className="flex mb-6 gap-4">
             <MechanicalButton
-              className="mt-6"
+              className="mt-10"
               onPress={() => handleButtonPress(5)}
               onRelease={() => handleButtonRelease(5)}
             >
@@ -275,7 +312,7 @@ export default function Game() {
         </div>
 
         {/* Start/Select */}
-        <div className="flex justify-center gap-4 mb-3">
+        <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
             onPress={() => handleButtonPress(6)}
@@ -292,30 +329,6 @@ export default function Game() {
           >
             START
           </MechanicalButton>
-        </div>
-
-        <div className="mt-10">
-          {/* Reset/Load Button */}
-          {!isLoaded ? (
-            <label className="block w-full py-2 bg-emerald-500 text-white text-center font-semibold rounded-lg cursor-pointer hover:bg-emerald-600 active:bg-emerald-700 transition-colors">
-              Load ROM
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept=".gb,.gbc"
-                onChange={handleFileSelect}
-                disabled={!gameboy}
-                className="hidden"
-              />
-            </label>
-          ) : (
-            <button
-              onClick={handleReset}
-              className="w-full py-2 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-600 transition-colors"
-            >
-              Load New ROM
-            </button>
-          )}
         </div>
       </div>
     </div>
