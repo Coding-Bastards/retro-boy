@@ -1,5 +1,5 @@
 {
-  "name": "codingbastards.com",
+  "name": "retro-boy",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,7 +13,8 @@
     "next": "16.0.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "react-icons": "^5.5.0"
+    "react-icons": "^5.5.0",
+    "react-joystick-component": "^6.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

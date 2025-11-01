@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
+import { Joystick } from "react-joystick-component"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -8,7 +9,6 @@ export default function Game() {
   const [gameboy, setGameboy] = useState<any>(null)
   const [audioClass, setAudioClass] = useState<any>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isRunning, setIsRunning] = useState(false)
   const gbInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
 
@@ -40,18 +40,48 @@ export default function Game() {
     loadEmulator()
   }, [])
 
-  // Handle button press
+  const releaseAllDirections = () => {
+    const gb = gbInstanceRef.current
+    if (!gb) return
+    gb.JoyPadEvent(0, false)
+    gb.JoyPadEvent(1, false)
+    gb.JoyPadEvent(2, false)
+    gb.JoyPadEvent(3, false)
+  }
+
   const handleButtonPress = (joypadCode: number) => {
     const gb = gbInstanceRef.current
     if (!gb) return
     gb.JoyPadEvent(joypadCode, true)
   }
 
-  // Handle button release
   const handleButtonRelease = (joypadCode: number) => {
     const gb = gbInstanceRef.current
     if (!gb) return
     gb.JoyPadEvent(joypadCode, false)
+  }
+
+  const handleJoystickMove = (data: any) => {
+    const gb = gbInstanceRef.current
+    if (!gb) return
+
+    if (data.distance && data.distance < 10) {
+      releaseAllDirections()
+      return
+    }
+
+    if (data.direction) {
+      releaseAllDirections()
+
+      if (data.direction === "RIGHT") gb.JoyPadEvent(0, true)
+      else if (data.direction === "LEFT") gb.JoyPadEvent(1, true)
+      else if (data.direction === "FORWARD") gb.JoyPadEvent(2, true)
+      else if (data.direction === "BACKWARD") gb.JoyPadEvent(3, true)
+    }
+  }
+
+  const handleJoystickStop = () => {
+    releaseAllDirections()
   }
 
   // Cleanup on unmount
@@ -109,7 +139,6 @@ export default function Game() {
       // Start the emulator
       gb.start()
       setIsLoaded(true)
-      setIsRunning(true)
 
       console.log(
         "GameBoy initialized and started, audioHandle:",
@@ -166,15 +195,12 @@ export default function Game() {
     // Clear refs
     gbInstanceRef.current = null
 
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
+    if (fileInputRef.current) fileInputRef.current.value = ""
     setIsLoaded(false)
-    setIsRunning(false)
   }
 
   return (
-    <div className="flex flex-col items-center justify-between min-h-screen bg-linear-to-b from-slate-900 to-slate-800 p-4">
+    <div className="flex flex-col items-center justify-between h-[80vh] bg-linear-to-b from-slate-900 to-slate-800 p-4">
       {/* Header */}
       <div className="text-center py-4">
         <h1 className="text-3xl font-bold text-white mb-2">🎮 Retro Boy</h1>
@@ -198,45 +224,16 @@ export default function Game() {
       {/* Controls */}
       <div className="w-full max-w-md pb-4">
         <div className="flex justify-between items-center mb-4">
-          {/* D-Pad */}
-          <div className="relative w-32 h-32">
-            <button
-              onTouchStart={() => handleButtonPress(2)}
-              onTouchEnd={() => handleButtonRelease(2)}
-              onMouseDown={() => handleButtonPress(2)}
-              onMouseUp={() => handleButtonRelease(2)}
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-700 rounded active:bg-slate-600 flex items-center justify-center text-white text-xl select-none"
-            >
-              ▲
-            </button>
-            <button
-              onTouchStart={() => handleButtonPress(3)}
-              onTouchEnd={() => handleButtonRelease(3)}
-              onMouseDown={() => handleButtonPress(3)}
-              onMouseUp={() => handleButtonRelease(3)}
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-10 h-10 bg-slate-700 rounded active:bg-slate-600 flex items-center justify-center text-white text-xl select-none"
-            >
-              ▼
-            </button>
-            <button
-              onTouchStart={() => handleButtonPress(1)}
-              onTouchEnd={() => handleButtonRelease(1)}
-              onMouseDown={() => handleButtonPress(1)}
-              onMouseUp={() => handleButtonRelease(1)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-slate-700 rounded active:bg-slate-600 flex items-center justify-center text-white text-xl select-none"
-            >
-              ◀
-            </button>
-            <button
-              onTouchStart={() => handleButtonPress(0)}
-              onTouchEnd={() => handleButtonRelease(0)}
-              onMouseDown={() => handleButtonPress(0)}
-              onMouseUp={() => handleButtonRelease(0)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 w-10 h-10 bg-slate-700 rounded active:bg-slate-600 flex items-center justify-center text-white text-xl select-none"
-            >
-              ▶
-            </button>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-slate-800 rounded" />
+          {/* Joystick */}
+          <div className="flex items-center justify-center">
+            <Joystick
+              size={120}
+              baseColor="#475569"
+              stickColor="#64748b"
+              move={handleJoystickMove}
+              stop={handleJoystickStop}
+              throttle={16}
+            />
           </div>
 
           {/* A/B Buttons */}
