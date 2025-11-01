@@ -204,8 +204,25 @@ export default function Game() {
     setIsLoaded(false)
   }
 
+  async function loadGameFromRemote() {
+    const GAME_URL =
+      "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb"
+
+    const response = await fetch(GAME_URL)
+    if (!response.ok) {
+      throw new Error("Failed to fetch game")
+    }
+
+    const blob = await response.blob()
+    const file = new File([blob], "game.gb", {
+      type: "application/octet-stream",
+    })
+
+    handleFileSelect({ target: { files: [file] } } as any)
+  }
+
   return (
-    <div className="flex flex-col h-[80vh] p-4">
+    <div className="flex max-w-lg mx-auto flex-col h-screen p-5">
       <input
         ref={fileInputRef}
         type="file"
@@ -216,9 +233,11 @@ export default function Game() {
       />
 
       {/* Header */}
-      <div className="text-center py-4">
-        <h1 className="text-3xl italic font-bold text-white mb-2">RETRO BOY</h1>
-      </div>
+      <nav className="flex pb-2 items-center justify-center">
+        <h1 className="text-2xl px-4 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/20 via-white/40 to-white/20 mb-2">
+          RETRO BOY
+        </h1>
+      </nav>
 
       {/* Screen */}
       <button
@@ -243,7 +262,7 @@ export default function Game() {
       </button>
 
       {/* Controls */}
-      <div className="w-full mt-8 max-w-md pb-4">
+      <div className="w-full mt-4 pb-4">
         <div className="flex justify-between items-center">
           {/* Joystick */}
           <div className="flex bg-white/1 border border-black/15 shadow-inner rounded-full joy-container items-center justify-center relative">
@@ -315,11 +334,15 @@ export default function Game() {
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={() => handleButtonPress(6)}
+            onPress={() => {
+              // TODO: Temp to test loading remote game
+              if (!isLoaded) return loadGameFromRemote()
+              handleButtonPress(6)
+            }}
             onRelease={() => handleButtonRelease(6)}
             variant="pill"
           >
-            SELECT
+            {isLoaded ? "SELECT" : "PLAY DEMO"}
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
@@ -331,6 +354,8 @@ export default function Game() {
           </MechanicalButton>
         </div>
       </div>
+
+      <div className="grow" />
     </div>
   )
 }
