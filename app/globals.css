@@ -3,6 +3,7 @@
 html,
 body {
   background-color: #161616;
+  touch-action: none;
   user-select: none;
 }
 
@@ -12,5 +13,5 @@ body {
 
 @theme {
   --z-index-1: 1;
-  --color-cb-red: #f90000;
+  --color-rb-green: #10f715;
 }

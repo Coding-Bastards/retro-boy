@@ -233,9 +233,17 @@ export default function Game() {
       />
 
       {/* Header */}
-      <nav className="flex pb-2 items-center justify-center">
-        <h1 className="text-2xl px-4 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/20 via-white/40 to-white/20 mb-2">
+      <nav className="flex pb-4 items-center justify-center">
+        <h1 className="text-lg relative px-4 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
           RETRO BOY
+          <div
+            className={cn(
+              isLoaded
+                ? "bg-rb-green shadow-[0_0_6px_2px_rgba(34,197,94,0.4),0_0_14px_4px_rgba(34,197,94,0.2)]"
+                : "bg-[#727272]",
+              "absolute rounded-full top-1/2 -translate-y-1/2 -left-0.5 size-2"
+            )}
+          />
         </h1>
       </nav>
 
