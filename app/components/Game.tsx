@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react"
 import { Joystick } from "react-joystick-component"
+import MechanicalButton from "./MechanicalButton"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -228,8 +229,8 @@ export default function Game() {
           <div className="flex items-center justify-center">
             <Joystick
               size={120}
-              baseColor="#475569"
-              stickColor="#64748b"
+              baseColor="#1a1a1a"
+              stickColor="#2a2a2a"
               move={handleJoystickMove}
               stop={handleJoystickStop}
               throttle={16}
@@ -238,70 +239,66 @@ export default function Game() {
 
           {/* A/B Buttons */}
           <div className="flex gap-3">
-            <button
-              onTouchStart={() => handleButtonPress(5)}
-              onTouchEnd={() => handleButtonRelease(5)}
-              onMouseDown={() => handleButtonPress(5)}
-              onMouseUp={() => handleButtonRelease(5)}
-              className="w-16 h-16 bg-rose-600 rounded-full active:bg-rose-700 text-white font-bold text-xl shadow-lg select-none"
+            <MechanicalButton
+              className="mt-6"
+              onPress={() => handleButtonPress(5)}
+              onRelease={() => handleButtonRelease(5)}
             >
               B
-            </button>
-            <button
-              onTouchStart={() => handleButtonPress(4)}
-              onTouchEnd={() => handleButtonRelease(4)}
-              onMouseDown={() => handleButtonPress(4)}
-              onMouseUp={() => handleButtonRelease(4)}
-              className="w-16 h-16 bg-rose-600 rounded-full active:bg-rose-700 text-white font-bold text-xl shadow-lg select-none"
+            </MechanicalButton>
+
+            <MechanicalButton
+              onPress={() => handleButtonPress(4)}
+              onRelease={() => handleButtonRelease(4)}
             >
               A
-            </button>
+            </MechanicalButton>
           </div>
         </div>
 
         {/* Start/Select */}
         <div className="flex justify-center gap-4 mb-3">
-          <button
-            onTouchStart={() => handleButtonPress(6)}
-            onTouchEnd={() => handleButtonRelease(6)}
-            onMouseDown={() => handleButtonPress(6)}
-            onMouseUp={() => handleButtonRelease(6)}
-            className="px-6 py-2 bg-slate-600 rounded-full text-white text-sm active:bg-slate-500 select-none"
+          <MechanicalButton
+            className="h-6"
+            onPress={() => handleButtonPress(6)}
+            onRelease={() => handleButtonRelease(6)}
+            variant="pill"
           >
             SELECT
-          </button>
-          <button
-            onTouchStart={() => handleButtonPress(7)}
-            onTouchEnd={() => handleButtonRelease(7)}
-            onMouseDown={() => handleButtonPress(7)}
-            onMouseUp={() => handleButtonRelease(7)}
-            className="px-6 py-2 bg-slate-600 rounded-full text-white text-sm active:bg-slate-500 select-none"
+          </MechanicalButton>
+          <MechanicalButton
+            className="h-6"
+            onPress={() => handleButtonPress(7)}
+            onRelease={() => handleButtonRelease(7)}
+            variant="pill"
           >
             START
-          </button>
+          </MechanicalButton>
         </div>
 
-        {/* Reset/Load Button */}
-        {!isLoaded ? (
-          <label className="block w-full py-2 bg-emerald-500 text-white text-center font-semibold rounded-lg cursor-pointer hover:bg-emerald-600 active:bg-emerald-700 transition-colors">
-            Load ROM
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".gb,.gbc"
-              onChange={handleFileSelect}
-              disabled={!gameboy}
-              className="hidden"
-            />
-          </label>
-        ) : (
-          <button
-            onClick={handleReset}
-            className="w-full py-2 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-600 transition-colors"
-          >
-            Load New ROM
-          </button>
-        )}
+        <div className="mt-10">
+          {/* Reset/Load Button */}
+          {!isLoaded ? (
+            <label className="block w-full py-2 bg-emerald-500 text-white text-center font-semibold rounded-lg cursor-pointer hover:bg-emerald-600 active:bg-emerald-700 transition-colors">
+              Load ROM
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".gb,.gbc"
+                onChange={handleFileSelect}
+                disabled={!gameboy}
+                className="hidden"
+              />
+            </label>
+          ) : (
+            <button
+              onClick={handleReset}
+              className="w-full py-2 bg-amber-500 text-slate-900 font-semibold rounded-lg hover:bg-amber-400 active:bg-amber-600 transition-colors"
+            >
+              Load New ROM
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
