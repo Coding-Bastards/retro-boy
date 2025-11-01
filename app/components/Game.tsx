@@ -201,10 +201,10 @@ export default function Game() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-between h-[80vh] bg-linear-to-b from-slate-900 to-slate-800 p-4">
+    <div className="flex flex-col items-center justify-between h-[80vh] p-4">
       {/* Header */}
       <div className="text-center py-4">
-        <h1 className="text-3xl font-bold text-white mb-2">🎮 Retro Boy</h1>
+        <h1 className="text-3xl italic font-bold text-white mb-2">RETRO BOY</h1>
       </div>
 
       {/* Screen */}
@@ -213,7 +213,7 @@ export default function Game() {
           ref={canvasRef}
           width={160}
           height={144}
-          className="border-8 border-slate-700 rounded-xl shadow-2xl bg-[#8b956d]"
+          className="border-4 border-black/45 rounded-xl shadow-2xl bg-[#8b956d]"
           style={{
             imageRendering: "pixelated",
             width: "min(90vw, 320px)",
@@ -226,14 +226,32 @@ export default function Game() {
       <div className="w-full max-w-md pb-4">
         <div className="flex justify-between items-center mb-4">
           {/* Joystick */}
-          <div className="flex items-center justify-center">
+          <div className="flex bg-black/10 rounded-full joy-container items-center justify-center relative">
+            <style scoped>{`
+              .joy-container button {
+                width: 100% !important;
+                height: 100% !important;
+              }
+
+              .joy-container button::after {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 70%;
+                height: 70%;
+                border-radius: 100%;
+                background: #1a1a1a;
+              }
+            `}</style>
             <Joystick
               size={120}
-              baseColor="#1a1a1a"
-              stickColor="#2a2a2a"
+              baseColor="transparent"
+              stickColor="transparent"
               move={handleJoystickMove}
               stop={handleJoystickStop}
-              throttle={16}
+              throttle={10}
             />
           </div>
 
