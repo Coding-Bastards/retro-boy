@@ -7,6 +7,8 @@ import { cn } from "@/app/lib/utils"
 import { RiArrowUpWideLine } from "react-icons/ri"
 
 import MechanicalButton from "./MechanicalButton"
+import WalletConnect from "./WalletConnect"
+import { ImFolderDownload } from "react-icons/im"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -233,18 +235,22 @@ export default function Game() {
       />
 
       {/* Header */}
-      <nav className="flex pb-4 items-center justify-center">
-        <h1 className="text-lg relative px-4 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
-          RETRO BOY
+      <nav className="flex pb-4 items-center justify-between">
+        <div className="flex px-1.5 items-center">
           <div
             className={cn(
               isLoaded
                 ? "bg-rb-green shadow-[0_0_6px_2px_rgba(34,197,94,0.4),0_0_14px_4px_rgba(34,197,94,0.2)]"
                 : "bg-[#727272]",
-              "absolute rounded-full top-1/2 -translate-y-1/2 -left-0.5 size-2"
+              "rounded-full size-2"
             )}
           />
-        </h1>
+          <h1 className="text-lg relative px-2.5 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
+            RETRO BOY
+          </h1>
+        </div>
+
+        <WalletConnect />
       </nav>
 
       {/* Screen */}
@@ -252,8 +258,15 @@ export default function Game() {
         onClick={() => {
           fileInputRef.current?.click()
         }}
-        className="flex-1 w-full flex items-center justify-center"
+        className="flex-1 relative w-full flex items-center justify-center"
       >
+        {isLoaded ? null : (
+          <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">
+            <ImFolderDownload className="text-3xl" />
+            <span className="text-sm font-black uppercase">LOAD GAME</span>
+          </div>
+        )}
+
         <canvas
           ref={canvasRef}
           width={160}
@@ -342,15 +355,11 @@ export default function Game() {
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={() => {
-              // TODO: Temp to test loading remote game
-              if (!isLoaded) return loadGameFromRemote()
-              handleButtonPress(6)
-            }}
+            onPress={() => handleButtonPress(6)}
             onRelease={() => handleButtonRelease(6)}
             variant="pill"
           >
-            {isLoaded ? "SELECT" : "PLAY DEMO"}
+            SELECT
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
