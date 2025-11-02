@@ -222,7 +222,7 @@ export default function Game() {
   }
 
   return (
-    <div className="flex max-w-lg mx-auto flex-col h-screen p-5">
+    <div className="flex flex-col h-screen p-5">
       <input
         ref={fileInputRef}
         type="file"
