@@ -1,10 +1,16 @@
+"use client"
+
+import { useSetAtom } from "jotai"
 import Game from "@/app/components/Game"
+import { catalogueOpenAtom } from "@/app/lib/store"
 
 import { ImFolderDownload } from "react-icons/im"
 import { MdLeaderboard } from "react-icons/md"
 import { PiHandbagSimpleFill } from "react-icons/pi"
 
 export default function Home() {
+  const setCatalogueOpen = useSetAtom(catalogueOpenAtom)
+
   return (
     <main className="max-w-md mx-auto">
       <Game />
@@ -25,7 +31,10 @@ export default function Home() {
             <span className="uppercase text-xs font-black">BOARD</span>
           </button>
 
-          <button className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center">
+          <button
+            onClick={() => setCatalogueOpen(true)}
+            className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center"
+          >
             <div className="size-9 flex justify-center items-end">
               <ImFolderDownload className="text-xl scale-95" />
             </div>

@@ -1,13 +1,16 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
+import { useSetAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
 
 import { cn } from "@/app/lib/utils"
+import { catalogueOpenAtom } from "@/app/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 
 import MechanicalButton from "./MechanicalButton"
 import WalletConnect from "./WalletConnect"
+import GameCatalogue from "./GameCatalogue"
 import { ImFolderDownload } from "react-icons/im"
 
 export default function Game() {
@@ -18,6 +21,7 @@ export default function Game() {
   const [isLoaded, setIsLoaded] = useState(false)
   const gbInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
+  const setCatalogueOpen = useSetAtom(catalogueOpenAtom)
 
   // Load the GameBoy emulator and audio library
   useEffect(() => {
@@ -225,6 +229,7 @@ export default function Game() {
 
   return (
     <div className="flex flex-col h-screen p-5">
+      <GameCatalogue onSelectGame={loadGameFromRemote} />
       <input
         ref={fileInputRef}
         type="file"
@@ -256,7 +261,7 @@ export default function Game() {
       {/* Screen */}
       <button
         onClick={() => {
-          fileInputRef.current?.click()
+          setCatalogueOpen(true)
         }}
         className="flex-1 relative w-full flex items-center justify-center"
       >
