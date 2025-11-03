@@ -51,6 +51,10 @@ export default function Game() {
     loadEmulator()
   }, [])
 
+  const addActiveDirectionClsx = (direction: string) => {
+    document.getElementById(direction)?.classList.add("text-white/60")
+  }
+
   const releaseAllDirections = () => {
     const gb = gbInstanceRef.current
     if (!gb) return
@@ -58,6 +62,11 @@ export default function Game() {
     gb.JoyPadEvent(1, false)
     gb.JoyPadEvent(2, false)
     gb.JoyPadEvent(3, false)
+
+    // Remove active state from all direction arrows
+    document.querySelectorAll(".joy-container div[id]").forEach((el) => {
+      el.classList.remove("text-white/60")
+    })
   }
 
   const handleButtonPress = (joypadCode: number) => {
@@ -84,10 +93,19 @@ export default function Game() {
     if (data.direction) {
       releaseAllDirections()
 
-      if (data.direction === "RIGHT") gb.JoyPadEvent(0, true)
-      else if (data.direction === "LEFT") gb.JoyPadEvent(1, true)
-      else if (data.direction === "FORWARD") gb.JoyPadEvent(2, true)
-      else if (data.direction === "BACKWARD") gb.JoyPadEvent(3, true)
+      if (data.direction === "RIGHT") {
+        gb.JoyPadEvent(0, true)
+        addActiveDirectionClsx("RIGHT")
+      } else if (data.direction === "LEFT") {
+        gb.JoyPadEvent(1, true)
+        addActiveDirectionClsx("LEFT")
+      } else if (data.direction === "FORWARD") {
+        gb.JoyPadEvent(2, true)
+        addActiveDirectionClsx("FORWARD")
+      } else if (data.direction === "BACKWARD") {
+        gb.JoyPadEvent(3, true)
+        addActiveDirectionClsx("BACKWARD")
+      }
     }
   }
 
@@ -196,20 +214,6 @@ export default function Game() {
     }
   }
 
-  const handleReset = () => {
-    // Stop the game loop
-    if (animationIdRef.current) {
-      cancelAnimationFrame(animationIdRef.current)
-      animationIdRef.current = 0
-    }
-
-    // Clear refs
-    gbInstanceRef.current = null
-
-    if (fileInputRef.current) fileInputRef.current.value = ""
-    setIsLoaded(false)
-  }
-
   async function loadGameFromRemote() {
     const GAME_URL =
       "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb"
@@ -290,19 +294,25 @@ export default function Game() {
       {/* Controls */}
       <div className="w-full mt-4 pb-4">
         <div className="flex justify-between items-center">
-          {/* Joystick */}
+          {/* Joystick Pad Keys */}
           <div className="flex bg-white/1 border border-black/15 shadow-inner rounded-full joy-container items-center justify-center relative">
             <div className="absolute pointer-events-none text-white/5 text-xl grid grid-cols-2 p-1 inset-0">
-              <div className="col-span-2 flex items-start justify-center">
+              <div
+                id="FORWARD"
+                className="col-span-2 flex items-start justify-center"
+              >
                 <RiArrowUpWideLine />
               </div>
-              <div className="flex items-center justify-start">
+              <div id="LEFT" className="flex items-center justify-start">
                 <RiArrowUpWideLine className="-rotate-90" />
               </div>
-              <div className="flex items-center justify-end">
+              <div id="RIGHT" className="flex items-center justify-end">
                 <RiArrowUpWideLine className="rotate-90" />
               </div>
-              <div className="col-span-2 flex items-end justify-center">
+              <div
+                id="BACKWARD"
+                className="col-span-2 flex items-end justify-center"
+              >
                 <RiArrowUpWideLine className="rotate-180" />
               </div>
             </div>
