@@ -278,7 +278,7 @@ export default function Game() {
           height={144}
           className={cn(
             isLoaded ? "border-black/75" : "border-black/45",
-            "border-[3px] rounded-xl bg-[#8b956d] w-full h-auto"
+            "border-[3px] rounded-xl bg-rb-lcd w-full h-auto"
           )}
           style={{
             imageRendering: "pixelated",

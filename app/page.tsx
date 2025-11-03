@@ -15,7 +15,7 @@ export default function Home() {
     <main className="max-w-md mx-auto">
       <Game />
       <div className="bg-black fixed bottom-0 left-0 right-0">
-        <div className="h-6 border-b-4 border-white/7 bg-[#161616] rounded-b-4xl w-full" />
+        <div className="h-6 border-b-4 border-white/7 bg-rb-black rounded-b-4xl w-full" />
         <nav className="max-w-md [&_button]:pb-5 grid grid-cols-3 text-white h-20 w-full mx-auto">
           <button className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center">
             <div className="size-9 flex justify-center items-end">

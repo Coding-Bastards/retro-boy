@@ -2,7 +2,7 @@
 
 html,
 body {
-  background-color: #161616;
+  background-color: var(--color-rb-black);
   touch-action: none;
   user-select: none;
 }
@@ -14,4 +14,9 @@ body {
 @theme {
   --z-index-1: 1;
   --color-rb-green: #10f715;
+  --color-rb-black: #161616;
+  --color-rb-dark: #2a2a2a;
+  --color-rb-darker: #1a1a1a;
+  --color-rb-lcd: #8b956d;
+  --scale-98: 0.98;
 }
