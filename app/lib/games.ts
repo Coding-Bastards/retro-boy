@@ -1,3 +1,4 @@
+import { useMemo } from "react"
 import type { Address } from "viem"
 
 export interface Game {
@@ -46,7 +47,11 @@ export const useAllGames = () => {
 export const useOwnedGames = (ownerAddress?: Address) => {
   // TODO: Add real implementation to fetch owned games from
   // the Game Registry contract
-  const games =  MOCK_GAMES//[] as Game[]
+  const games = useMemo(() => {
+    // Temporary random filter to simulate owned games
+    return MOCK_GAMES.filter(() => Math.random() > 0.5)
+  }, [ownerAddress])
+
   return {
     games,
     isEmpty: games.length === 0,
