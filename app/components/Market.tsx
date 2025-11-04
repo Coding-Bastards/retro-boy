@@ -1,9 +1,10 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import Button from "./Button"
 
-export default function Market() {
+function MarketContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isOpen = searchParams.get("market") === "open"
@@ -35,5 +36,13 @@ export default function Market() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Market() {
+  return (
+    <Suspense fallback={null}>
+      <MarketContent />
+    </Suspense>
   )
 }
