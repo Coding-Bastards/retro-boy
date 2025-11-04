@@ -367,6 +367,7 @@ export default function Game() {
               stickColor="transparent"
               move={handleJoystickMove}
               stop={handleJoystickStop}
+              minDistance={5}
               throttle={10}
             />
           </div>

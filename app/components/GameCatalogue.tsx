@@ -153,7 +153,17 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
         <div className="grow" />
 
         <div className="px-4 pt-1 pb-6">
-          <Button>GAME MARKET</Button>
+          <Button
+            onClick={() => {
+              setOpen(false)
+              setTimeout(
+                () => document.getElementById("market-button")?.click(),
+                0 // Wait for stack to clear
+              )
+            }}
+          >
+            GAME MARKET
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>
