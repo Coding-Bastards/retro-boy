@@ -55,13 +55,15 @@ export default function Game() {
     document.getElementById(direction)?.classList.add("text-white/60")
   }
 
+  const sendJoyPadEvent = (code: number, isPressed: boolean) => {
+    gbInstanceRef?.current?.JoyPadEvent(code, isPressed)
+  }
+
   const releaseAllDirections = () => {
-    const gb = gbInstanceRef.current
-    if (!gb) return
-    gb.JoyPadEvent(0, false)
-    gb.JoyPadEvent(1, false)
-    gb.JoyPadEvent(2, false)
-    gb.JoyPadEvent(3, false)
+    sendJoyPadEvent(0, false) // RIGHT
+    sendJoyPadEvent(1, false) // LEFT
+    sendJoyPadEvent(2, false) // UP
+    sendJoyPadEvent(3, false) // DOWN
 
     // Remove active state from all direction arrows
     document.querySelectorAll(".joy-container div[id]").forEach((el) => {
@@ -70,42 +72,28 @@ export default function Game() {
   }
 
   const handleButtonPress = (joypadCode: number) => {
-    const gb = gbInstanceRef.current
-    if (!gb) return
-    gb.JoyPadEvent(joypadCode, true)
+    sendJoyPadEvent(joypadCode, true)
   }
 
   const handleButtonRelease = (joypadCode: number) => {
-    const gb = gbInstanceRef.current
-    if (!gb) return
-    gb.JoyPadEvent(joypadCode, false)
+    sendJoyPadEvent(joypadCode, false)
   }
 
-  const handleJoystickMove = (data: any) => {
-    const gb = gbInstanceRef.current
-    if (!gb) return
+  const handleJoystickMove = (data: any = {}) => {
+    releaseAllDirections()
 
-    if (data.distance && data.distance < 10) {
-      releaseAllDirections()
-      return
-    }
-
-    if (data.direction) {
-      releaseAllDirections()
-
-      if (data.direction === "RIGHT") {
-        gb.JoyPadEvent(0, true)
-        addActiveDirectionClsx("RIGHT")
-      } else if (data.direction === "LEFT") {
-        gb.JoyPadEvent(1, true)
-        addActiveDirectionClsx("LEFT")
-      } else if (data.direction === "FORWARD") {
-        gb.JoyPadEvent(2, true)
-        addActiveDirectionClsx("FORWARD")
-      } else if (data.direction === "BACKWARD") {
-        gb.JoyPadEvent(3, true)
-        addActiveDirectionClsx("BACKWARD")
-      }
+    if (data.direction === "RIGHT") {
+      sendJoyPadEvent(0, true)
+      addActiveDirectionClsx("RIGHT")
+    } else if (data.direction === "LEFT") {
+      sendJoyPadEvent(1, true)
+      addActiveDirectionClsx("LEFT")
+    } else if (data.direction === "FORWARD") {
+      sendJoyPadEvent(2, true)
+      addActiveDirectionClsx("FORWARD")
+    } else if (data.direction === "BACKWARD") {
+      sendJoyPadEvent(3, true)
+      addActiveDirectionClsx("BACKWARD")
     }
   }
 
