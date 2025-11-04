@@ -6,7 +6,7 @@ import { HTML5Backend } from "react-dnd-html5-backend"
 export default function DNDProvider({
   children,
 }: {
-  children: React.JSX.Element
+  children: React.ReactNode
 }) {
   return <DndProvider backend={HTML5Backend}>{children}</DndProvider>
 }
