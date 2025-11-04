@@ -34,9 +34,11 @@ function GameCard({
   const [, drag, preview] = useDrag(() => ({
     type: "game",
     item: { game },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
+    collect: (monitor) => {
+      return {
+        isDragging: monitor.isDragging(),
+      }
+    },
   }))
 
   useEffect(() => {
@@ -58,7 +60,7 @@ function GameCard({
         setOpen(false)
       }}
       className={cn(
-        "flex rounded-b-2xl overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark/100 snap-center",
+        "flex rounded-b-2xl active:scale-98 overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark snap-center",
         className
       )}
     >
