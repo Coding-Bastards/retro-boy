@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation"
 import Game from "@/app/components/Game"
 import Market from "@/app/components/Market"
+import GamePage from "@/app/components/GamePage"
 import { useSetAtom } from "jotai"
 import { catalogueOpenAtom, boardOpenAtom } from "@/app/lib/store"
 
@@ -19,10 +20,15 @@ export default function Home() {
     router.push("?market=open")
   }
 
+  const handlePlayGame = () => {
+    ;(window as any).loadGame?.()
+  }
+
   return (
     <main className="max-w-md mx-auto">
       <Game />
       <Market />
+      <GamePage onPlay={handlePlayGame} />
       <div className="bg-black fixed bottom-0 left-0 right-0">
         <div className="h-6 border-b-4 border-white/7 bg-rb-black rounded-b-4xl w-full" />
         <nav className="max-w-md [&_button]:pb-5 grid grid-cols-3 text-white h-20 w-full mx-auto">

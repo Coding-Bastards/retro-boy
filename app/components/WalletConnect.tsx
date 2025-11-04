@@ -8,7 +8,7 @@ export default function WalletConnect() {
     <div className="nav text-white flex gap-2 items-center">
       <div className="text-right">
         <div className="font-bold text-sm">{beautifyAddress(ADDY, 3, "")}</div>
-        <div className="text-xs -mt-0.5 text-rb-green font-bold">1.2K GTP</div>
+        <div className="text-xs -mt-0.5 text-rb-green font-bold">1.2K RBC</div>
       </div>
 
       <div className="border-2 border-white/15 rounded-lg overflow-hidden">

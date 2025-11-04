@@ -18,7 +18,7 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
 import asset_default_cover from "@/public/default-cover.png"
 
 interface GameCatalogueProps {
-  onSelectGame: () => void
+  onSelectGame: (collectionId: string) => void
 }
 
 function GameCard({
@@ -137,7 +137,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
               {ownedGames.map((game) => (
                 <GameCard
                   key={`game-${game.collectionId}`}
-                  onSelect={onSelectGame}
+                  onSelect={() => onSelectGame(game.collectionId)}
                   className={
                     isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
                   }

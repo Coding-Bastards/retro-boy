@@ -1,6 +1,7 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
 import { useDrop } from "react-dnd"
@@ -17,6 +18,7 @@ import CartridgeDragPreview from "./CartridgeDragPreview"
 import DrawerBoard from "./DrawerBoard"
 
 export default function Game() {
+  const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [gameboy, setGameboy] = useState<any>(null)
@@ -213,8 +215,9 @@ export default function Game() {
     }
   }
 
-  async function loadGameFromRemote() {
+  async function loadGameFromRemote(gameURL?: string) {
     const GAME_URL =
+      gameURL ||
       "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb"
 
     const response = await fetch(GAME_URL)
@@ -228,6 +231,11 @@ export default function Game() {
     })
 
     handleFileSelect({ target: { files: [file] } } as any)
+  }
+
+  if (typeof window !== "undefined") {
+    // Expose to window for external access
+    ;(window as any).loadGame = loadGameFromRemote
   }
 
   const [{ isOver, isDragging }, drop] = useDrop(
@@ -246,10 +254,14 @@ export default function Game() {
     [gameboy, canvasRef.current]
   )
 
+  const handleSelectGame = (collectionId: string) => {
+    router.push(`?game=${collectionId}`)
+  }
+
   return (
     <div className="flex flex-col h-screen p-5">
       <CartridgeDragPreview />
-      <GameCatalogue onSelectGame={loadGameFromRemote} />
+      <GameCatalogue onSelectGame={handleSelectGame} />
       <DrawerBoard />
       <input
         ref={fileInputRef}
