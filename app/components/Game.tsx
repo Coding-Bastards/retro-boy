@@ -277,7 +277,7 @@ export default function Game() {
           }
         }}
         className={cn(
-          "flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all",
+          "flex-1 z-10 relative w-full flex items-center justify-center cursor-pointer transition-all",
           isOver && "border-2 rounded-xl border-rb-green scale-98"
         )}
       >
