@@ -16,7 +16,7 @@ function MarketContent() {
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50 bg-rb-darker">
+    <div className="fixed inset-0 z-60 bg-rb-darker">
       <div className="flex flex-col h-full max-w-md mx-auto">
         {/* Header */}
         <div className="p-5 pb-4">
@@ -31,8 +31,8 @@ function MarketContent() {
         </div>
 
         {/* Footer */}
-        <div className="p-5 pt-1">
-          <Button onClick={handleClose}>BACK TO GAME</Button>
+        <div className="p-4 pt-1 pb-6">
+          <Button onClick={handleClose}>CONTINUE PLAYING</Button>
         </div>
       </div>
     </div>

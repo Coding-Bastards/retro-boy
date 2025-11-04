@@ -39,7 +39,7 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-rb-darker">
+    <div className="fixed inset-0 z-60 pointer-events-auto! bg-rb-darker">
       <div className="flex flex-col h-full max-w-md mx-auto">
         {/* Header */}
         <div className="p-5 pb-4 flex items-center gap-4">
@@ -49,7 +49,8 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
           >
             <IoArrowBack className="text-2xl" />
           </button>
-          <h1 className="text-white text-center uppercase font-black text-xl flex-1">
+
+          <h1 className="text-white uppercase font-black text-xl flex-1">
             {game.title}
           </h1>
           <div className="w-8" />
@@ -63,7 +64,7 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
         </div>
 
         {/* Footer */}
-        <div className="p-5 pt-1">
+        <div className="p-4 pt-1 pb-6">
           <Button onClick={handleAction}>
             {isOwned ? "PLAY NOW" : "BUY (5 WLD)"}
           </Button>

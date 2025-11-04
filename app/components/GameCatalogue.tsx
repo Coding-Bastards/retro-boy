@@ -56,10 +56,7 @@ function GameCard({
       ref={drag as any}
       draggable
       onDragStart={handleDragStart}
-      onClick={() => {
-        onSelect()
-        setOpen(false)
-      }}
+      onClick={onSelect}
       className={cn(
         "flex rounded-b-2xl active:scale-98 overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark snap-center",
         className
@@ -158,7 +155,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
               setOpen(false)
               setTimeout(
                 () => document.getElementById("market-button")?.click(),
-                0 // Wait for stack to clear
+                200 // Wait for stack to clear
               )
             }}
           >
