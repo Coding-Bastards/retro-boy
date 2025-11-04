@@ -1,12 +1,12 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { useSetAtom } from "jotai"
+import { useAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
 import { useDrop } from "react-dnd"
 
 import { cn } from "@/app/lib/utils"
-import { catalogueOpenAtom } from "@/app/lib/store"
+import { catalogueOpenAtom, boardOpenAtom } from "@/app/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 
@@ -14,6 +14,7 @@ import MechanicalButton from "./MechanicalButton"
 import WalletConnect from "./WalletConnect"
 import GameCatalogue from "./GameCatalogue"
 import CartridgeDragPreview from "./CartridgeDragPreview"
+import DrawerBoard from "./DrawerBoard"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -23,7 +24,15 @@ export default function Game() {
   const [isLoaded, setIsLoaded] = useState(false)
   const gbInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
-  const setCatalogueOpen = useSetAtom(catalogueOpenAtom)
+  const [isCatalogueOpen, setCatalogueOpen] = useAtom(catalogueOpenAtom)
+  const [, setBoardOpen] = useAtom(boardOpenAtom)
+
+  useEffect(() => {
+    if (isCatalogueOpen) {
+      // Try to press START button when catalogue opens
+      handleButtonPress(7)
+    }
+  }, [isCatalogueOpen])
 
   // Load the GameBoy emulator and audio library
   useEffect(() => {
@@ -54,7 +63,7 @@ export default function Game() {
   }, [])
 
   const addActiveDirectionClsx = (direction: string) => {
-    document.getElementById(direction)?.classList.add("text-white/60")
+    document.getElementById(direction)?.classList?.add("text-white/60")
   }
 
   const sendJoyPadEvent = (code: number, isPressed: boolean) => {
@@ -221,7 +230,7 @@ export default function Game() {
     handleFileSelect({ target: { files: [file] } } as any)
   }
 
-  const [{ isOver }, drop] = useDrop(
+  const [{ isOver, isDragging }, drop] = useDrop(
     () => ({
       accept: "game",
       drop: (item: any) => {
@@ -231,6 +240,7 @@ export default function Game() {
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
+        isDragging: Boolean(monitor.getItemType()),
       }),
     }),
     [gameboy, canvasRef.current]
@@ -240,6 +250,7 @@ export default function Game() {
     <div className="flex flex-col h-screen p-5">
       <CartridgeDragPreview />
       <GameCatalogue onSelectGame={loadGameFromRemote} />
+      <DrawerBoard />
       <input
         ref={fileInputRef}
         type="file"
@@ -277,8 +288,9 @@ export default function Game() {
           }
         }}
         className={cn(
-          "flex-1 z-10 relative w-full flex items-center justify-center cursor-pointer transition-all",
-          isOver && "border-2 rounded-xl border-rb-green scale-98"
+          "flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all",
+          isOver && "border-2 rounded-xl border-rb-green scale-98",
+          isDragging && "z-10"
         )}
       >
         {isLoaded ? null : (

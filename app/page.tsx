@@ -1,8 +1,8 @@
 "use client"
 
-import { useSetAtom } from "jotai"
 import Game from "@/app/components/Game"
-import { catalogueOpenAtom } from "@/app/lib/store"
+import { useSetAtom } from "jotai"
+import { catalogueOpenAtom, boardOpenAtom } from "@/app/lib/store"
 
 import { ImFolderDownload } from "react-icons/im"
 import { MdLeaderboard } from "react-icons/md"
@@ -10,6 +10,7 @@ import { PiHandbagSimpleFill } from "react-icons/pi"
 
 export default function Home() {
   const setCatalogueOpen = useSetAtom(catalogueOpenAtom)
+  const setBoardOpen = useSetAtom(boardOpenAtom)
 
   return (
     <main className="max-w-md mx-auto">
@@ -24,7 +25,10 @@ export default function Home() {
             <span className="uppercase text-xs font-black">Market</span>
           </button>
 
-          <button className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center">
+          <button
+            onClick={() => setBoardOpen(true)}
+            className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center"
+          >
             <div className="size-9 flex justify-center items-end">
               <MdLeaderboard className="text-xl scale-105" />
             </div>

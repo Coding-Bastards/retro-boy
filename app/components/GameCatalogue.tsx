@@ -10,6 +10,7 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
 import { useOwnedGames, type Game } from "@/app/lib/games"
 import { catalogueOpenAtom } from "@/app/lib/store"
 import { cn } from "@/app/lib/utils"
+import Button from "./Button"
 
 import { BiSolidInvader } from "react-icons/bi"
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
@@ -152,9 +153,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
         <div className="grow" />
 
         <div className="px-4 pt-1 pb-6">
-          <button className="w-full bg-rb-green text-black font-black uppercase py-4 rounded-lg hover:opacity-95 transition-opacity active:scale-98">
-            GAME MARKET
-          </button>
+          <Button>GAME MARKET</Button>
         </div>
       </DrawerContent>
     </Drawer>
