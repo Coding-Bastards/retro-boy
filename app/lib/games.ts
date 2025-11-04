@@ -6,6 +6,7 @@ export interface Game {
   title: string
   playTime: string
   stars: number
+  rom?: string
   cover: string
 }
 
@@ -15,7 +16,18 @@ const MOCK_GAMES: Game[] = [
     title: "Tobu Tobu Girl DX",
     playTime: "2h 30m",
     stars: 5,
-    cover: "/game-covers/tobutobugirl.png",
+    rom: "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb",
+    cover:
+      "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/cover.png",
+  },
+  {
+    collectionId: "0x12c4567890123456789012345678901234567890",
+    title: "Tobu Tobu Girl DX",
+    playTime: "2h 30m",
+    stars: 5,
+    rom: "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb",
+    cover:
+      "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/cover.png",
   },
   {
     collectionId: "0x2234567890123456789012345678901234567890",
@@ -23,20 +35,6 @@ const MOCK_GAMES: Game[] = [
     playTime: "5h 15m",
     stars: 4,
     cover: "/game-covers/adventure.png",
-  },
-  {
-    collectionId: "0x3234567890123456789012345678901234567890",
-    title: "Pixel Racer",
-    playTime: "1h 45m",
-    stars: 5,
-    cover: "/game-covers/racer.png",
-  },
-  {
-    collectionId: "0x4234567890123456789012345678901234567890",
-    title: "Retro Legends",
-    playTime: "3h 20m",
-    stars: 4,
-    cover: "/game-covers/legends.png",
   },
 ]
 

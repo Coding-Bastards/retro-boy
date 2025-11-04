@@ -3,15 +3,17 @@
 import { useRef, useEffect, useState } from "react"
 import { useSetAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
+import { useDrop } from "react-dnd"
 
 import { cn } from "@/app/lib/utils"
 import { catalogueOpenAtom } from "@/app/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
+import { ImFolderDownload } from "react-icons/im"
 
 import MechanicalButton from "./MechanicalButton"
 import WalletConnect from "./WalletConnect"
 import GameCatalogue from "./GameCatalogue"
-import { ImFolderDownload } from "react-icons/im"
+import CartridgeDragPreview from "./CartridgeDragPreview"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -219,8 +221,24 @@ export default function Game() {
     handleFileSelect({ target: { files: [file] } } as any)
   }
 
+  const [{ isOver }, drop] = useDrop(
+    () => ({
+      accept: "game",
+      drop: (item: any) => {
+        console.log("Game Dropped:", item)
+        loadGameFromRemote()
+        return { success: true }
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+      }),
+    }),
+    [gameboy, canvasRef.current]
+  )
+
   return (
     <div className="flex flex-col h-screen p-5">
+      <CartridgeDragPreview />
       <GameCatalogue onSelectGame={loadGameFromRemote} />
       <input
         ref={fileInputRef}
@@ -251,11 +269,17 @@ export default function Game() {
       </nav>
 
       {/* Screen */}
-      <button
-        onClick={() => {
-          setCatalogueOpen(true)
+      <div
+        ref={drop as any}
+        onClick={(e) => {
+          if (!isOver) {
+            setCatalogueOpen(true)
+          }
         }}
-        className="flex-1 relative w-full flex items-center justify-center"
+        className={cn(
+          "flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all",
+          isOver && "border-2 rounded-xl border-rb-green scale-98"
+        )}
       >
         {isLoaded ? null : (
           <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">
@@ -277,7 +301,7 @@ export default function Game() {
             aspectRatio: "160 / 144",
           }}
         />
-      </button>
+      </div>
 
       {/* Controls */}
       <div className="w-full mt-4 pb-4">
