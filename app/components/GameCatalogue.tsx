@@ -153,13 +153,15 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
           <Button
             onClick={() => {
               setOpen(false)
-              setTimeout(
-                () => document.getElementById("market-button")?.click(),
-                200 // Wait for stack to clear
-              )
+              if (isEmpty) {
+                setTimeout(
+                  () => document.getElementById("market-button")?.click(),
+                  200 // Wait for stack to clear
+                )
+              }
             }}
           >
-            GAME MARKET
+            {isEmpty ? "GAME MARKET" : "CONTINUE PLAYING"}
           </Button>
         </div>
       </DrawerContent>

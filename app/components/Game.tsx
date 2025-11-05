@@ -27,14 +27,6 @@ export default function Game() {
   const gbInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
   const [isCatalogueOpen, setCatalogueOpen] = useAtom(catalogueOpenAtom)
-  const [, setBoardOpen] = useAtom(boardOpenAtom)
-
-  useEffect(() => {
-    if (isCatalogueOpen) {
-      // Try to press START button when catalogue opens
-      handleButtonPress(7)
-    }
-  }, [isCatalogueOpen])
 
   // Load the GameBoy emulator and audio library
   useEffect(() => {
@@ -113,6 +105,17 @@ export default function Game() {
   const handleJoystickStop = () => {
     releaseAllDirections()
   }
+
+  useEffect(() => {
+    if (isCatalogueOpen) {
+      // Try to press START button when catalogue opens
+      handleButtonPress(7)
+      setTimeout(
+        () => handleButtonRelease(7),
+        100 // Release after a short delay
+      )
+    }
+  }, [isCatalogueOpen])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -256,6 +259,12 @@ export default function Game() {
 
   const handleSelectGame = (collectionId: string) => {
     router.push(`?game=${collectionId}`)
+  }
+
+  const withOpenCatalogue = (cb: () => void) => {
+    // Open catalogue if game not loaded
+    if (isLoaded) return cb
+    return () => setCatalogueOpen(true)
   }
 
   return (
@@ -407,16 +416,16 @@ export default function Game() {
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={() => handleButtonPress(6)}
-            onRelease={() => handleButtonRelease(6)}
+            onPress={withOpenCatalogue(() => handleButtonPress(6))}
+            onRelease={withOpenCatalogue(() => handleButtonRelease(6))}
             variant="pill"
           >
             SELECT
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
-            onPress={() => handleButtonPress(7)}
-            onRelease={() => handleButtonRelease(7)}
+            onPress={withOpenCatalogue(() => handleButtonPress(7))}
+            onRelease={withOpenCatalogue(() => handleButtonRelease(7))}
             variant="pill"
           >
             START
