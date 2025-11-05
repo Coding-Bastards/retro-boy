@@ -12,10 +12,10 @@ import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 
 import MechanicalButton from "./MechanicalButton"
-import WalletConnect from "./WalletConnect"
 import GameCatalogue from "./GameCatalogue"
 import CartridgeDragPreview from "./CartridgeDragPreview"
 import DrawerBoard from "./DrawerBoard"
+import TopNavigation from "./TopNavigation"
 
 export default function Game() {
   const router = useRouter()
@@ -280,25 +280,7 @@ export default function Game() {
         disabled={!gameboy}
         className="hidden"
       />
-
-      {/* Header */}
-      <nav className="flex pb-4 items-center justify-between">
-        <div className="flex px-1.5 items-center">
-          <div
-            className={cn(
-              isLoaded
-                ? "bg-rb-green shadow-[0_0_6px_2px_rgba(34,197,94,0.4),0_0_14px_4px_rgba(34,197,94,0.2)]"
-                : "bg-[#727272]",
-              "rounded-full size-2"
-            )}
-          />
-          <h1 className="text-lg relative px-2.5 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
-            RETRO BOY
-          </h1>
-        </div>
-
-        <WalletConnect />
-      </nav>
+      <TopNavigation isActiveLight={isLoaded} />
 
       {/* Screen */}
       <div
