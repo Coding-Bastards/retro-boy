@@ -1,10 +1,15 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense } from "react"
-import { IoArrowBack } from "react-icons/io5"
-import Button from "./Button"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useAllGames, useOwnedGames } from "@/app/lib/games"
+import { localizeNumber } from "@/app/lib/numbers"
+
+import { IoArrowBack } from "react-icons/io5"
+import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
+import { MdPerson } from "react-icons/md"
+
+import Button from "./Button"
 
 interface GamePageContentProps {
   onPlay: () => void
@@ -38,6 +43,11 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
     }
   }
 
+  const GALLERY = [
+    ...(game.nftImage ? [game.nftImage] : []),
+    ...(game.gallery || []),
+  ]
+
   return (
     <div className="fixed inset-0 z-60 pointer-events-auto! bg-rb-darker">
       <div className="flex flex-col h-full max-w-md mx-auto">
@@ -57,16 +67,74 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5">
-          <div className="text-white/60 text-center py-12">
-            Game details coming soon...
+        <div className="flex-1 overflow-auto px-5 pb-4">
+          {/* Cover Image */}
+          <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4">
+            <img
+              src={game.cover}
+              className="w-full h-full object-cover"
+              alt=""
+            />
+          </div>
+
+          {/* Score Section */}
+          <div className="flex items-center gap-6 mb-6 pb-4 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <AiOutlineLike className="text-rb-green text-xl" />
+              <span className="text-white font-bold">
+                {localizeNumber(game.likes)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <AiOutlineDislike className="text-red-400 text-xl" />
+              <span className="text-white font-bold">
+                {localizeNumber(game.dislikes)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <MdPerson className="text-white/60 text-xl" />
+              <span className="text-white/80 text-sm">
+                {localizeNumber(game.totalOwners)} owners
+              </span>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="mb-6">
+            <h3 className="text-white font-black uppercase text-sm mb-2 tracking-wider">
+              About
+            </h3>
+            <p className="text-white/70 text-sm leading-relaxed">
+              {game?.description || "No description available."}
+            </p>
+          </div>
+
+          {/* Gallery */}
+          <div className="mb-6">
+            <h3 className="text-white font-black uppercase text-sm mb-3 tracking-wider">
+              Gallery
+            </h3>
+            <div className="grid grid-cols-2 gap-2">
+              {GALLERY.map((image, index) => (
+                <div
+                  key={index}
+                  className="aspect-square rounded-lg overflow-hidden bg-rb-dark"
+                >
+                  <img
+                    src={image}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="p-4 pt-1 pb-6">
           <Button onClick={handleAction}>
-            {isOwned ? "PLAY NOW" : "BUY (5 WLD)"}
+            {isOwned ? "PLAY NOW" : "MINT (5 WLD)"}
           </Button>
         </div>
       </div>

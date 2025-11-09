@@ -11,6 +11,11 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
+button,
+a {
+  cursor: pointer;
+}
+
 @theme {
   --z-index-1: 1;
   --color-rb-green: #10f715;

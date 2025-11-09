@@ -7,7 +7,7 @@ import { Joystick } from "react-joystick-component"
 import { useDrop } from "react-dnd"
 
 import { cn } from "@/app/lib/utils"
-import { catalogueOpenAtom, boardOpenAtom } from "@/app/lib/store"
+import { catalogueOpenAtom } from "@/app/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 
@@ -26,7 +26,7 @@ export default function Game() {
   const [isLoaded, setIsLoaded] = useState(false)
   const gbInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
-  const [isCatalogueOpen, setCatalogueOpen] = useAtom(catalogueOpenAtom)
+  const [, setCatalogueOpen] = useAtom(catalogueOpenAtom)
 
   // Load the GameBoy emulator and audio library
   useEffect(() => {
@@ -105,17 +105,6 @@ export default function Game() {
   const handleJoystickStop = () => {
     releaseAllDirections()
   }
-
-  useEffect(() => {
-    if (isCatalogueOpen) {
-      // Try to press START button when catalogue opens
-      handleButtonPress(7)
-      setTimeout(
-        () => handleButtonRelease(7),
-        100 // Release after a short delay
-      )
-    }
-  }, [isCatalogueOpen])
 
   // Cleanup on unmount
   useEffect(() => {
@@ -285,11 +274,11 @@ export default function Game() {
       {/* Screen */}
       <div
         ref={drop as any}
-        onClick={(e) => {
-          if (!isOver) {
-            setCatalogueOpen(true)
-          }
-        }}
+        role="button"
+        onClick={withOpenCatalogue(() => {
+          // Handle screen click
+          console.log("Screen clicked")
+        })}
         className={cn(
           "flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all",
           isOver && "border-2 rounded-xl border-rb-green scale-98",

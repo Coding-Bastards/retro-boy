@@ -6,14 +6,15 @@ import Image from "next/image"
 import { useDrag } from "react-dnd"
 import { getEmptyImage } from "react-dnd-html5-backend"
 
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
 import { useOwnedGames, type Game } from "@/app/lib/games"
 import { catalogueOpenAtom } from "@/app/lib/store"
 import { cn } from "@/app/lib/utils"
-import Button from "./Button"
+
+import Button from "@/app/components/Button"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer"
+import GameStars from "./GameStars"
 
 import { BiSolidInvader } from "react-icons/bi"
-import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
 
 import asset_default_cover from "@/public/default-cover.png"
 
@@ -84,18 +85,7 @@ function GameCard({
         <h3 className="text-white font-bold line-clamp-1">{game.title}</h3>
         <div className="flex items-center justify-between text-sm">
           <span className="text-white/60">{game.playTime}</span>
-          <div className="flex gap-0.5 text-yellow-400">
-            {Array.from({ length: 5 }, (_, i) => {
-              const starValue = i + 1
-              const StarIcon =
-                game.stars >= starValue
-                  ? FaStar
-                  : game.stars >= starValue - 0.5
-                  ? FaStarHalfAlt
-                  : FaRegStar
-              return <StarIcon key={`rate-${game.collectionId}-${i}`} />
-            })}
-          </div>
+          <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
         </div>
       </div>
     </button>

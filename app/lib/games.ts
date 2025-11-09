@@ -8,6 +8,12 @@ export interface Game {
   stars: number
   rom?: string
   cover: string
+  nftImage?: string
+  description?: string
+  totalOwners?: number
+  likes?: number
+  dislikes?: number
+  gallery?: string[]
 }
 
 const MOCK_GAMES: Game[] = [
@@ -17,24 +23,15 @@ const MOCK_GAMES: Game[] = [
     playTime: "2h 30m",
     stars: 5,
     rom: "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb",
-    cover:
+    cover: "https://img.itch.zone/aW1nLzI2Mjg1MjcucG5n/original/8xica8.png",
+    nftImage:
       "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/cover.png",
-  },
-  {
-    collectionId: "0x12c4567890123456789012345678901234567890",
-    title: "Tobu Tobu Girl DX",
-    playTime: "2h 30m",
-    stars: 5,
-    rom: "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/game.gb",
-    cover:
-      "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/tobutobugirl-dx/cover.png",
-  },
-  {
-    collectionId: "0x2234567890123456789012345678901234567890",
-    title: "Adventure Quest",
-    playTime: "5h 15m",
-    stars: 4,
-    cover: "/game-covers/adventure.png",
+    description:
+      "A cute platformer where you control Tobu, a girl who can double jump and glide through colorful levels. Collect stars, avoid obstacles, and reach the goal in this charming adventure.",
+    totalOwners: 1247,
+    likes: 892,
+    dislikes: 34,
+    gallery: ["https://tangramgames.dk/tobutobugirldx/img/bounce.gif"],
   },
 ]
 
@@ -47,7 +44,7 @@ export const useOwnedGames = (ownerAddress?: Address) => {
   // the Game Registry contract
   const games = useMemo(() => {
     // Temporary random filter to simulate owned games
-    return MOCK_GAMES.filter(() => Math.random() > 0.5)
+    return MOCK_GAMES //.filter(() => Math.random() > 0.5)
   }, [ownerAddress])
 
   return {
