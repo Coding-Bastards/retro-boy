@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
-import { useDrop } from "react-dnd"
 
 import { cn } from "@/app/lib/utils"
 import { catalogueOpenAtom } from "@/app/lib/store"
@@ -13,7 +12,6 @@ import { ImFolderDownload } from "react-icons/im"
 
 import MechanicalButton from "./MechanicalButton"
 import GameCatalogue from "./GameCatalogue"
-import CartridgeDragPreview from "./CartridgeDragPreview"
 import DrawerBoard from "./DrawerBoard"
 import TopNavigation from "./TopNavigation"
 
@@ -230,22 +228,6 @@ export default function Game() {
     ;(window as any).loadGame = loadGameFromRemote
   }
 
-  const [{ isOver, isDragging }, drop] = useDrop(
-    () => ({
-      accept: "game",
-      drop: (item: any) => {
-        console.log("Game Dropped:", item)
-        loadGameFromRemote()
-        return { success: true }
-      },
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        isDragging: Boolean(monitor.getItemType()),
-      }),
-    }),
-    [gameboy, canvasRef.current]
-  )
-
   const handleSelectGame = (collectionId: string) => {
     router.push(`?game=${collectionId}`)
   }
@@ -258,7 +240,6 @@ export default function Game() {
 
   return (
     <div className="flex flex-col h-screen p-5">
-      <CartridgeDragPreview />
       <GameCatalogue onSelectGame={handleSelectGame} />
       <DrawerBoard />
       <input
@@ -273,17 +254,12 @@ export default function Game() {
 
       {/* Screen */}
       <div
-        ref={drop as any}
         role="button"
         onClick={withOpenCatalogue(() => {
           // Handle screen click
           console.log("Screen clicked")
         })}
-        className={cn(
-          "flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all",
-          isOver && "border-2 rounded-xl border-rb-green scale-98",
-          isDragging && "z-10"
-        )}
+        className="flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all"
       >
         {isLoaded ? null : (
           <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">

@@ -1,10 +1,7 @@
 "use client"
 
-import { useEffect } from "react"
-import { useAtom, useSetAtom } from "jotai"
+import { useAtom } from "jotai"
 import Image from "next/image"
-import { useDrag } from "react-dnd"
-import { getEmptyImage } from "react-dnd-html5-backend"
 
 import { useOwnedGames, type Game } from "@/app/lib/games"
 import { catalogueOpenAtom } from "@/app/lib/store"
@@ -31,32 +28,8 @@ function GameCard({
   onSelect: () => void
   className?: string
 }) {
-  const setOpen = useSetAtom(catalogueOpenAtom)
-
-  const [, drag, preview] = useDrag(() => ({
-    type: "game",
-    item: { game },
-    collect: (monitor) => {
-      return {
-        isDragging: monitor.isDragging(),
-      }
-    },
-  }))
-
-  useEffect(() => {
-    preview(getEmptyImage(), { captureDraggingState: true })
-  }, [preview])
-
-  const handleDragStart = () => {
-    console.log("Drag started:", game.title)
-    setOpen(false)
-  }
-
   return (
     <button
-      ref={drag as any}
-      draggable
-      onDragStart={handleDragStart}
       onClick={onSelect}
       className={cn(
         "flex rounded-b-2xl active:scale-98 overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark snap-center",

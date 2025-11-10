@@ -1,7 +1,6 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Geist_Mono } from "next/font/google"
-import DNDProvider from "./components/DNDProvider"
 
 const nextFont = Geist_Mono({
   subsets: [],
@@ -25,9 +24,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${nextFont.className} antialiased`}>
-        <DNDProvider>{children}</DNDProvider>
-      </body>
+      <body className={`${nextFont.className} antialiased`}>{children}</body>
     </html>
   )
 }
