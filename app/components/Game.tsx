@@ -232,10 +232,12 @@ export default function Game() {
     router.push(`?game=${collectionId}`)
   }
 
+  const openGameCatalogue = () => setCatalogueOpen(true)
+
   const withOpenCatalogue = (cb: () => void) => {
     // Open catalogue if game not loaded
-    if (isLoaded) return cb
-    return () => setCatalogueOpen(true)
+    // else call the callback method
+    return isLoaded ? cb : openGameCatalogue
   }
 
   return (
@@ -255,10 +257,7 @@ export default function Game() {
       {/* Screen */}
       <div
         role="button"
-        onClick={withOpenCatalogue(() => {
-          // Handle screen click
-          console.log("Screen clicked")
-        })}
+        onClick={openGameCatalogue}
         className="flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all"
       >
         {isLoaded ? null : (

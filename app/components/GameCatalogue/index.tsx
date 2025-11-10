@@ -1,10 +1,11 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
 import { useAtom } from "jotai"
 import Image from "next/image"
 
 import { useOwnedGames, type Game } from "@/app/lib/games"
-import { catalogueOpenAtom } from "@/app/lib/store"
+import { catalogueOpenAtom, activeGameIdAtom } from "@/app/lib/store"
 import { cn } from "@/app/lib/utils"
 
 import Button from "@/app/components/Button"
@@ -30,6 +31,7 @@ function GameCard({
 }) {
   return (
     <button
+      data-game-id={game.collectionId}
       onClick={onSelect}
       className={cn(
         "flex rounded-b-2xl active:scale-98 overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark snap-center",
@@ -67,8 +69,104 @@ function GameCard({
 
 export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
   const [open, setOpen] = useAtom(catalogueOpenAtom)
+  const [activeGameId, setActiveGameId] = useAtom(activeGameIdAtom)
   const { games: ownedGames, isEmpty } = useOwnedGames()
   const isSingleGameOwned = ownedGames.length === 1
+
+  const FIRST_GAME_ID = ownedGames[0]?.collectionId || null
+  const [centeredGameId, setCenteredGameId] = useState<string | null>(
+    FIRST_GAME_ID
+  )
+
+  useEffect(() => {
+    if (open) {
+      // Reset centered game to first game when opening
+      setCenteredGameId(FIRST_GAME_ID)
+    }
+  }, [open])
+
+  console.debug({ centeredGameId, activeGameId })
+
+  useEffect(() => {
+    // Wait for drawer animation to complete
+    const timer = setTimeout(() => {
+      const container = document.getElementById("game-container")
+      const cards = Array.from(
+        container?.querySelectorAll("[data-game-id]") || []
+      )
+
+      if (!container) return
+
+      console.debug("Setting up observer", container)
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          console.debug({ entries })
+
+          let maxRatio = 0
+          let mostVisibleId: string | null = null
+
+          entries.forEach((entry) => {
+            if (entry.intersectionRatio > maxRatio) {
+              maxRatio = entry.intersectionRatio
+              const gameId = entry.target.getAttribute("data-game-id")
+              if (gameId) mostVisibleId = gameId
+            }
+          })
+
+          if (mostVisibleId) {
+            console.debug({ settingCenteredGameId: mostVisibleId })
+            setCenteredGameId(mostVisibleId)
+          }
+        },
+        {
+          root: container,
+          threshold: [0, 0.55, 0.8],
+        }
+      )
+
+      cards.forEach((e) => observer.observe(e))
+
+      return () => observer.disconnect()
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [open])
+
+  const isActiveGameCentered = activeGameId === centeredGameId
+
+  const buttonLabel = isEmpty
+    ? "GAME MARKET"
+    : isActiveGameCentered
+    ? "CONTINUE PLAYING"
+    : "PLAY NOW"
+
+  const handleButtonClick = () => {
+    // Close the catalogue drawer
+    setOpen(false)
+
+    // Early exit to continue playing current game
+    if (isActiveGameCentered) return
+
+    if (isEmpty) {
+      // Show get-games market state
+      // if Empty
+      return setTimeout(
+        () => document.getElementById("market-button")?.click(),
+        200
+      )
+    }
+
+    if (centeredGameId) {
+      console.debug({ select: true, centeredGameId })
+      const game = ownedGames.find((g) => g.collectionId === centeredGameId)
+      if (game?.rom) {
+        // Load the game directly
+        setActiveGameId(game.collectionId)
+        ;(window as any).loadGame?.(game.rom)
+      }
+    }
+  }
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -92,16 +190,19 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
+          <div
+            id="game-container"
+            className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory"
+          >
             <div className="flex gap-4">
               {ownedGames.map((game) => (
                 <GameCard
                   key={`game-${game.collectionId}`}
+                  game={game}
                   onSelect={() => onSelectGame(game.collectionId)}
                   className={
                     isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
                   }
-                  game={game}
                 />
               ))}
 
@@ -113,19 +214,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
         <div className="grow" />
 
         <div className="px-4 pt-1 pb-6">
-          <Button
-            onClick={() => {
-              setOpen(false)
-              if (isEmpty) {
-                setTimeout(
-                  () => document.getElementById("market-button")?.click(),
-                  200 // Wait for stack to clear
-                )
-              }
-            }}
-          >
-            {isEmpty ? "GAME MARKET" : "CONTINUE PLAYING"}
-          </Button>
+          <Button onClick={handleButtonClick}>{buttonLabel}</Button>
         </div>
       </DrawerContent>
     </Drawer>

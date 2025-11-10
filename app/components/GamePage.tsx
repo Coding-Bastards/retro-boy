@@ -10,6 +10,8 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
+import { useAtom } from "jotai"
+import { activeGameIdAtom } from "@/app/lib/store"
 
 interface GamePageContentProps {
   onPlay: () => void
@@ -17,6 +19,7 @@ interface GamePageContentProps {
 
 function GamePageContent({ onPlay }: GamePageContentProps) {
   const router = useRouter()
+  const [, setActiveGameId] = useAtom(activeGameIdAtom)
   const searchParams = useSearchParams()
   const collectionId = searchParams.get("game")
   const allGames = useAllGames()
@@ -37,6 +40,7 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
     if (isOwned) {
       handleBack()
       onPlay()
+      setActiveGameId(collectionId)
     } else {
       // Handle buy logic
       console.log("Buy game:", game.title)
