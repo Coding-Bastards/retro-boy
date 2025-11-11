@@ -64,7 +64,7 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
             <IoArrowBack className="text-2xl" />
           </button>
 
-          <h1 className="text-white uppercase font-black text-xl flex-1">
+          <h1 className="text-white uppercase font-black text-xl flex-1 whitespace-nowrap overflow-hidden text-ellipsis">
             {game.title}
           </h1>
           <div className="w-8" />
@@ -97,7 +97,7 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
             </div>
             <div className="flex items-center gap-2 ml-auto">
               <MdPerson className="text-white/60 text-xl" />
-              <span className="text-white/80 text-sm">
+              <span className="text-white/80 whitespace-nowrap text-sm">
                 {localizeNumber(game.totalOwners)} owners
               </span>
             </div>
