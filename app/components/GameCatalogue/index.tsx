@@ -57,7 +57,7 @@ function GameCard({
 
       {/* Game Info */}
       <div className="flex p-6 flex-col text-left">
-        <h3 className="text-white font-bold line-clamp-1">{game.title}</h3>
+        <h3 className="text-white font-black line-clamp-1">{game.title}</h3>
         <div className="flex items-center justify-between text-sm">
           <span className="text-white/60">{game.playTime}</span>
           <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />

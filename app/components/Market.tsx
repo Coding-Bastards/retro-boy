@@ -50,24 +50,25 @@ function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
       </div>
 
       {/* Info */}
-      <div
-        className={cn(
-          "p-3 flex flex-col gap-2",
-          isOwned && "grayscale saturate-50"
-        )}
-      >
-        <h3 className="text-white font-bold text-sm line-clamp-1">
+      <div className={cn("p-3", isOwned && "grayscale saturate-50")}>
+        <h3 className="text-white font-black text-sm line-clamp-1">
           {game.title}
         </h3>
 
-        <div className="flex items-center justify-between gap-2">
-          <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
-          <div className="text-rb-green font-bold text-sm">5 WLD</div>
-        </div>
+        <nav className="mt-1">
+          <GameStars
+            className="text-xs"
+            likes={game.likes || 0}
+            dislikes={game.dislikes || 0}
+          />
+        </nav>
 
-        <div className="flex items-center gap-1 text-xs text-white/60">
-          <MdPerson />
-          <span>{localizeNumber(game.totalOwners)}</span>
+        <div className="flex border-t mt-7 pt-2.5 -mx-3 px-3 border-white/15 items-center justify-between gap-2">
+          <div className="flex items-center gap-1 text-xs text-white/60">
+            <MdPerson />
+            <span>{localizeNumber(game.totalOwners)}</span>
+          </div>
+          <div className="text-rb-green font-black text-sm">5 WLD</div>
         </div>
       </div>
     </button>
@@ -78,12 +79,12 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
   return (
     <button
       onClick={onSelect}
-      className="flex gap-3 p-3 rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left"
+      className="flex gap-1 pr-1 rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left overflow-hidden"
     >
       {/* Cover */}
       <div
         className={cn(
-          "w-24 h-24 overflow-hidden rounded-lg bg-rb-darker relative shrink-0",
+          "w-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
           isOwned && "grayscale"
         )}
       >
@@ -96,22 +97,18 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
           </div>
         )}
 
-        <img
-          src={game.cover}
-          alt=""
-          className="w-full h-full object-cover rounded-lg"
-        />
+        <img src={game.cover} alt="" className="w-full h-full object-cover" />
       </div>
 
       {/* Info */}
       <div
         className={cn(
-          "flex-1 flex flex-col justify-between min-w-0",
+          "flex-1 flex flex-col justify-between min-w-0 p-3",
           isOwned && "grayscale saturate-50"
         )}
       >
         <div>
-          <h3 className="text-white font-bold text-sm line-clamp-1 mb-1">
+          <h3 className="text-white font-black text-sm line-clamp-1 mb-1">
             {game.title}
           </h3>
           <p className="text-white/60 text-xs line-clamp-2 mb-2">
@@ -121,13 +118,17 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
 
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
+            <GameStars
+              className="text-xs"
+              likes={game.likes || 0}
+              dislikes={game.dislikes || 0}
+            />
             <div className="flex items-center gap-1 text-xs text-white/60">
               <MdPerson />
               <span>{localizeNumber(game.totalOwners)}</span>
             </div>
           </div>
-          <div className="text-rb-green font-bold text-sm">5 WLD</div>
+          <div className="text-rb-green font-black text-sm">5 WLD</div>
         </div>
       </div>
     </button>
@@ -241,7 +242,7 @@ function MarketContent() {
           >
             {availableGames.map((game) => {
               const isOwned = ownedGames.some(
-                (owned) => false//owned.collectionId === game.collectionId
+                (owned) => false //owned.collectionId === game.collectionId
               )
 
               const handleSelect = () =>

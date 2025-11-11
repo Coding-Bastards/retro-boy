@@ -85,13 +85,13 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
           <div className="flex items-center gap-6 mb-6 pb-4 border-b border-white/10">
             <div className="flex items-center gap-2">
               <AiOutlineLike className="text-rb-green text-xl" />
-              <span className="text-white font-bold">
+              <span className="text-white font-black">
                 {localizeNumber(game.likes)}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <AiOutlineDislike className="text-red-400 text-xl" />
-              <span className="text-white font-bold">
+              <span className="text-white font-black">
                 {localizeNumber(game.dislikes)}
               </span>
             </div>

@@ -44,16 +44,6 @@ export default function Home() {
           </button>
 
           <button
-            onClick={() => setBoardOpen(true)}
-            className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center"
-          >
-            <div className="size-9 flex justify-center items-end">
-              <MdLeaderboard className="text-xl scale-105" />
-            </div>
-            <span className="uppercase text-xs font-black">BOARD</span>
-          </button>
-
-          <button
             onClick={() => setCatalogueOpen(true)}
             className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center"
           >
@@ -61,6 +51,16 @@ export default function Home() {
               <ImFolderDownload className="text-xl scale-95" />
             </div>
             <span className="uppercase text-xs font-black">GAME/ROM</span>
+          </button>
+
+          <button
+            onClick={() => setBoardOpen(true)}
+            className="flex gap-0.5 opacity-25 active:opacity-100 flex-col items-center justify-center"
+          >
+            <div className="size-9 flex justify-center items-end">
+              <MdLeaderboard className="text-xl scale-105" />
+            </div>
+            <span className="uppercase text-xs font-black">BOARD</span>
           </button>
         </nav>
       </div>

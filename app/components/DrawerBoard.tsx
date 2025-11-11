@@ -91,7 +91,7 @@ export default function DrawerBoard() {
                 {/* Info */}
                 <div className="flex-1 grow">
                   <div className="flex items-center gap-2">
-                    <span className="text-white font-bold text-sm">
+                    <span className="text-white font-black text-sm">
                       {beautifyAddress(player.address, 4, "")}
                     </span>
                     {isConnected && (

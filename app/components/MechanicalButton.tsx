@@ -2,7 +2,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "../lib/utils"
 
 const buttonVariants = cva(
-  "relative flex items-center justify-center select-none bg-linear-to-b from-rb-dark to-rb-darker text-white/40 font-bold shadow-[0_6px_0_0_#0a0a0a,0_8px_12px_0_rgba(0,0,0,0.4)] active:shadow-[0_2px_0_0_#0a0a0a,0_3px_6px_0_rgba(0,0,0,0.4)] active:translate-y-1",
+  "relative flex items-center justify-center select-none bg-linear-to-b from-rb-dark to-rb-darker text-white/40 font-black shadow-[0_6px_0_0_#0a0a0a,0_8px_12px_0_rgba(0,0,0,0.4)] active:shadow-[0_2px_0_0_#0a0a0a,0_3px_6px_0_rgba(0,0,0,0.4)] active:translate-y-1",
   {
     variants: {
       variant: {
