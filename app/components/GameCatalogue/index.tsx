@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useAtom } from "jotai"
 import Image from "next/image"
 
@@ -169,7 +169,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
+    <Drawer modal={false} open={open} onOpenChange={setOpen}>
       <DrawerContent className="max-w-md min-h-[calc(85vh-4rem)] mx-auto bg-rb-darker border-white/10">
         <DrawerHeader>
           <DrawerTitle

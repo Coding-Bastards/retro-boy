@@ -5,14 +5,20 @@ import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/app/lib/utils"
 
+const DrawerContext = React.createContext<{ modal: boolean }>({ modal: true })
+
 const Drawer = ({
   shouldScaleBackground = true,
+  modal = true,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
-  <DrawerPrimitive.Root
-    shouldScaleBackground={shouldScaleBackground}
-    {...props}
-  />
+}: React.ComponentProps<typeof DrawerPrimitive.Root> & { modal?: boolean }) => (
+  <DrawerContext.Provider value={{ modal }}>
+    <DrawerPrimitive.Root
+      shouldScaleBackground={shouldScaleBackground}
+      modal={modal}
+      {...props}
+    />
+  </DrawerContext.Provider>
 )
 Drawer.displayName = "Drawer"
 
@@ -22,14 +28,17 @@ const DrawerPortal = DrawerPrimitive.Portal
 
 const DrawerClose = DrawerPrimitive.Close
 
+const overlayClassName = (extraClassName?: string) =>
+  cn("fixed inset-0 z-50 bg-black/80", extraClassName)
+
 const DrawerOverlay = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
 >(({ className, ...props }, ref) => (
   <DrawerPrimitive.Overlay
-    ref={ref}
-    className={cn("fixed inset-0 z-50 bg-black/80", className)}
     {...props}
+    ref={ref}
+    className={overlayClassName(className)}
   />
 ))
 DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
@@ -37,22 +46,35 @@ DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
 const DrawerContent = React.forwardRef<
   React.ElementRef<typeof DrawerPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DrawerPortal>
-    <DrawerOverlay />
-    <DrawerPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed inset-x-0 outline-none bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-3xl border-t bg-background",
-        className
+>(({ className, children, ...props }, ref) => {
+  const { modal: isModal } = React.useContext(DrawerContext)
+
+  return (
+    <DrawerPortal>
+      {isModal ? (
+        <DrawerOverlay />
+      ) : (
+        <DrawerClose asChild>
+          <div
+            className={overlayClassName()}
+            style={{ pointerEvents: "auto" }}
+          />
+        </DrawerClose>
       )}
-      {...props}
-    >
-      <div className="mt-3" />
-      {children}
-    </DrawerPrimitive.Content>
-  </DrawerPortal>
-))
+      <DrawerPrimitive.Content
+        ref={ref}
+        className={cn(
+          "fixed inset-x-0 outline-none bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-3xl border-t bg-background",
+          className
+        )}
+        {...props}
+      >
+        <div className="mt-3" />
+        {children}
+      </DrawerPrimitive.Content>
+    </DrawerPortal>
+  )
+})
 DrawerContent.displayName = "DrawerContent"
 
 const DrawerHeader = ({
