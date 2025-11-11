@@ -2,13 +2,18 @@
 
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
-import { IoArrowBack } from "react-icons/io5"
-import { MdPerson, MdViewModule, MdViewStream } from "react-icons/md"
+import { IoArrowBack, IoChevronDownSharp } from "react-icons/io5"
+import { MdPerson, MdViewModule, MdViewList } from "react-icons/md"
 import { useAllGames, useOwnedGames } from "@/app/lib/games"
 import { localizeNumber } from "@/app/lib/numbers"
 import { cn } from "@/app/lib/utils"
 import WalletConnect from "./WalletConnect"
 import GameStars from "./GameCatalogue/GameStars"
+import {
+  TfiLayoutColumn2Alt,
+  TfiLayoutColumn3Alt,
+  TfiLayoutGrid2Alt,
+} from "react-icons/tfi"
 
 type SortBy = "owners" | "score" | "price"
 type ViewMode = "grid" | "list"
@@ -20,7 +25,7 @@ function MarketContent() {
   const allGames = useAllGames()
   const { games: ownedGames } = useOwnedGames()
 
-  const [sortBy, setSortBy] = useState<SortBy>("owners")
+  const [sortBy, setSortBy] = useState<SortBy>("score")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
   const handleClose = () => {
@@ -66,53 +71,17 @@ function MarketContent() {
 
         {/* Filters */}
         <div className="px-5 pb-4 flex items-center justify-between gap-4">
-          <div className="flex gap-2">
-            <button
-              onClick={() => setSortBy("owners")}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                sortBy === "owners"
-                  ? "bg-rb-green text-black"
-                  : "bg-rb-dark text-white/60 hover:text-white"
-              )}
-            >
-              OWNERS
-            </button>
-            <button
-              onClick={() => setSortBy("score")}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                sortBy === "score"
-                  ? "bg-rb-green text-black"
-                  : "bg-rb-dark text-white/60 hover:text-white"
-              )}
-            >
-              SCORE
-            </button>
-            <button
-              onClick={() => setSortBy("price")}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors",
-                sortBy === "price"
-                  ? "bg-rb-green text-black"
-                  : "bg-rb-dark text-white/60 hover:text-white"
-              )}
-            >
-              PRICE
-            </button>
-          </div>
-
-          <div className="flex gap-1">
+          <div className="flex rounded-lg overflow-hidden bg-rb-dark text-white/60">
             <button
               onClick={() => setViewMode("grid")}
               className={cn(
                 "p-2 rounded-lg transition-colors",
                 viewMode === "grid"
                   ? "bg-rb-green text-black"
-                  : "bg-rb-dark text-white/60 hover:text-white"
+                  : "hover:text-white"
               )}
             >
-              <MdViewModule className="text-lg" />
+              <TfiLayoutGrid2Alt />
             </button>
             <button
               onClick={() => setViewMode("list")}
@@ -120,12 +89,30 @@ function MarketContent() {
                 "p-2 rounded-lg transition-colors",
                 viewMode === "list"
                   ? "bg-rb-green text-black"
-                  : "bg-rb-dark text-white/60 hover:text-white"
+                  : "hover:text-white"
               )}
             >
-              <MdViewStream className="text-lg" />
+              <TfiLayoutColumn3Alt className="rotate-90 scale-95" />
             </button>
           </div>
+
+          <label className="flex items-center gap-2">
+            <span className="text-white/60 text-xs">Sort by:</span>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as SortBy)}
+                className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-semibold bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
+              >
+                <option value="score">SCORE</option>
+                <option value="owners">OWNERS</option>
+                <option value="price">PRICE</option>
+              </select>
+              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white">
+                <IoChevronDownSharp />
+              </div>
+            </div>
+          </label>
         </div>
 
         {/* Content */}
