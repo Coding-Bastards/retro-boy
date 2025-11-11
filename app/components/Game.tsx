@@ -1,7 +1,6 @@
 "use client"
 
 import { useRef, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 import { useAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
 
@@ -11,18 +10,14 @@ import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 
 import MechanicalButton from "./MechanicalButton"
-import GameCatalogue from "./GameCatalogue"
-import DrawerBoard from "./DrawerBoard"
-import TopNavigation from "./TopNavigation"
 
 export default function Game() {
-  const router = useRouter()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [gameboy, setGameboy] = useState<any>(null)
   const [audioClass, setAudioClass] = useState<any>(null)
   const [isLoaded, setIsLoaded] = useState(false)
-  const gbInstanceRef = useRef<any>(null)
+  const currentGameRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
   const [, setCatalogueOpen] = useAtom(catalogueOpenAtom)
 
@@ -59,7 +54,7 @@ export default function Game() {
   }
 
   const sendJoyPadEvent = (code: number, isPressed: boolean) => {
-    gbInstanceRef?.current?.JoyPadEvent(code, isPressed)
+    currentGameRef?.current?.JoyPadEvent(code, isPressed)
   }
 
   const releaseAllDirections = () => {
@@ -151,7 +146,7 @@ export default function Game() {
       })
 
       // Store instance in ref
-      gbInstanceRef.current = gb
+      currentGameRef.current = gb
 
       console.log("GameBoy instance created, opts.sound:", gb.opts.sound)
       console.log("GameBoy audioHandle:", gb.audioHandle)
@@ -228,10 +223,6 @@ export default function Game() {
     ;(window as any).loadGame = loadGameFromRemote
   }
 
-  const handleSelectGame = (collectionId: string) => {
-    router.push(`?game=${collectionId}`)
-  }
-
   const openGameCatalogue = () => setCatalogueOpen(true)
 
   const withOpenCatalogue = (cb: () => void) => {
@@ -241,9 +232,7 @@ export default function Game() {
   }
 
   return (
-    <div className="flex flex-col h-screen p-5">
-      <GameCatalogue onSelectGame={handleSelectGame} />
-      <DrawerBoard />
+    <div className="flex flex-col h-full">
       <input
         ref={fileInputRef}
         type="file"
@@ -252,7 +241,6 @@ export default function Game() {
         disabled={!gameboy}
         className="hidden"
       />
-      <TopNavigation isActiveLight={isLoaded} />
 
       {/* Screen */}
       <div
