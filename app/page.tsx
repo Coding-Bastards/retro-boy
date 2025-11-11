@@ -27,14 +27,10 @@ export default function Home() {
     router.push("?market=open")
   }
 
-  const handlePlayGame = () => {
-    ;(window as any).loadGame?.()
-  }
-
   return (
     <Fragment>
       <Market />
-      <GamePage onPlay={handlePlayGame} />
+      <GamePage />
       <GameCatalogue
         onSelectGame={(gameCollectionId) => {
           // Show game page

@@ -76,7 +76,7 @@ class GameBoyAudio {
       }
 
       this.isInitialized = true
-      console.log("GameBoy Audio initialized:", {
+      console.debug("GameBoy Audio initialized:", {
         sampleRate: this.audioContext.sampleRate,
         channels: this.channels,
         bufferSize: this.bufferSize,

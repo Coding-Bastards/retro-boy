@@ -1,6 +1,7 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Geist_Mono } from "next/font/google"
+import { EmulatorProvider } from "@/app/lib/EmulatorContext"
 
 const nextFont = Geist_Mono({
   subsets: [],
@@ -24,7 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${nextFont.className} antialiased`}>{children}</body>
+      <body className={`${nextFont.className} antialiased`}>
+        <EmulatorProvider>{children}</EmulatorProvider>
+      </body>
     </html>
   )
 }

@@ -5,8 +5,9 @@ import { useAtom } from "jotai"
 import Image from "next/image"
 
 import { useOwnedGames, type Game } from "@/app/lib/games"
-import { catalogueOpenAtom, activeGameIdAtom } from "@/app/lib/store"
+import { catalogueOpenAtom } from "@/app/lib/store"
 import { cn } from "@/app/lib/utils"
+import { useEmulator } from "@/app/lib/EmulatorContext"
 
 import Button from "@/app/components/Button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer"
@@ -69,8 +70,8 @@ function GameCard({
 
 export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
   const [open, setOpen] = useAtom(catalogueOpenAtom)
-  const [activeGameId, setActiveGameId] = useAtom(activeGameIdAtom)
   const { games: ownedGames, isEmpty } = useOwnedGames()
+  const { loadGame, currentGame } = useEmulator()
   const isSingleGameOwned = ownedGames.length === 1
 
   const FIRST_GAME_ID = ownedGames[0]?.collectionId || null
@@ -85,8 +86,6 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
     }
   }, [open])
 
-  console.debug({ centeredGameId, activeGameId })
-
   useEffect(() => {
     // Wait for drawer animation to complete
     const timer = setTimeout(() => {
@@ -97,12 +96,8 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
 
       if (!container) return
 
-      console.debug("Setting up observer", container)
-
       const observer = new IntersectionObserver(
         (entries) => {
-          console.debug({ entries })
-
           let maxRatio = 0
           let mostVisibleId: string | null = null
 
@@ -114,10 +109,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
             }
           })
 
-          if (mostVisibleId) {
-            console.debug({ settingCenteredGameId: mostVisibleId })
-            setCenteredGameId(mostVisibleId)
-          }
+          if (mostVisibleId) setCenteredGameId(mostVisibleId)
         },
         {
           root: container,
@@ -133,7 +125,7 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
     return () => clearTimeout(timer)
   }, [open])
 
-  const isActiveGameCentered = activeGameId === centeredGameId
+  const isActiveGameCentered = currentGame?.gameCollectionId === centeredGameId
 
   const buttonLabel = isEmpty
     ? "GAME MARKET"
@@ -158,13 +150,9 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
     }
 
     if (centeredGameId) {
-      console.debug({ select: true, centeredGameId })
       const game = ownedGames.find((g) => g.collectionId === centeredGameId)
-      if (game?.rom) {
-        // Load the game directly
-        setActiveGameId(game.collectionId)
-        ;(window as any).loadGame?.(game.rom)
-      }
+      // Load the game directly
+      if (game?.rom) loadGame(game.rom, game.collectionId)
     }
   }
 

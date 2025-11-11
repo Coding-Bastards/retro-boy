@@ -2,28 +2,25 @@
 
 import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+
 import { useAllGames, useOwnedGames } from "@/app/lib/games"
 import { localizeNumber } from "@/app/lib/numbers"
+import { useEmulator } from "@/app/lib/EmulatorContext"
 
 import { IoArrowBack } from "react-icons/io5"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
-import { useAtom } from "jotai"
-import { activeGameIdAtom } from "@/app/lib/store"
 
-interface GamePageContentProps {
-  onPlay: () => void
-}
-
-function GamePageContent({ onPlay }: GamePageContentProps) {
+function GamePageContent() {
   const router = useRouter()
-  const [, setActiveGameId] = useAtom(activeGameIdAtom)
   const searchParams = useSearchParams()
-  const collectionId = searchParams.get("game")
   const allGames = useAllGames()
   const { games: ownedGames } = useOwnedGames()
+
+  const { loadGame } = useEmulator()
+  const collectionId = searchParams.get("game")
 
   if (!collectionId) return null
 
@@ -39,11 +36,10 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
   const handleAction = () => {
     if (isOwned) {
       handleBack()
-      onPlay()
-      setActiveGameId(collectionId)
+      loadGame(game.rom, game.collectionId)
     } else {
       // Handle buy logic
-      console.log("Buy game:", game.title)
+      console.debug("Buy game:", game.title)
     }
   }
 
@@ -146,10 +142,10 @@ function GamePageContent({ onPlay }: GamePageContentProps) {
   )
 }
 
-export default function GamePage({ onPlay }: GamePageContentProps) {
+export default function GamePage() {
   return (
     <Suspense fallback={null}>
-      <GamePageContent onPlay={onPlay} />
+      <GamePageContent />
     </Suspense>
   )
 }
