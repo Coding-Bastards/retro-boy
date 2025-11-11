@@ -1,19 +1,19 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
-import { IoArrowBack, IoChevronDownSharp } from "react-icons/io5"
-import { MdPerson, MdViewModule, MdViewList } from "react-icons/md"
+
 import { useAllGames, useOwnedGames } from "@/app/lib/games"
+import { useAppRouter } from "@/app/lib/routes"
 import { localizeNumber } from "@/app/lib/numbers"
 import { cn } from "@/app/lib/utils"
+
+import { TfiLayoutColumn3Alt, TfiLayoutGrid2Alt } from "react-icons/tfi"
+import { IoArrowBack, IoChevronDownSharp } from "react-icons/io5"
+import { MdPerson } from "react-icons/md"
+
 import WalletConnect from "./WalletConnect"
 import GameStars from "./GameCatalogue/GameStars"
-import {
-  TfiLayoutColumn2Alt,
-  TfiLayoutColumn3Alt,
-  TfiLayoutGrid2Alt,
-} from "react-icons/tfi"
 
 type SortBy = "owners" | "score" | "price"
 type ViewMode = "grid" | "list"
@@ -136,7 +136,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
 }
 
 function MarketContent() {
-  const router = useRouter()
+  const { pushGamePage, router } = useAppRouter()
   const searchParams = useSearchParams()
   const isOpen = searchParams.get("market") === "open"
   const allGames = useAllGames()
@@ -145,9 +145,7 @@ function MarketContent() {
   const [sortBy, setSortBy] = useState<SortBy>("score")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
-  const handleClose = () => {
-    router.back()
-  }
+  const handleClose = () => router.back()
 
   if (!isOpen) return null
 
@@ -245,8 +243,7 @@ function MarketContent() {
                 (owned) => false //owned.collectionId === game.collectionId
               )
 
-              const handleSelect = () =>
-                router.push(`?game=${game.collectionId}`)
+              const handleSelect = () => pushGamePage(game.collectionId)
 
               return viewMode === "grid" ? (
                 <ItemGrid
