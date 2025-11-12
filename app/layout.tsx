@@ -1,5 +1,5 @@
 import "./globals.css"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 
 import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/app/lib/EmulatorContext"
@@ -16,8 +16,13 @@ const nextFont = Geist_Mono({
 export const metadata: Metadata = {
   title: "Retro Boy",
   description: "Nostalgic Gaming on the Go",
-  viewport:
-    "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
+}
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 }
 
 export default function RootLayout({

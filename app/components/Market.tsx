@@ -1,7 +1,6 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
-import { Suspense, useState } from "react"
+import { useState } from "react"
 
 import { useAllGames, useOwnedGames } from "@/lib/games"
 import { useAppRouter } from "@/app/lib/routes"
@@ -15,34 +14,27 @@ import { MdPerson } from "react-icons/md"
 import WalletConnect from "./WalletConnect"
 import GameStars from "./GameCatalogue/GameStars"
 
-type SortBy = "owners" | "score" | "price"
+type SortBy = "minted" | "score" | "price"
 type ViewMode = "grid" | "list"
 
-function MarketContent() {
-  const { pushGamePage, router } = useAppRouter()
-  const searchParams = useSearchParams()
-  const isOpen = searchParams.get("market") === "open"
+export default function MarketPage() {
+  const { pushGamePage, navigateBack } = useAppRouter()
   const allGames = useAllGames()
   const { games: ownedGames } = useOwnedGames()
 
   const [sortBy, setSortBy] = useState<SortBy>("score")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
-  const handleClose = () => router.back()
-
-  if (!isOpen) return null
-
   // Sort games
   const availableGames = allGames.sort((a, b) => {
     switch (sortBy) {
-      case "owners":
+      case "minted":
         return (b.totalOwners || 0) - (a.totalOwners || 0)
       case "score":
         const scoreA = (a.likes || 0) - (a.dislikes || 0)
         const scoreB = (b.likes || 0) - (b.dislikes || 0)
         return scoreB - scoreA
       case "price":
-        return 0 // All same price for now
       default:
         return 0
     }
@@ -54,7 +46,7 @@ function MarketContent() {
         {/* Header */}
         <div className="p-5 pb-4 flex items-center gap-4">
           <button
-            onClick={handleClose}
+            onClick={navigateBack}
             className="text-white/80 hover:text-white transition-colors"
           >
             <IoArrowBack className="text-2xl" />
@@ -104,7 +96,7 @@ function MarketContent() {
                 className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-black bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
               >
                 <option value="score">SCORE</option>
-                <option value="owners">OWNERS</option>
+                <option value="minted">MINTED</option>
                 <option value="price">PRICE</option>
               </select>
               <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white">
@@ -277,13 +269,5 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
         </div>
       </div>
     </button>
-  )
-}
-
-export default function Market() {
-  return (
-    <Suspense fallback={null}>
-      <MarketContent />
-    </Suspense>
   )
 }

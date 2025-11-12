@@ -1,10 +1,10 @@
 "use client"
 
-import { Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { useAllGames, useOwnedGames } from "@/app/lib/games"
 import { localizeNumber } from "@/app/lib/numbers"
+import { useAtomIsCatalogueOpen } from "@/lib/store"
 import { useEmulator } from "@/app/lib/EmulatorContext"
 
 import { IoArrowBack } from "react-icons/io5"
@@ -12,9 +12,8 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
-import { useAtomIsCatalogueOpen } from "../lib/store"
 
-function GamePageContent() {
+export default function GamePage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const allGames = useAllGames()
@@ -97,7 +96,7 @@ function GamePageContent() {
             <div className="flex items-center gap-2 ml-auto">
               <MdPerson className="text-white/60 text-xl" />
               <span className="text-white/80 whitespace-nowrap text-sm">
-                {localizeNumber(game.totalOwners)} owners
+                {localizeNumber(game.totalOwners)} Minted
               </span>
             </div>
           </div>
@@ -142,13 +141,5 @@ function GamePageContent() {
         </div>
       </div>
     </div>
-  )
-}
-
-export default function GamePage() {
-  return (
-    <Suspense fallback={null}>
-      <GamePageContent />
-    </Suspense>
   )
 }

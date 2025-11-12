@@ -1,11 +1,12 @@
 "use client"
 
-import React, {
+import {
   createContext,
   useContext,
   useState,
   useEffect,
   useRef,
+  type PropsWithChildren,
 } from "react"
 
 interface GameCartridge {
@@ -25,7 +26,7 @@ interface EmulatorContextValue {
 
 const EmulatorContext = createContext<EmulatorContextValue | null>(null)
 
-export function EmulatorProvider({ children }: { children: React.ReactNode }) {
+export function EmulatorProvider({ children }: PropsWithChildren) {
   const [gameboy, setGameboy] = useState<any>(null)
   const [audioClass, setAudioClass] = useState<any>(null)
   const [currentGame, setCurrentGame] = useState<GameCartridge | null>(null)
