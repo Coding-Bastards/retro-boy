@@ -1,11 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { useAtom } from "jotai"
 import { Joystick } from "react-joystick-component"
 
 import { cn } from "@/app/lib/utils"
-import { catalogueOpenAtom } from "@/app/lib/store"
+import { useAtomIsCatalogueOpen } from "@/app/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 import { useEmulator } from "@/app/lib/EmulatorContext"
@@ -14,7 +13,7 @@ import MechanicalButton from "./MechanicalButton"
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [, setCatalogueOpen] = useAtom(catalogueOpenAtom)
+  const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
   const { isGameLoaded, sendJoyPadEvent, registerCanvas, gameCanvas } =
     useEmulator()
 

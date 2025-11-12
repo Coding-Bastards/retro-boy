@@ -1,5 +1,5 @@
 import { useSetAtom } from "jotai"
-import { catalogueOpenAtom, boardOpenAtom } from "@/app/lib/store"
+import { useAtomIsBoardOpen, useAtomIsCatalogueOpen } from "@/app/lib/store"
 import { useAppRouter } from "@/app/lib/routes"
 
 import { ImFolderDownload } from "react-icons/im"
@@ -7,8 +7,8 @@ import { MdLeaderboard } from "react-icons/md"
 import { PiHandbagSimpleFill } from "react-icons/pi"
 
 export default function Footer() {
-  const setCatalogueOpen = useSetAtom(catalogueOpenAtom)
-  const setBoardOpen = useSetAtom(boardOpenAtom)
+  const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
+  const [, setBoardOpen] = useAtomIsBoardOpen()
   const { pushMarketPage } = useAppRouter()
 
   return (

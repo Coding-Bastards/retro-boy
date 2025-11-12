@@ -5,7 +5,7 @@ import { useAtom } from "jotai"
 import Image from "next/image"
 
 import { useOwnedGames, type Game } from "@/app/lib/games"
-import { catalogueOpenAtom } from "@/app/lib/store"
+import { useAtomIsCatalogueOpen } from "@/app/lib/store"
 import { cn } from "@/app/lib/utils"
 import { useEmulator } from "@/app/lib/EmulatorContext"
 
@@ -69,7 +69,7 @@ function GameCard({
 }
 
 export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
-  const [open, setOpen] = useAtom(catalogueOpenAtom)
+  const [open, setOpen] = useAtomIsCatalogueOpen()
   const { games: ownedGames, isEmpty } = useOwnedGames()
   const { loadGame, currentGame } = useEmulator()
   const isSingleGameOwned = ownedGames.length === 1

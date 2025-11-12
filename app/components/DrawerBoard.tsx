@@ -1,13 +1,20 @@
 "use client"
 
-import { useAtom } from "jotai"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer"
-import { boardOpenAtom } from "@/app/lib/store"
+import type { Address } from "viem"
+
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/app/components/ui/drawer"
+import { useAtomIsBoardOpen } from "@/app/lib/store"
 import { beautifyAddress, cn } from "@/app/lib/utils"
+
+import { MdPerson } from "react-icons/md"
+
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
-import type { Address } from "viem"
-import { MdPerson } from "react-icons/md"
 
 const CONNECTED_WALLET = "0x163f8c2467924be0ae7b5347228cabf260318753" as Address
 
@@ -46,7 +53,7 @@ const MOCK_PLAYERS: Player[] = [
 ]
 
 export default function DrawerBoard() {
-  const [open, setOpen] = useAtom(boardOpenAtom)
+  const [open, setOpen] = useAtomIsBoardOpen()
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>

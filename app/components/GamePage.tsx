@@ -12,12 +12,14 @@ import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
+import { useAtomIsCatalogueOpen } from "../lib/store"
 
 function GamePageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const allGames = useAllGames()
   const { games: ownedGames } = useOwnedGames()
+  const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
 
   const { loadGame } = useEmulator()
   const collectionId = searchParams.get("game")
@@ -35,8 +37,9 @@ function GamePageContent() {
 
   const handleAction = () => {
     if (isOwned) {
-      handleBack()
+      router.push("/") // Back to main emulator page
       loadGame(game.rom, game.collectionId)
+      setIsCatalogueOpen(false) // Close catalogue on game load
     } else {
       // Handle buy logic
       console.debug("Buy game:", game.title)

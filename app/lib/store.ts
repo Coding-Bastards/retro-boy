@@ -1,4 +1,7 @@
-import { atom } from "jotai"
+import { atom, useAtom } from "jotai"
 
-export const catalogueOpenAtom = atom(false)
-export const boardOpenAtom = atom(false)
+const atomIsCatalogueOpen = atom(false)
+const atomIsBoardOpen = atom(false)
+
+export const useAtomIsCatalogueOpen = () => useAtom(atomIsCatalogueOpen)
+export const useAtomIsBoardOpen = () => useAtom(atomIsBoardOpen)
