@@ -8,7 +8,7 @@ interface AddressBlockProps {
 
 export default function AddressBlock({ address, size = 8 }: AddressBlockProps) {
   return (
-    <div className="border-2 border-white/15 rounded-lg overflow-hidden">
+    <div className="border-2 AddressBlock border-white/15 rounded-lg overflow-hidden">
       <figure
         style={{
           width: `calc(var(--spacing) * ${size})`,
