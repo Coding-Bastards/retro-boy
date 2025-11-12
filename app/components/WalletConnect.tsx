@@ -10,7 +10,7 @@ import { FaClock } from "react-icons/fa"
 import { beautifyAddress } from "@/app/lib/utils"
 
 export default function WalletConnect() {
-  const { address, isConnected, signOut } = useWorldAuth()
+  const { address, isConnected, signOut, signIn } = useWorldAuth()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const handleDisconnect = () => {
@@ -20,7 +20,10 @@ export default function WalletConnect() {
 
   const TRIGGER = (
     <button
-      onClick={isConnected ? () => setDialogOpen(true) : undefined}
+      onClick={
+        // undefined if connected so the dialog opens automatically
+        isConnected ? undefined : signIn
+      }
       className="text-white flex gap-2 items-center"
     >
       <div className="text-right font-black">
