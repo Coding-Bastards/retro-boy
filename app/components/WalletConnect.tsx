@@ -7,16 +7,26 @@ import Dialog from "./Dialog"
 import Button from "./Button"
 import { FaClock } from "react-icons/fa"
 
-import { beautifyAddress } from "@/app/lib/utils"
+import { useAccountBalancess } from "@/hooks/balances"
+import { beautifyAddress } from "@/lib/utils"
+import { numberToShortWords } from "@/lib/numbers"
 
-export default function WalletConnect() {
-  const { address, isConnected, signOut, signIn } = useWorldAuth()
+export default function WalletConnect({
+  summaryToken = "RBC",
+}: {
+  summaryToken?: "WLD" | "RBC"
+}) {
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  const { address, isConnected, signOut, signIn } = useWorldAuth()
+  const { WLD, RBC } = useAccountBalancess(address)
 
   const handleDisconnect = () => {
     signOut?.()
     setDialogOpen(false)
   }
+
+  const SUMMARY_TOKEN = summaryToken === "WLD" ? WLD : RBC
 
   const TRIGGER = (
     <button
@@ -28,9 +38,11 @@ export default function WalletConnect() {
     >
       <div className="text-right font-black">
         <div className="text-sm">
-          {address ? beautifyAddress(address, 3, "") : "WALLET"}
+          {address ? beautifyAddress(address, 3, "") : "CONN"}
         </div>
-        <div className="text-xs -mt-0.5 text-rb-green">1.2K RBC</div>
+        <div className="text-xs -mt-0.5 text-rb-green">
+          {numberToShortWords(SUMMARY_TOKEN.formatted)} {summaryToken}
+        </div>
       </div>
 
       <AddressBlock address={address} size={8} />
@@ -59,12 +71,16 @@ export default function WalletConnect() {
         <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
           <div className="flex justify-between items-center">
             <span className="text-white/60 text-sm">WLD Balance</span>
-            <span className="font-black">5.2 WLD</span>
+            <span className="font-black">
+              {numberToShortWords(WLD.formatted)} WLD
+            </span>
           </div>
 
           <div className="flex justify-between items-center">
             <span className="text-white/60 text-sm">RBC Balance</span>
-            <span className="font-black text-rb-green">1.2K RBC</span>
+            <span className="font-black text-rb-green">
+              {numberToShortWords(RBC.formatted)} RBC
+            </span>
           </div>
         </div>
 

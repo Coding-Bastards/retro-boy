@@ -181,7 +181,7 @@ function MarketContent() {
             MARKET
           </h1>
 
-          <WalletConnect />
+          <WalletConnect summaryToken="WLD" />
         </div>
 
         {/* Filters */}
