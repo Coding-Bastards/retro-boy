@@ -69,10 +69,7 @@ export default function WalletConnect() {
         </div>
 
         {/* Disconnect Button */}
-        <Button
-          onClick={handleDisconnect}
-          className="mt-2 bg-white/10 text-white border border-white/10"
-        >
+        <Button onClick={handleDisconnect} className="mt-2" variant="secondary">
           DISCONNECT
         </Button>
       </div>

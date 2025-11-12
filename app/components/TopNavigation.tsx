@@ -1,17 +1,24 @@
 "use client"
 
+import { useState } from "react"
+import { cn } from "@/app/lib/utils"
+
 import Dialog from "@/app/components/Dialog"
 import WalletConnect from "@/app/components/WalletConnect"
-import { cn } from "@/app/lib/utils"
+import Button from "./Button"
 
 type TopNavigationProps = {
   isActiveLight: boolean
 }
 
 export default function TopNavigation({ isActiveLight }: TopNavigationProps) {
+  const [open, setOpen] = useState(false)
+
   return (
     <nav className="flex pb-4 items-center justify-between">
       <Dialog
+        open={open}
+        onOpenChange={setOpen}
         title="ABOUT RETRO BOY"
         trigger={
           <button
@@ -38,6 +45,14 @@ export default function TopNavigation({ isActiveLight }: TopNavigationProps) {
           <strong>Retro Boy</strong> is a Mini App that brings on-chain
           emulation for retro gaming consoles directly to your phone.
         </p>
+
+        <Button
+          onClick={() => setOpen(false)}
+          className="mt-7"
+          variant="secondary"
+        >
+          CLOSE
+        </Button>
       </Dialog>
 
       <WalletConnect />
