@@ -13,6 +13,7 @@ import { MdPerson } from "react-icons/md"
 
 import WalletConnect from "./WalletConnect"
 import GameStars from "./GameCatalogue/GameStars"
+import PageContainer from "./PageContainer"
 
 type SortBy = "minted" | "score" | "price"
 type ViewMode = "grid" | "list"
@@ -41,98 +42,83 @@ export default function MarketPage() {
   })
 
   return (
-    <div className="fixed inset-0 z-60 bg-rb-darker">
-      <div className="flex flex-col h-full max-w-md mx-auto">
-        {/* Header */}
-        <div className="p-5 pb-4 flex items-center gap-4">
+    <PageContainer
+      title="MARKET"
+      endTitleEnhancer={<WalletConnect summaryToken="WLD" />}
+    >
+      {/* Filters */}
+      <div className="px-5 py-4 flex items-center justify-between gap-4">
+        <div className="flex border border-white/10 rounded-lg overflow-hidden bg-rb-dark text-white/60">
           <button
-            onClick={navigateBack}
-            className="text-white/80 hover:text-white transition-colors"
-          >
-            <IoArrowBack className="text-2xl" />
-          </button>
-
-          <h1 className="text-white uppercase font-black text-xl flex-1">
-            MARKET
-          </h1>
-
-          <WalletConnect summaryToken="WLD" />
-        </div>
-
-        {/* Filters */}
-        <div className="px-5 pb-4 flex items-center justify-between gap-4">
-          <div className="flex rounded-lg overflow-hidden bg-rb-dark text-white/60">
-            <button
-              onClick={() => setViewMode("grid")}
-              className={cn(
-                "size-8 grid place-items-center pl-0.5 rounded-l-lg transition-colors",
-                viewMode === "grid"
-                  ? "bg-rb-green text-black"
-                  : "hover:text-white"
-              )}
-            >
-              <TfiLayoutGrid2Alt />
-            </button>
-
-            <button
-              onClick={() => setViewMode("list")}
-              className={cn(
-                "size-8 grid place-items-center pr-0.5 rounded-r-lg transition-colors",
-                viewMode === "list"
-                  ? "bg-rb-green text-black"
-                  : "hover:text-white"
-              )}
-            >
-              <TfiLayoutColumn3Alt className="rotate-90 scale-95" />
-            </button>
-          </div>
-
-          <label className="flex items-center gap-2">
-            <span className="text-white/60 text-xs">Sort by:</span>
-            <div className="relative">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-black bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
-              >
-                <option value="score">SCORE</option>
-                <option value="minted">MINTED</option>
-                <option value="price">PRICE</option>
-              </select>
-              <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white">
-                <IoChevronDownSharp />
-              </div>
-            </div>
-          </label>
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
-          <div
+            onClick={() => setViewMode("grid")}
             className={cn(
-              "grid gap-3",
-              viewMode === "grid" ? "grid-cols-2" : "grid-cols-1"
+              "size-8 grid place-items-center pl-0.5 transition-colors",
+              viewMode === "grid"
+                ? "bg-rb-green-light text-black"
+                : "hover:text-white"
             )}
           >
-            {availableGames.map((game) => {
-              const isOwned = ownedGames.some(
-                (owned) => false //owned.collectionId === game.collectionId
-              )
+            <TfiLayoutGrid2Alt />
+          </button>
 
-              const Container = viewMode === "grid" ? ItemGrid : ItemList
-              return (
-                <Container
-                  key={`game-cat-${game.collectionId}`}
-                  game={game}
-                  isOwned={isOwned}
-                  onSelect={() => pushGamePage(game.collectionId)}
-                />
-              )
-            })}
+          <button
+            onClick={() => setViewMode("list")}
+            className={cn(
+              "size-8 grid place-items-center pr-0.5 transition-colors",
+              viewMode === "list"
+                ? "bg-rb-green-light text-black/85"
+                : "hover:text-white"
+            )}
+          >
+            <TfiLayoutColumn3Alt className="rotate-90 scale-95" />
+          </button>
+        </div>
+
+        <label className="flex items-center gap-2">
+          <span className="text-white/60 text-xs">Sort by:</span>
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as SortBy)}
+              className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-black bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
+            >
+              <option value="score">SCORE</option>
+              <option value="minted">MINTED</option>
+              <option value="price">PRICE</option>
+            </select>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-white">
+              <IoChevronDownSharp />
+            </div>
           </div>
+        </label>
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-5 pb-4">
+        <div
+          className={cn(
+            "grid gap-3",
+            viewMode === "grid" ? "grid-cols-2" : "grid-cols-1"
+          )}
+        >
+          {availableGames.map((game) => {
+            const isOwned = ownedGames.some(
+              (owned) => false //owned.collectionId === game.collectionId
+            )
+
+            const Container = viewMode === "grid" ? ItemGrid : ItemList
+            return (
+              <Container
+                key={`game-cat-${game.collectionId}`}
+                game={game}
+                isOwned={isOwned}
+                onSelect={() => pushGamePage(game.collectionId)}
+              />
+            )
+          })}
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }
 

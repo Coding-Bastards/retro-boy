@@ -5,9 +5,9 @@ import { Fragment } from "react/jsx-runtime"
 import { useEmulator } from "./lib/EmulatorContext"
 import { useAppRouter } from "./lib/routes"
 
-import Game from "@/app/components/Game"
-import MarketPage from "@/app/components/Market"
-import GamePage from "@/app/components/GamePage"
+import Game from "@/components/Game"
+import MarketPage from "@/components/MarketPage"
+import GamePage from "@/components/GamePage"
 
 import GameCatalogue from "./components/GameCatalogue"
 import DrawerBoard from "./components/DrawerBoard"
