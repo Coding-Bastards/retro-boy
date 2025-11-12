@@ -29,11 +29,12 @@ function PlayerItem({
   player,
   position,
   isConnectedUser,
-  className,
+  isOutsideBoard,
 }: {
   player: Player
   position: number
   isConnectedUser?: boolean
+  isOutsideBoard?: boolean
   className?: string
 }) {
   return (
@@ -42,17 +43,22 @@ function PlayerItem({
         "flex items-center gap-3 p-3 rounded-lg",
         isConnectedUser
           ? "bg-rb-green/10 border border-rb-green/30"
-          : "bg-rb-dark",
-        className
+          : "bg-rb-dark"
       )}
     >
-      <div
-        className={cn(
-          "text-xl PositionContainer font-black shrink-0 w-8 whitespace-nowrap text-center",
-          isConnectedUser ? "text-rb-green" : "text-white/40"
-        )}
-      >
-        #{numberToShortWords(position)}
+      <div>
+        {isOutsideBoard ? (
+          <h2 className="text-xs text-white font-black mt-1">POS</h2>
+        ) : null}
+        <div
+          className={cn(
+            "font-black shrink-0 whitespace-nowrap text-center",
+            isConnectedUser ? "text-rb-green" : "text-white/40",
+            isOutsideBoard ? "text-base -mt-1 mr-2" : "text-xl w-8"
+          )}
+        >
+          #{position}
+        </div>
       </div>
 
       <AddressBlock address={player.address} size={10} />
@@ -118,10 +124,12 @@ export default function DrawerBoard() {
 
   const isInTopBoard = MOCK_PLAYERS.some((p) => p.address === address)
 
+  const BOARD = [...MOCK_PLAYERS, ...MOCK_PLAYERS]
+
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerContent className="max-w-md h-[calc(100vh-4rem)] mx-auto bg-rb-darker border-white/10">
-        <DrawerHeader>
+        <DrawerHeader className="pb-6">
           <DrawerTitle className="text-white text-center uppercase font-black">
             TOP PLAYERS (
             <span className="inline-flex items-center gap-1">
@@ -133,22 +141,11 @@ export default function DrawerBoard() {
         </DrawerHeader>
 
         <div className="grow flex flex-col gap-2 overflow-y-auto px-4">
-          {[...MOCK_PLAYERS, ...MOCK_PLAYERS].map((player, index) => (
-            <PlayerItem
-              key={`board-player-${player.address}`}
-              player={player}
-              position={index + 1}
-              isConnectedUser={player.address === address}
-            />
-          ))}
-
           {isInTopBoard || !address ? null : (
             <Fragment>
-              <div className="h-px w-full shrink-0 bg-white/15 my-2" />
-
               <PlayerItem
                 isConnectedUser
-                className="[&_.PositionContainer]:w-auto [&_.AddressBlock]:border-black"
+                isOutsideBoard
                 player={{
                   address,
                   rbcPoints: 4,
@@ -156,8 +153,20 @@ export default function DrawerBoard() {
                 }}
                 position={5420}
               />
+
+              <div className="h-px w-full shrink-0 bg-white/10 my-3" />
             </Fragment>
           )}
+
+          {BOARD.map((player, index) => (
+            <PlayerItem
+              key={`board-player-${player.address}-${index}`}
+              player={player}
+              position={index + 1}
+              isConnectedUser={player.address === address}
+            />
+          ))}
+
           <div className="my-2" />
         </div>
 

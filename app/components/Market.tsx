@@ -3,10 +3,10 @@
 import { useSearchParams } from "next/navigation"
 import { Suspense, useState } from "react"
 
-import { useAllGames, useOwnedGames } from "@/app/lib/games"
+import { useAllGames, useOwnedGames } from "@/lib/games"
 import { useAppRouter } from "@/app/lib/routes"
-import { localizeNumber } from "@/app/lib/numbers"
-import { cn } from "@/app/lib/utils"
+import { localizeNumber, numberToShortWords } from "@/lib/numbers"
+import { cn } from "@/lib/utils"
 
 import { TfiLayoutColumn3Alt, TfiLayoutGrid2Alt } from "react-icons/tfi"
 import { IoArrowBack, IoChevronDownSharp } from "react-icons/io5"
@@ -17,123 +17,6 @@ import GameStars from "./GameCatalogue/GameStars"
 
 type SortBy = "owners" | "score" | "price"
 type ViewMode = "grid" | "list"
-
-interface MarketItemProps {
-  game: ReturnType<typeof useAllGames>[0]
-  isOwned: boolean
-  onSelect: () => void
-}
-
-function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
-  return (
-    <button
-      onClick={onSelect}
-      className="flex flex-col rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left overflow-hidden"
-    >
-      {/* Cover */}
-      <div
-        className={cn(
-          "w-full aspect-square bg-rb-darker relative",
-          isOwned && "grayscale"
-        )}
-      >
-        {/* Owned Overlay */}
-        {isOwned && (
-          <div className="absolute inset-0 bg-black/60 z-10 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="text-white/80 font-black text-lg uppercase tracking-wider">
-              OWNED
-            </span>
-          </div>
-        )}
-
-        <img src={game.cover} alt="" className="w-full h-full object-cover" />
-      </div>
-
-      {/* Info */}
-      <div className={cn("p-3", isOwned && "grayscale saturate-50")}>
-        <h3 className="text-white font-black text-sm line-clamp-1">
-          {game.title}
-        </h3>
-
-        <nav className="mt-1">
-          <GameStars
-            className="text-xs"
-            likes={game.likes || 0}
-            dislikes={game.dislikes || 0}
-          />
-        </nav>
-
-        <div className="flex border-t mt-7 pt-2.5 -mx-3 px-3 border-white/15 items-center justify-between gap-2">
-          <div className="flex items-center gap-1 text-xs text-white/60">
-            <MdPerson />
-            <span>{localizeNumber(game.totalOwners)}</span>
-          </div>
-          <div className="text-rb-green font-black text-sm">5 WLD</div>
-        </div>
-      </div>
-    </button>
-  )
-}
-
-function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
-  return (
-    <button
-      onClick={onSelect}
-      className="flex gap-1 pr-1 rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left overflow-hidden"
-    >
-      {/* Cover */}
-      <div
-        className={cn(
-          "w-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
-          isOwned && "grayscale"
-        )}
-      >
-        {/* Owned Overlay */}
-        {isOwned && (
-          <div className="absolute inset-0 bg-black/60 z-10 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="text-white/80 font-black text-xs uppercase tracking-wider">
-              OWNED
-            </span>
-          </div>
-        )}
-
-        <img src={game.cover} alt="" className="w-full h-full object-cover" />
-      </div>
-
-      {/* Info */}
-      <div
-        className={cn(
-          "flex-1 flex flex-col justify-between min-w-0 p-3",
-          isOwned && "grayscale saturate-50"
-        )}
-      >
-        <div>
-          <h3 className="text-white font-black text-sm line-clamp-1 mb-1">
-            {game.title}
-          </h3>
-          <p className="text-white/60 text-xs line-clamp-2 mb-2">
-            {game.description || "No description available."}
-          </p>
-        </div>
-
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-            <GameStars
-              className="text-xs"
-              likes={game.likes || 0}
-              dislikes={game.dislikes || 0}
-            />
-            <div className="flex items-center gap-1 text-xs text-white/60">
-              <MdPerson />
-              <span>{localizeNumber(game.totalOwners)}</span>
-            </div>
-          </div>
-          <div className="text-rb-green font-black text-sm">5 WLD</div>
-        </div>
-      </div>
-    </button>
-  )
-}
 
 function MarketContent() {
   const { pushGamePage, router } = useAppRouter()
@@ -190,7 +73,7 @@ function MarketContent() {
             <button
               onClick={() => setViewMode("grid")}
               className={cn(
-                "p-2 rounded-lg transition-colors",
+                "size-8 grid place-items-center pl-0.5 rounded-l-lg transition-colors",
                 viewMode === "grid"
                   ? "bg-rb-green text-black"
                   : "hover:text-white"
@@ -198,10 +81,11 @@ function MarketContent() {
             >
               <TfiLayoutGrid2Alt />
             </button>
+
             <button
               onClick={() => setViewMode("list")}
               className={cn(
-                "p-2 rounded-lg transition-colors",
+                "size-8 grid place-items-center pr-0.5 rounded-r-lg transition-colors",
                 viewMode === "list"
                   ? "bg-rb-green text-black"
                   : "hover:text-white"
@@ -217,7 +101,7 @@ function MarketContent() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-semibold bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
+                className="appearance-none px-3 py-1.5 pr-8 rounded-lg text-xs font-black bg-rb-dark text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-rb-green/60 cursor-pointer"
               >
                 <option value="score">SCORE</option>
                 <option value="owners">OWNERS</option>
@@ -243,21 +127,13 @@ function MarketContent() {
                 (owned) => false //owned.collectionId === game.collectionId
               )
 
-              const handleSelect = () => pushGamePage(game.collectionId)
-
-              return viewMode === "grid" ? (
-                <ItemGrid
-                  key={`market-game-${game.collectionId}`}
+              const Container = viewMode === "grid" ? ItemGrid : ItemList
+              return (
+                <Container
+                  key={`game-cat-${game.collectionId}`}
                   game={game}
                   isOwned={isOwned}
-                  onSelect={handleSelect}
-                />
-              ) : (
-                <ItemList
-                  key={`market-game-${game.collectionId}`}
-                  game={game}
-                  isOwned={isOwned}
-                  onSelect={handleSelect}
+                  onSelect={() => pushGamePage(game.collectionId)}
                 />
               )
             })}
@@ -265,6 +141,142 @@ function MarketContent() {
         </div>
       </div>
     </div>
+  )
+}
+
+interface MarketItemProps {
+  game: ReturnType<typeof useAllGames>[0]
+  isOwned: boolean
+  onSelect: () => void
+}
+
+function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
+  return (
+    <button
+      onClick={onSelect}
+      className="flex flex-col rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left overflow-hidden relative"
+    >
+      <div
+        className={cn(
+          "absolute right-0 bottom-0 w-32 h-10 bg-linear-to-tl from-rb-green/15 via-rb-green/0 to-rb-green/0 pointer-events-none",
+          isOwned && "grayscale"
+        )}
+      />
+
+      {/* Cover */}
+      <div
+        className={cn(
+          "w-full aspect-square bg-rb-darker relative",
+          isOwned && "grayscale"
+        )}
+      >
+        {/* Owned Overlay */}
+        {isOwned && (
+          <div className="absolute inset-0 bg-black/60 z-10 backdrop-blur-[2px] flex items-center justify-center">
+            <span className="text-white/80 font-black text-lg uppercase tracking-wider">
+              OWNED
+            </span>
+          </div>
+        )}
+
+        <img src={game.cover} alt="" className="w-full h-full object-cover" />
+      </div>
+
+      {/* Info */}
+      <div className={cn("p-3", isOwned && "grayscale saturate-50")}>
+        <h3 className="text-white font-black text-sm line-clamp-1">
+          {game.title}
+        </h3>
+
+        <nav className="mt-1">
+          <GameStars
+            className="text-xs"
+            likes={game.likes || 0}
+            dislikes={game.dislikes || 0}
+          />
+        </nav>
+
+        <div className="flex border-t mt-7 pt-2.5 -mx-3 px-3 border-white/15 items-center justify-between gap-2">
+          <div className="flex items-center gap-1 text-xs text-white/60">
+            <MdPerson />
+            <span>{localizeNumber(game.totalOwners)}</span>
+          </div>
+          <div className="text-rb-green font-black whitespace-nowrap text-sm">
+            5 WLD
+          </div>
+        </div>
+      </div>
+    </button>
+  )
+}
+
+function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
+  return (
+    <button
+      onClick={onSelect}
+      className="flex gap-1 pr-1 rounded-xl bg-rb-dark hover:bg-rb-dark/80 transition-colors text-left overflow-hidden relative"
+    >
+      {/* Gradient overlay on right edge */}
+      <div
+        className={cn(
+          "absolute right-0 bottom-0 w-40 h-14 bg-linear-to-tl from-rb-green/15 via-rb-green/0 to-rb-green/0 pointer-events-none",
+          isOwned && "grayscale"
+        )}
+      />
+
+      {/* Cover */}
+      <div
+        className={cn(
+          "w-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
+          isOwned && "grayscale"
+        )}
+      >
+        {/* Owned Overlay */}
+        {isOwned && (
+          <div className="absolute inset-0 bg-black/60 z-10 backdrop-blur-[2px] flex items-center justify-center">
+            <span className="text-white/80 font-black text-xs uppercase tracking-wider">
+              OWNED
+            </span>
+          </div>
+        )}
+
+        <img src={game.cover} alt="" className="w-full h-full object-cover" />
+      </div>
+
+      {/* Info */}
+      <div
+        className={cn(
+          "flex-1 flex flex-col justify-between min-w-0 p-3",
+          isOwned && "grayscale saturate-50"
+        )}
+      >
+        <div>
+          <h3 className="text-white font-black text-sm line-clamp-1 mb-1">
+            {game.title}
+          </h3>
+          <p className="text-white/60 text-xs line-clamp-2 mb-2">
+            {game.description || "No description available."}
+          </p>
+        </div>
+
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-3">
+            <GameStars
+              className="text-xs"
+              likes={game.likes || 0}
+              dislikes={game.dislikes || 0}
+            />
+            <div className="flex items-center gap-1 text-xs text-white/60">
+              <MdPerson />
+              <span>{numberToShortWords(game.totalOwners)}</span>
+            </div>
+          </div>
+          <div className="text-rb-green font-black whitespace-nowrap text-sm">
+            5 WLD
+          </div>
+        </div>
+      </div>
+    </button>
   )
 }
 
