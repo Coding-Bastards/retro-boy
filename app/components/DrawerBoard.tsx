@@ -15,8 +15,7 @@ import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
-
-const CONNECTED_WALLET = "0x163f8c2467924be0ae7b5347228cabf260318753" as Address
+import { useWorldAuth } from "@radish-la/world-auth"
 
 interface Player {
   address: Address
@@ -54,6 +53,7 @@ const MOCK_PLAYERS: Player[] = [
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
+  const { address } = useWorldAuth()
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -71,7 +71,7 @@ export default function DrawerBoard() {
 
         <div className="grow flex flex-col gap-2 overflow-y-auto px-4">
           {[...MOCK_PLAYERS, ...MOCK_PLAYERS].map((player, index) => {
-            const isConnected = player.address === CONNECTED_WALLET
+            const isConnected = player.address === address
             return (
               <div
                 key={player.address}
