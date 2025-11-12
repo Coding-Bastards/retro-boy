@@ -63,14 +63,6 @@ export default function Game() {
     releaseAllDirections()
   }
 
-  const openGameCatalogue = () => setCatalogueOpen(true)
-
-  const withOpenCatalogue = (cb: () => void) => {
-    // Open catalogue if game not loaded
-    // else call the callback method
-    return isGameLoaded ? cb : openGameCatalogue
-  }
-
   // Register the canvas with the emulator context
   useEffect(() => {
     if (gameCanvas) return
@@ -82,7 +74,7 @@ export default function Game() {
       {/* Screen */}
       <div
         role="button"
-        onClick={openGameCatalogue}
+        onClick={() => setCatalogueOpen(true)}
         className="flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all"
       >
         {isGameLoaded ? null : (
@@ -187,16 +179,16 @@ export default function Game() {
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={withOpenCatalogue(() => handleButtonPress(6))}
-            onRelease={withOpenCatalogue(() => handleButtonRelease(6))}
+            onPress={() => handleButtonPress(6)}
+            onRelease={() => handleButtonRelease(6)}
             variant="pill"
           >
             SELECT
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
-            onPress={withOpenCatalogue(() => handleButtonPress(7))}
-            onRelease={withOpenCatalogue(() => handleButtonRelease(7))}
+            onPress={() => handleButtonPress(7)}
+            onRelease={() => handleButtonRelease(7)}
             variant="pill"
           >
             START
