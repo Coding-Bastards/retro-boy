@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useAtom } from "jotai"
 import Image from "next/image"
 
 import { useOwnedGames, type Game } from "@/app/lib/games"

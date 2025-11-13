@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
 import AddressBlock from "./AddressBlock"
 import Dialog from "./Dialog"
@@ -20,6 +20,11 @@ export default function WalletConnect({
 
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { WLD, RBC } = useAccountBalancess(address)
+
+  useEffect(() => {
+    // For debugging purposes
+    console.debug(`Address - ${address}`)
+  }, [address])
 
   const handleDisconnect = () => {
     signOut?.()

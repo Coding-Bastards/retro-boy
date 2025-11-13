@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 
 import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/app/lib/EmulatorContext"
+import ErudaProvider from "@/components/ErudaProdiver"
 import WorldProvider from "./WorldProvider"
 
 const nextFont = Geist_Mono({
@@ -34,9 +35,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nextFont.className} antialiased`}>
-        <EmulatorProvider>
-          <WorldProvider>{children}</WorldProvider>
-        </EmulatorProvider>
+        <ErudaProvider>
+          <EmulatorProvider>
+            <WorldProvider>{children}</WorldProvider>
+          </EmulatorProvider>
+        </ErudaProvider>
       </body>
     </html>
   )

@@ -60,6 +60,7 @@ export default function GamePage() {
       ],
     })
 
+    console.debug({ finalPayload })
     if (finalPayload.status === "success") {
       alert("Yaaay")
     }

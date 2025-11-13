@@ -4,10 +4,12 @@ import type { TGameNFT } from "@/@types/game-nft"
 import imageGallery from "@/public/image-gallery.json"
 import useSWR from "swr"
 
+import { useWorldAuth } from "@radish-la/world-auth"
 import { erc721Abi, parseAbi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
-import { ADDRESS_GAME_REGISTRY, BASE_REPO_URL } from "./constants"
+import { ADDRESS_GAME_REGISTRY, BASE_REPO_URL, ZERO } from "./constants"
+
 export interface Game {
   collectionId: Address
   title: string
@@ -89,12 +91,38 @@ export const useAllGames = () => {
   }
 }
 
-export const useOwnedGames = (ownerAddress?: Address) => {
+export const useOwnedGames = () => {
+  // Fetch all games from registry
+  const { address: ownerAddress } = useWorldAuth()
   const { games: allGames } = useAllGames()
-  const games = [] as Game[]
+
+  const { data: ownedGames = [] } = useSWR(
+    ownerAddress ? `games.owned.${ownerAddress}.${allGames.length}` : null,
+    async () => {
+      if (!ownerAddress) return []
+
+      const ownedNFTs = await clientWorldchain.multicall({
+        contracts: allGames.map((game) => ({
+          address: game.collectionId,
+          abi: erc721Abi,
+          functionName: "balanceOf",
+          args: [ownerAddress],
+        })),
+      })
+
+      return ownedNFTs
+        .map((nft, index) => {
+          const nftAddress = allGames[index].collectionId
+          const game = allGames.find((g) => g.collectionId === nftAddress)
+          const ownedBalance = BigInt(nft.result || ZERO)
+          return game && ownedBalance > 0 ? game : null
+        })
+        .filter(Boolean) as Game[]
+    }
+  )
 
   return {
-    games,
-    isEmpty: games.length === 0,
+    games: ownedGames,
+    isEmpty: ownedGames.length === 0,
   }
 }
