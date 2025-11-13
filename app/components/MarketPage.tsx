@@ -205,7 +205,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
       {/* Cover */}
       <div
         className={cn(
-          "w-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
+          "size-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
           isOwned && "grayscale"
         )}
       >
