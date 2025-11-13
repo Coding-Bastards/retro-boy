@@ -1,21 +1,29 @@
 "use client"
 
-import { useRouter, useSearchParams } from "next/navigation"
+import type { ReadContractParameters } from "viem"
+import { MiniKit } from "@worldcoin/minikit-js"
+import { useSearchParams } from "next/navigation"
 
-import { useAllGames, useOwnedGames } from "@/app/lib/games"
-import { localizeNumber } from "@/app/lib/numbers"
+import { useWorldAuth } from "@radish-la/world-auth"
+import { useAllGames, useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
-import { useEmulator } from "@/app/lib/EmulatorContext"
+import { useEmulator } from "@/lib/EmulatorContext"
+import { useAppRouter } from "@/lib/routes"
+
+import { localizeNumber } from "@/lib/numbers"
 
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
 import PageContainer from "./PageContainer"
+import { parseAbi } from "viem"
+import { ADDRESS_GAME_REGISTRY } from "../lib/constants"
 
 export default function GamePage() {
-  const router = useRouter()
+  const { isConnected, signIn } = useWorldAuth()
   const { loadGame } = useEmulator()
+  const { navigateHome } = useAppRouter()
   const searchParams = useSearchParams()
 
   const { games: allGames } = useAllGames()
@@ -23,20 +31,37 @@ export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
 
   const collectionId = searchParams.get("game")
-
   const game = allGames.find((g) => g.collectionId === collectionId)
   if (!game) return null
 
   const isOwned = ownedGames.some((g) => g.collectionId === collectionId)
 
-  const handleAction = () => {
+  const handleAction = async () => {
     if (isOwned) {
-      router.push("/") // Back to main emulator page
       loadGame(game.rom, game.collectionId)
       setIsCatalogueOpen(false) // Close catalogue on game load
-    } else {
-      // Handle buy logic
-      console.debug("Buy game:", game.title)
+      return navigateHome()
+    }
+
+    if (!isConnected) return signIn()
+
+    const ABI = parseAbi([
+      "function mintCartridge(address gameAddress) external",
+    ])
+
+    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+      transaction: [
+        {
+          abi: ABI,
+          address: ADDRESS_GAME_REGISTRY,
+          functionName: "mintCartridge",
+          args: [game.collectionId],
+        } satisfies ReadContractParameters<typeof ABI>,
+      ],
+    })
+
+    if (finalPayload.status === "success") {
+      alert("Yaaay")
     }
   }
 
