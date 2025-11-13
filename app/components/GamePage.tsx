@@ -4,13 +4,14 @@ import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
 
 import { useWorldAuth } from "@radish-la/world-auth"
-import { useAllGames, useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useAppRouter } from "@/lib/routes"
+import { useGame } from "@/hooks/games"
 
 import { localizeNumber } from "@/lib/numbers"
 
+import { FaHeart } from "react-icons/fa6"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
@@ -21,20 +22,16 @@ import Button from "./Button"
 import PageContainer from "./PageContainer"
 
 export default function GamePage() {
+  const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
+
   const { isConnected, signIn } = useWorldAuth()
   const { loadGame } = useEmulator()
   const { navigateHome } = useAppRouter()
   const searchParams = useSearchParams()
 
-  const { games: allGames } = useAllGames()
-  const { games: ownedGames } = useOwnedGames()
-  const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
-
   const collectionId = searchParams.get("game")
-  const game = allGames.find((g) => g.collectionId === collectionId)
+  const { game, isOwned } = useGame(collectionId || "")
   if (!game) return null
-
-  const isOwned = ownedGames.some((g) => g.collectionId === collectionId)
 
   const handleAction = async () => {
     if (isOwned) {
@@ -68,7 +65,13 @@ export default function GamePage() {
     <PageContainer title={game.title}>
       <div className="flex-1 overflow-auto p-5 pt-6">
         {/* Cover Image */}
-        <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4">
+        <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4 relative">
+          {isOwned && (
+            <div className="absolute flex items-center gap-1.5 z-1 top-3 right-3 rounded-full bg-linear-to-tr border border-white/10 from-white/60 to-white/30 text-black px-3 py-1 text-xs font-black">
+              <span>OWNED</span>
+              <FaHeart />
+            </div>
+          )}
           <img src={game.cover} className="w-full h-full object-cover" alt="" />
         </div>
 
