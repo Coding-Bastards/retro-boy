@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 
-import { useOwnedGames, type Game } from "@/app/lib/games"
-import { useAtomIsCatalogueOpen } from "@/app/lib/store"
-import { cn } from "@/app/lib/utils"
-import { useEmulator } from "@/app/lib/EmulatorContext"
+import { useOwnedGames, type Game } from "@/lib/games"
+import { useAtomIsCatalogueOpen } from "@/lib/store"
+import { cn } from "@/lib/utils"
+import { useEmulator } from "@/lib/EmulatorContext"
 
-import Button from "@/app/components/Button"
+import { useGameStats } from "@/hooks/games"
+import Button from "@/components/Button"
+
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer"
 import GameStars from "./GameStars"
 
@@ -29,6 +31,8 @@ function GameCard({
   onSelect: () => void
   className?: string
 }) {
+  const { gameStats } = useGameStats(game.collectionId)
+
   return (
     <button
       data-game-id={game.collectionId}
@@ -59,7 +63,7 @@ function GameCard({
       <div className="flex p-6 flex-col text-left">
         <h3 className="text-white font-black line-clamp-1">{game.title}</h3>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-white/60">{game.playTime}</span>
+          <span className="text-white/60">{gameStats.playTimeInSeconds}</span>
           <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
         </div>
       </div>

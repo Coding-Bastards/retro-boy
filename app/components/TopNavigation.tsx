@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { cn } from "@/app/lib/utils"
+import { cn } from "@/lib/utils"
 
-import Dialog from "@/app/components/Dialog"
-import WalletConnect from "@/app/components/WalletConnect"
+import Dialog from "@/components/Dialog"
+import WalletConnect from "@/components/WalletConnect"
 import Button from "./Button"
 
 type TopNavigationProps = {

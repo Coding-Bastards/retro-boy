@@ -2,7 +2,7 @@ import "./globals.css"
 import type { Metadata, Viewport } from "next"
 
 import { Geist_Mono } from "next/font/google"
-import { EmulatorProvider } from "@/app/lib/EmulatorContext"
+import { EmulatorProvider } from "@/lib/EmulatorContext"
 import ErudaProvider from "@/components/ErudaProdiver"
 import WorldProvider from "./WorldProvider"
 

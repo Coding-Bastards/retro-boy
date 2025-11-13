@@ -6,9 +6,8 @@ import {
   DialogContent,
   DialogTrigger,
   DialogTitle,
-  DialogClose,
-} from "@/app/components/ui/dialog"
-import { cn } from "@/app/lib/utils"
+} from "@/components/ui/dialog"
+import { cn } from "@/lib/utils"
 
 export type DialogProps = {
   trigger: ReactNode

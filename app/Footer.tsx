@@ -1,6 +1,5 @@
-import { useSetAtom } from "jotai"
-import { useAtomIsBoardOpen, useAtomIsCatalogueOpen } from "@/app/lib/store"
-import { useAppRouter } from "@/app/lib/routes"
+import { useAtomIsBoardOpen, useAtomIsCatalogueOpen } from "@/lib/store"
+import { useAppRouter } from "@/lib/routes"
 
 import { ImFolderDownload } from "react-icons/im"
 import { MdLeaderboard } from "react-icons/md"

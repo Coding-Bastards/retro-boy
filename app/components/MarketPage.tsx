@@ -3,7 +3,7 @@
 import { useState } from "react"
 
 import { type Game, useAllGames, useOwnedGames } from "@/lib/games"
-import { useAppRouter } from "@/app/lib/routes"
+import { useAppRouter } from "@/lib/routes"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 

@@ -5,10 +5,11 @@ import imageGallery from "@/public/image-gallery.json"
 import useSWR from "swr"
 
 import { useWorldAuth } from "@radish-la/world-auth"
-import { erc721Abi, parseAbi, type Address } from "viem"
+import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
 import { ADDRESS_GAME_REGISTRY, BASE_REPO_URL, ZERO } from "./constants"
+import { ABI_REGISTRY } from "./abi"
 
 export interface Game {
   collectionId: Address
@@ -19,15 +20,10 @@ export interface Game {
   nftImage: string
   gallery: string[]
   cover?: string
-  playTime?: string
-  totalOwners?: number
+  totalOwners: number
   likes?: number
   dislikes?: number
 }
-
-const ABI_REGISTRY = parseAbi([
-  "function getGames() external view returns (address[] memory)",
-])
 
 export const useAllGames = () => {
   const { data: games = [] } = useSWR(`all-games`, async () => {
@@ -38,25 +34,36 @@ export const useAllGames = () => {
     })
 
     const rawGames = await clientWorldchain.multicall({
-      contracts: addresses.map((address) => ({
-        address,
-        abi: erc721Abi,
-        functionName: "symbol",
-      })),
+      contracts: [
+        ...addresses.map((address) => ({
+          address,
+          abi: erc721Abi,
+          functionName: "symbol",
+        })),
+
+        // Get total owners for each game
+        ...addresses.map((address) => ({
+          address,
+          abi: erc721Abi,
+          functionName: "totalSupply",
+        })),
+      ],
     })
 
     const filteredGames = rawGames
       .map((rawGame, index) => ({
         collectionId: addresses[index],
+        // Map total owners from multicall result
+        totalOwners: Number(rawGames[addresses.length + index]?.result || 0),
         symbol: rawGame.result,
       }))
       .filter(
         (game) => typeof game?.symbol === "string"
         // Filter out invalid games
-      ) as { collectionId: Address; symbol: string }[]
+      ) as { collectionId: Address; symbol: string; totalOwners: number }[]
 
     return await Promise.all(
-      filteredGames.map(async ({ collectionId, symbol }) => {
+      filteredGames.map(async ({ collectionId, totalOwners, symbol }) => {
         const data = await fetch(
           `https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/${symbol}/data.json`
         )
@@ -78,6 +85,7 @@ export const useAllGames = () => {
           title,
           nftImage,
           description,
+          totalOwners,
           gallery,
           cover: `${BASE_REPO_URL}/games/${symbol}/gallery/cover.png`,
           rom: emulator.rom,

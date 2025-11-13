@@ -1,5 +1,5 @@
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
-import { cn } from "@/app/lib/utils"
+import { cn } from "@/lib/utils"
 
 interface GameStarsProps {
   likes: number

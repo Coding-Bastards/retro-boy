@@ -1,6 +1,5 @@
 "use client"
 
-import type { ReadContractParameters } from "viem"
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
 
@@ -15,10 +14,11 @@ import { localizeNumber } from "@/lib/numbers"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
+import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
+import { ADDRESS_GAME_REGISTRY } from "@/lib/constants"
+
 import Button from "./Button"
 import PageContainer from "./PageContainer"
-import { parseAbi } from "viem"
-import { ADDRESS_GAME_REGISTRY } from "../lib/constants"
 
 export default function GamePage() {
   const { isConnected, signIn } = useWorldAuth()
@@ -45,18 +45,14 @@ export default function GamePage() {
 
     if (!isConnected) return signIn()
 
-    const ABI = parseAbi([
-      "function mintCartridge(address gameAddress) external",
-    ])
-
     const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
-          abi: ABI,
+          abi: ABI_REGISTRY,
           address: ADDRESS_GAME_REGISTRY,
           functionName: "mintCartridge",
           args: [game.collectionId],
-        } satisfies ReadContractParameters<typeof ABI>,
+        } satisfies WriteParameters<typeof ABI_REGISTRY>,
       ],
     })
 
@@ -90,6 +86,7 @@ export default function GamePage() {
               {localizeNumber(game.dislikes)}
             </span>
           </div>
+
           <div className="flex items-center gap-2 ml-auto">
             <MdPerson className="text-white/60 text-xl" />
             <span className="text-white/80 whitespace-nowrap text-sm">

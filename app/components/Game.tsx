@@ -3,11 +3,11 @@
 import { useEffect, useRef } from "react"
 import { Joystick } from "react-joystick-component"
 
-import { cn } from "@/app/lib/utils"
-import { useAtomIsCatalogueOpen } from "@/app/lib/store"
+import { cn } from "@/lib/utils"
+import { useAtomIsCatalogueOpen } from "@/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
-import { useEmulator } from "@/app/lib/EmulatorContext"
+import { useEmulator } from "@/lib/EmulatorContext"
 
 import MechanicalButton from "./MechanicalButton"
 
