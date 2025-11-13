@@ -13,7 +13,7 @@ export default function GameStars({
   className,
 }: GameStarsProps) {
   const total = likes + dislikes
-  const rating = total > 0 ? (likes / total) * 5 : 0
+  const rating = total > 0 ? (likes / total) * 5 : 5 // Default to 5 stars
 
   return (
     <div className={cn("flex gap-0.5 text-yellow-400", className)}>
@@ -25,7 +25,7 @@ export default function GameStars({
             : rating >= starValue - 0.5
             ? FaStarHalfAlt
             : FaRegStar
-        return <StarIcon key={i} />
+        return <StarIcon key={`stars-${i}`} />
       })}
     </div>
   )

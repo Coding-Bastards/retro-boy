@@ -5,7 +5,7 @@ import { Fragment } from "react/jsx-runtime"
 import { useEmulator } from "./lib/EmulatorContext"
 import { useAppRouter } from "./lib/routes"
 
-import Game from "@/components/Game"
+import Emulator from "@/components/Emulator"
 import MarketPage from "@/components/MarketPage"
 import GamePage from "@/components/GamePage"
 
@@ -36,7 +36,7 @@ export default function Home() {
 
       <main className="max-w-md p-5 mx-auto">
         <TopNavigation isActiveLight={isGameLoaded} />
-        <Game />
+        <Emulator />
       </main>
 
       <Footer />

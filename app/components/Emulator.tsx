@@ -11,7 +11,7 @@ import { useEmulator } from "@/lib/EmulatorContext"
 
 import MechanicalButton from "./MechanicalButton"
 
-export default function Game() {
+export default function Emulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
   const { isGameLoaded, sendJoyPadEvent, registerCanvas, gameCanvas } =

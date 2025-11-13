@@ -1,77 +1,28 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
 
-import { useOwnedGames, type Game } from "@/lib/games"
+import { useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
-import { cn } from "@/lib/utils"
 import { useEmulator } from "@/lib/EmulatorContext"
+import { cn } from "@/lib/utils"
 
-import { useGameStats } from "@/hooks/games"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+} from "@/components/ui/drawer"
 import Button from "@/components/Button"
 
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "../ui/drawer"
-import GameStars from "./GameStars"
-
 import { BiSolidInvader } from "react-icons/bi"
+import GameCard from "./GameCard"
 
-import asset_default_cover from "@/public/default-cover.png"
-
-interface GameCatalogueProps {
-  onSelectGame: (collectionId: string) => void
-}
-
-function GameCard({
-  game,
-  onSelect,
-  className,
+export default function GameCatalogue({
+  onSelectGame,
 }: {
-  game: Game
-  onSelect: () => void
-  className?: string
+  onSelectGame: (collectionId: string) => void
 }) {
-  const { gameStats } = useGameStats(game.collectionId)
-
-  return (
-    <button
-      data-game-id={game.collectionId}
-      onClick={onSelect}
-      className={cn(
-        "flex rounded-b-2xl active:scale-98 overflow-hidden shrink-0 w-full flex-col gap-2 bg-linear-to-b from-rb-dark/0 to-rb-dark snap-center",
-        className
-      )}
-    >
-      {/* Cover Image */}
-      <figure className="rounded-4xl w-full overflow-hidden">
-        <Image
-          className="w-full aspect-square"
-          placeholder="blur"
-          blurDataURL={asset_default_cover.src}
-          onError={(e) => {
-            // Fallback to default cover image if loading fails
-            e.currentTarget.src = asset_default_cover.src
-          }}
-          width={800}
-          height={800}
-          alt=""
-          src={game?.cover || asset_default_cover.src}
-        />
-      </figure>
-
-      {/* Game Info */}
-      <div className="flex p-6 flex-col text-left">
-        <h3 className="text-white font-black line-clamp-1">{game.title}</h3>
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-white/60">{gameStats.playTimeInSeconds}</span>
-          <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
-        </div>
-      </div>
-    </button>
-  )
-}
-
-export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
   const [open, setOpen] = useAtomIsCatalogueOpen()
   const { games: ownedGames, isEmpty } = useOwnedGames()
   const { loadGame, currentGame } = useEmulator()
@@ -188,9 +139,9 @@ export default function GameCatalogue({ onSelectGame }: GameCatalogueProps) {
             <div className="flex gap-4">
               {ownedGames.map((game) => (
                 <GameCard
-                  key={`game-${game.collectionId}`}
                   game={game}
                   onSelect={() => onSelectGame(game.collectionId)}
+                  key={`game-${game.collectionId}`}
                   className={
                     isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
                   }
