@@ -16,6 +16,7 @@ const nextFont = Geist_Mono({
 export const metadata: Metadata = {
   title: "Retro Boy",
   description: "Nostalgic Gaming on the Go",
+  metadataBase: new URL("https://retro-boy.codingbastards.com/"),
 }
 
 export const viewport: Viewport = {

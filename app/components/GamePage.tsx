@@ -15,15 +15,14 @@ import PageContainer from "./PageContainer"
 
 export default function GamePage() {
   const router = useRouter()
+  const { loadGame } = useEmulator()
   const searchParams = useSearchParams()
-  const allGames = useAllGames()
+
+  const { games: allGames } = useAllGames()
   const { games: ownedGames } = useOwnedGames()
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
 
-  const { loadGame } = useEmulator()
   const collectionId = searchParams.get("game")
-
-  if (!collectionId) return null
 
   const game = allGames.find((g) => g.collectionId === collectionId)
   if (!game) return null
@@ -41,10 +40,7 @@ export default function GamePage() {
     }
   }
 
-  const GALLERY = [
-    ...(game.nftImage ? [game.nftImage] : []),
-    ...(game.gallery || []),
-  ]
+  const GALLERY = [game.nftImage, ...game.gallery]
 
   return (
     <PageContainer title={game.title}>

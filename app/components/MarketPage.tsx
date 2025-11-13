@@ -2,13 +2,13 @@
 
 import { useState } from "react"
 
-import { useAllGames, useOwnedGames } from "@/lib/games"
+import { type Game, useAllGames, useOwnedGames } from "@/lib/games"
 import { useAppRouter } from "@/app/lib/routes"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { cn } from "@/lib/utils"
 
 import { TfiLayoutColumn3Alt, TfiLayoutGrid2Alt } from "react-icons/tfi"
-import { IoArrowBack, IoChevronDownSharp } from "react-icons/io5"
+import { IoChevronDownSharp } from "react-icons/io5"
 import { MdPerson } from "react-icons/md"
 
 import WalletConnect from "./WalletConnect"
@@ -19,8 +19,8 @@ type SortBy = "minted" | "score" | "price"
 type ViewMode = "grid" | "list"
 
 export default function MarketPage() {
-  const { pushGamePage, navigateBack } = useAppRouter()
-  const allGames = useAllGames()
+  const { pushGamePage } = useAppRouter()
+  const { games: allGames } = useAllGames()
   const { games: ownedGames } = useOwnedGames()
 
   const [sortBy, setSortBy] = useState<SortBy>("score")
@@ -103,7 +103,7 @@ export default function MarketPage() {
         >
           {availableGames.map((game) => {
             const isOwned = ownedGames.some(
-              (owned) => false //owned.collectionId === game.collectionId
+              (owned) => owned.collectionId === game.collectionId
             )
 
             const Container = viewMode === "grid" ? ItemGrid : ItemList
@@ -123,7 +123,7 @@ export default function MarketPage() {
 }
 
 interface MarketItemProps {
-  game: ReturnType<typeof useAllGames>[0]
+  game: Game
   isOwned: boolean
   onSelect: () => void
 }
@@ -246,7 +246,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
             />
             <div className="flex items-center gap-1 text-xs text-white/60">
               <MdPerson />
-              <span>{numberToShortWords(game.totalOwners)}</span>
+              <span>{numberToShortWords(game?.totalOwners || 0)}</span>
             </div>
           </div>
           <div className="text-rb-green font-black whitespace-nowrap text-sm">

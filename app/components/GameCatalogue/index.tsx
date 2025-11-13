@@ -52,7 +52,7 @@ function GameCard({
           width={800}
           height={800}
           alt=""
-          src={game.cover}
+          src={game?.cover || asset_default_cover.src}
         />
       </figure>
 
