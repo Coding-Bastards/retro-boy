@@ -1,0 +1,29 @@
+{
+  "name": "Don't Let Her In",
+  "description": "A short horror story about being alone. Your alone at night in your house but something feels weird, no-one else is home... or are they?",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DLHI/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DLHI/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://flowerstudio.itch.io/dont-let-her-in",
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Adventure"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1735599600,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "Author",
+      "value": "Flower Studio"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "512 KB"
+    }
+  ]
+}
