@@ -1,9 +1,9 @@
 {
   "name": "Tobu Tobu Girl Deluxe",
   "description": "Your cat is drifting into the sky, and only you can save it. Jump, dash, and flap through dangerous obstacles to rescue your pet before time runs out!",
-  "image": "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/TTGDX/nft.png",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/TTGDX/nft.png",
   "emulator": {
-    "rom": "https://raw.githubusercontent.com/Coding-Bastards/retro-boy/master/games/TTGDX/game.gb",
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/TTGDX/game.gb",
     "romVersion": "1"
   },
   "source_or_author_url": "https://github.com/SimonLarsen/tobutobugirl-dx",

@@ -19,6 +19,7 @@ export interface Game {
   rom: string
   nftImage: string
   gallery: string[]
+  price: bigint
   cover?: string
   totalOwners: number
   likes?: number
@@ -64,9 +65,15 @@ export const useAllGames = () => {
 
     return await Promise.all(
       filteredGames.map(async ({ collectionId, totalOwners, symbol }) => {
-        const data = await fetch(
-          `https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/${symbol}/data.json`
-        )
+        const [data, price] = await Promise.all([
+          fetch(`${BASE_REPO_URL}/games/${symbol}/data.json`),
+          clientWorldchain.readContract({
+            abi: ABI_REGISTRY,
+            address: ADDRESS_GAME_REGISTRY,
+            functionName: "getPrice",
+            args: [collectionId],
+          }),
+        ])
 
         const {
           emulator,
@@ -82,6 +89,7 @@ export const useAllGames = () => {
         return {
           collectionId,
           symbol,
+          price,
           title,
           nftImage,
           description,

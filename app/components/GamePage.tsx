@@ -15,8 +15,10 @@ import { FaHeart } from "react-icons/fa6"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
+import { appendSignatureResult } from "@/lib/utils"
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
-import { ADDRESS_GAME_REGISTRY } from "@/lib/constants"
+import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
+import { TOKENS } from "@/lib/tokens"
 
 import Button from "./Button"
 import PageContainer from "./PageContainer"
@@ -34,6 +36,8 @@ export default function GamePage() {
   if (!game) return null
 
   const handleAction = async () => {
+    console.debug({ game })
+
     if (isOwned) {
       loadGame(game.rom, game.collectionId)
       setIsCatalogueOpen(false) // Close catalogue on game load
@@ -42,15 +46,40 @@ export default function GamePage() {
 
     if (!isConnected) return signIn()
 
+    // 1 hour in the future
+    const DEADLINE = Math.floor(Date.now() / 1000) + ONE_HOUR_IN_SECONDS
+    const NONCE = Date.now()
+    const AMOUNT = game.price
+    const isFreeMint = AMOUNT <= 0
+
     const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
         {
           abi: ABI_REGISTRY,
           address: ADDRESS_GAME_REGISTRY,
           functionName: "mintCartridge",
-          args: [game.collectionId],
+          // game, nonce, deadline, signature
+          args: [
+            game.collectionId,
+            BigInt(NONCE),
+            BigInt(DEADLINE),
+            isFreeMint ? "0x" : appendSignatureResult(),
+          ],
         } satisfies WriteParameters<typeof ABI_REGISTRY>,
       ],
+      permit2: isFreeMint
+        ? undefined
+        : [
+            {
+              deadline: DEADLINE,
+              nonce: NONCE,
+              spender: ADDRESS_GAME_REGISTRY,
+              permitted: {
+                amount: game.price,
+                token: TOKENS.WLD.ADDRESS,
+              },
+            },
+          ],
     })
 
     console.debug({ finalPayload })
