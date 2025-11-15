@@ -3,7 +3,7 @@
   "description": "A story-driven horror game for Game Boy. Investigate a suspicious trailer park and uncover its secret horrors.",
   "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/OPCO/nft.png",
   "emulator": {
-    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/OPCO/game.gb",
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/OPCO/game.gbc",
     "romVersion": "1"
   },
   "source_or_author_url": "https://benjelter.itch.io/opossum-country",
