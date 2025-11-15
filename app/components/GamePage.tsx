@@ -151,12 +151,13 @@ export default function GamePage() {
               return (
                 <Dialog
                   key={`gallery-dialog-${index}`}
-                  title={isNFTImage ? "NFT CARTRIDGE" : "GALLERY IMAGE"}
+                  title={isNFTImage ? "NFT CARTRIDGE" : "GAME IMAGE"}
                   trigger={
                     <div
                       role="button"
                       className={cn(
-                        isNFTImage && "outline-2 outline-white/60",
+                        isNFTImage &&
+                          "drop-shadow-[2px_2px_8px_rgba(255,255,0,0.4)]",
                         "aspect-square rounded-3xl overflow-hidden bg-white/10"
                       )}
                     >
