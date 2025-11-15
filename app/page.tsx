@@ -2,9 +2,6 @@
 
 import { Fragment } from "react/jsx-runtime"
 
-import { useEmulator } from "./lib/EmulatorContext"
-import { useAppRouter } from "./lib/routes"
-
 import Emulator from "@/components/Emulator"
 import MarketPage from "@/components/MarketPage"
 import GamePage from "@/components/GamePage"
@@ -17,9 +14,6 @@ import QueryRouter from "./QueryRouter"
 import Footer from "./Footer"
 
 export default function Home() {
-  const { pushGamePage } = useAppRouter()
-  const { isGameLoaded } = useEmulator()
-
   return (
     <Fragment>
       <QueryRouter>
@@ -31,11 +25,11 @@ export default function Home() {
         </QueryRouter.Page>
       </QueryRouter>
 
-      <GameCatalogue onSelectGame={pushGamePage} />
+      <GameCatalogue />
       <DrawerBoard />
 
       <main className="max-w-md p-5 mx-auto">
-        <TopNavigation isActiveLight={isGameLoaded} />
+        <TopNavigation />
         <Emulator />
       </main>
 

@@ -16,13 +16,14 @@ import { FaHeart } from "react-icons/fa6"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
-import { appendSignatureResult } from "@/lib/utils"
+import { appendSignatureResult, cn } from "@/lib/utils"
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
 import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
 import { TOKENS } from "@/lib/tokens"
 
 import Button from "./Button"
 import PageContainer from "./PageContainer"
+import Dialog from "./Dialog"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -144,18 +145,35 @@ export default function GamePage() {
             Gallery
           </h3>
           <div className="grid grid-cols-2 gap-3">
-            {GALLERY.map((image, index) => (
-              <div
-                key={index}
-                className="aspect-square rounded-3xl overflow-hidden bg-rb-dark"
-              >
-                <img
-                  src={image}
-                  alt=""
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+            {GALLERY.map((image, index) => {
+              const isNFTImage = index === 0
+
+              return (
+                <Dialog
+                  key={`gallery-dialog-${index}`}
+                  title={isNFTImage ? "NFT CARTRIDGE" : "GALLERY IMAGE"}
+                  trigger={
+                    <div
+                      role="button"
+                      className={cn(
+                        isNFTImage && "outline-2 outline-white/60",
+                        "aspect-square rounded-3xl overflow-hidden bg-white/10"
+                      )}
+                    >
+                      <img
+                        src={image}
+                        className="w-full h-full object-cover rounded-3xl"
+                        alt=""
+                      />
+                    </div>
+                  }
+                >
+                  <figure className="mt-5 rounded-3xl overflow-hidden">
+                    <img className="w-full" src={image} alt="" />
+                  </figure>
+                </Dialog>
+              )
+            })}
           </div>
         </div>
       </div>

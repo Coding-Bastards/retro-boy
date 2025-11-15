@@ -1,3 +1,5 @@
+"use client"
+
 import { useAtomIsBoardOpen, useAtomIsCatalogueOpen } from "@/lib/store"
 import { useAppRouter } from "@/lib/routes"
 

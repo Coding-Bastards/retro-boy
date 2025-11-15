@@ -15,15 +15,16 @@ import {
 } from "@/components/ui/drawer"
 import Button from "@/components/Button"
 
-import { BiSolidInvader } from "react-icons/bi"
 import GameCard from "./GameCard"
+import { PiHandbagSimpleFill } from "react-icons/pi"
+import Link from "next/link"
+import { IoMdArrowForward } from "react-icons/io"
+import { useAppRouter } from "@/app/lib/routes"
 
-export default function GameCatalogue({
-  onSelectGame,
-}: {
-  onSelectGame: (collectionId: string) => void
-}) {
+export default function GameCatalogue() {
   const [open, setOpen] = useAtomIsCatalogueOpen()
+
+  const { pushGamePage } = useAppRouter()
   const { games: ownedGames, isEmpty } = useOwnedGames()
   const { loadGame, currentGame } = useEmulator()
   const isSingleGameOwned = ownedGames.length === 1
@@ -81,32 +82,15 @@ export default function GameCatalogue({
 
   const isActiveGameCentered = currentGame?.gameCollectionId === centeredGameId
 
-  const buttonLabel = isEmpty
-    ? "GAME MARKET"
-    : isActiveGameCentered
-    ? "CONTINUE PLAYING"
-    : "PLAY NOW"
-
   const handleButtonClick = () => {
     // Close the catalogue drawer
     setOpen(false)
-
-    // Early exit to continue playing current game
-    if (isActiveGameCentered) return
-
-    if (isEmpty) {
-      // Show get-games market state
-      // if Empty
-      return setTimeout(
-        () => document.getElementById("market-button")?.click(),
-        200
-      )
-    }
 
     if (centeredGameId) {
       const game = ownedGames.find((g) => g.collectionId === centeredGameId)
       // Load the game directly
       if (game?.rom) loadGame(game.rom, game.collectionId)
+      return // Exit early if game is found and loaded
     }
   }
 
@@ -125,10 +109,23 @@ export default function GameCatalogue({
         </DrawerHeader>
 
         {isEmpty ? (
-          <div className="flex p-6 gap-4 flex-col text-white/60 items-center justify-center">
-            <BiSolidInvader className="text-5xl" />
-            <p className="text-sm text-center max-w-xs">
-              Your game library is empty. Get some games from the Market!
+          <div className="flex p-5 gap-4 flex-col items-center justify-center">
+            <figure className="size-24 text-white/90 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-green/15 to-rb-green/10 border-2 border-rb-green/15">
+              <PiHandbagSimpleFill className="text-5xl" />
+            </figure>
+
+            <Link
+              className="mt-8 text-white inline-flex items-center gap-1.5 font-black"
+              href="/?market"
+            >
+              <span>Open Market</span>
+              <IoMdArrowForward className="text-xl" />
+            </Link>
+
+            <p className="text-sm text-white/60 text-center max-w-72">
+              Your game library is empty.
+              <br />
+              Get some games from the Market!
             </p>
           </div>
         ) : (
@@ -140,7 +137,7 @@ export default function GameCatalogue({
               {ownedGames.map((game) => (
                 <GameCard
                   game={game}
-                  onSelect={() => onSelectGame(game.collectionId)}
+                  onSelect={() => pushGamePage(game.collectionId)}
                   key={`game-${game.collectionId}`}
                   className={
                     isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
@@ -156,7 +153,9 @@ export default function GameCatalogue({
         <div className="grow" />
 
         <div className="px-4 pt-1 pb-6">
-          <Button onClick={handleButtonClick}>{buttonLabel}</Button>
+          <Button onClick={handleButtonClick}>
+            {isEmpty || isActiveGameCentered ? "CONTINUE PLAYING" : "PLAY NOW"}
+          </Button>
         </div>
       </DrawerContent>
     </Drawer>

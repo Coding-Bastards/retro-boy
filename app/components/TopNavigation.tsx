@@ -1,17 +1,15 @@
 "use client"
 
 import { useState } from "react"
+import { useEmulator } from "@/lib/EmulatorContext"
 import { cn } from "@/lib/utils"
 
 import Dialog from "@/components/Dialog"
 import WalletConnect from "@/components/WalletConnect"
 import Button from "./Button"
 
-type TopNavigationProps = {
-  isActiveLight: boolean
-}
-
-export default function TopNavigation({ isActiveLight }: TopNavigationProps) {
+export default function TopNavigation() {
+  const { isGameLoaded } = useEmulator()
   const [open, setOpen] = useState(false)
 
   return (
@@ -29,7 +27,7 @@ export default function TopNavigation({ isActiveLight }: TopNavigationProps) {
             <span
               aria-hidden="true"
               className={cn(
-                isActiveLight
+                isGameLoaded
                   ? "bg-rb-green shadow-[0_0_6px_2px_rgba(34,197,94,0.4),0_0_14px_4px_rgba(34,197,94,0.2)]"
                   : "bg-[#727272]",
                 "rounded-full size-2 transition-all duration-300"
