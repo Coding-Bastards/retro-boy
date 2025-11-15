@@ -114,9 +114,7 @@ export const useAllGames = () => {
 
 export const useOwnedGames = () => {
   // Fetch all games from registry
-  const {
-    address: ownerAddress = "0x4c46f6d2314a41915324af999685ac447cbb79d9",
-  } = useWorldAuth()
+  const { address: ownerAddress } = useWorldAuth()
   const { games: allGames } = useAllGames()
 
   const { data: ownedGames = [], mutate } = useSWR(
