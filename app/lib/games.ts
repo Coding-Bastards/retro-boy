@@ -8,7 +8,12 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
-import { ADDRESS_GAME_REGISTRY, BASE_REPO_URL, ZERO } from "./constants"
+import {
+  ADDRESS_GAME_REGISTRY,
+  BASE_REPO_URL,
+  BASE_CDN_URL,
+  ZERO,
+} from "./constants"
 import { ABI_REGISTRY } from "./abi"
 
 export interface Game {
@@ -83,7 +88,7 @@ export const useAllGames = () => {
         } = (await data.json()) as TGameNFT
 
         const gallery: string[] = ((imageGallery as any)[symbol] || []).map(
-          (path: string) => `${BASE_REPO_URL}/games/${symbol}/gallery${path}`
+          (path: string) => `${BASE_CDN_URL}/games/${symbol}/gallery${path}`
         )
 
         return {
@@ -95,7 +100,7 @@ export const useAllGames = () => {
           description,
           totalOwners,
           gallery,
-          cover: `${BASE_REPO_URL}/games/${symbol}/gallery/cover.png`,
+          cover: `${BASE_CDN_URL}/games/${symbol}/gallery/cover.png`,
           rom: emulator.rom,
         } as Game
       })
@@ -109,7 +114,9 @@ export const useAllGames = () => {
 
 export const useOwnedGames = () => {
   // Fetch all games from registry
-  const { address: ownerAddress } = useWorldAuth()
+  const {
+    address: ownerAddress = "0x4c46f6d2314a41915324af999685ac447cbb79d9",
+  } = useWorldAuth()
   const { games: allGames } = useAllGames()
 
   const { data: ownedGames = [], mutate } = useSWR(
