@@ -21,11 +21,24 @@ export const useGameStats = (collectionId: string) => {
 
 export const useGame = (collectionId: string) => {
   const { games: allGames } = useAllGames()
-  const { games: ownedGames } = useOwnedGames()
+  const { games: ownedGames, mutate: mutateOwnedGames } = useOwnedGames()
+
   const game = allGames.find((g) => g.collectionId === collectionId) || null
+  const isOwned = ownedGames.some((g) => g.collectionId === collectionId)
 
   return {
     game,
-    isOwned: ownedGames.some((g) => g.collectionId === collectionId),
+    isOwned,
+    markAsOwned: () => {
+      mutateOwnedGames(
+        (current = []) => {
+          if (isOwned) return current
+          return game ? [...current, game] : current
+        },
+        {
+          revalidate: false,
+        }
+      )
+    },
   }
 }

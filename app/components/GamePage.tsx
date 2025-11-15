@@ -2,6 +2,7 @@
 
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
+import { formatEther } from "viem"
 
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -32,12 +33,13 @@ export default function GamePage() {
   const searchParams = useSearchParams()
 
   const collectionId = searchParams.get("game")
-  const { game, isOwned } = useGame(collectionId || "")
+  const { game, isOwned, markAsOwned } = useGame(collectionId || "")
   if (!game) return null
 
-  const handleAction = async () => {
-    console.debug({ game })
+  const PRICE = game.price
+  const isFreeMint = PRICE <= 0
 
+  const handleAction = async () => {
     if (isOwned) {
       loadGame(game.rom, game.collectionId)
       setIsCatalogueOpen(false) // Close catalogue on game load
@@ -49,8 +51,6 @@ export default function GamePage() {
     // 1 hour in the future
     const DEADLINE = Math.floor(Date.now() / 1000) + ONE_HOUR_IN_SECONDS
     const NONCE = Date.now()
-    const AMOUNT = game.price
-    const isFreeMint = AMOUNT <= 0
 
     const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
@@ -75,7 +75,7 @@ export default function GamePage() {
               nonce: NONCE,
               spender: ADDRESS_GAME_REGISTRY,
               permitted: {
-                amount: game.price,
+                amount: PRICE,
                 token: TOKENS.WLD.ADDRESS,
               },
             },
@@ -84,7 +84,8 @@ export default function GamePage() {
 
     console.debug({ finalPayload })
     if (finalPayload.status === "success") {
-      alert("Yaaay")
+      markAsOwned()
+      alert("Yaay!")
     }
   }
 
@@ -162,7 +163,11 @@ export default function GamePage() {
       {/* Footer */}
       <div className="p-4 pt-1 pb-6">
         <Button onClick={handleAction}>
-          {isOwned ? "PLAY NOW" : "MINT (5 WLD)"}
+          {isOwned
+            ? "PLAY NOW"
+            : isFreeMint
+            ? "MINT (FREE)"
+            : `MINT (${formatEther(PRICE)} WLD)`}
         </Button>
       </div>
     </PageContainer>

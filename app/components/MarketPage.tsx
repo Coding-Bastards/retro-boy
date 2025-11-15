@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { formatEther } from "viem"
 
 import { type Game, useAllGames, useOwnedGames } from "@/lib/games"
 import { useAppRouter } from "@/lib/routes"
@@ -180,7 +181,7 @@ function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
             <span>{localizeNumber(game.totalOwners)}</span>
           </div>
           <div className="text-rb-green font-black whitespace-nowrap text-sm">
-            5 WLD
+            {game.price > 0 ? `${formatEther(game.price)} WLD` : "FREE"}
           </div>
         </div>
       </div>
@@ -250,7 +251,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
             </div>
           </div>
           <div className="text-rb-green font-black whitespace-nowrap text-sm">
-            5 WLD
+            {game.price > 0 ? `${formatEther(game.price)} WLD` : "FREE"}
           </div>
         </div>
       </div>

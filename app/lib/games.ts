@@ -112,7 +112,7 @@ export const useOwnedGames = () => {
   const { address: ownerAddress } = useWorldAuth()
   const { games: allGames } = useAllGames()
 
-  const { data: ownedGames = [] } = useSWR(
+  const { data: ownedGames = [], mutate } = useSWR(
     ownerAddress ? `games.owned.${ownerAddress}.${allGames.length}` : null,
     async () => {
       if (!ownerAddress) return []
@@ -138,6 +138,7 @@ export const useOwnedGames = () => {
   )
 
   return {
+    mutate,
     games: ownedGames,
     isEmpty: ownedGames.length === 0,
   }
