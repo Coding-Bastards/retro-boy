@@ -13,6 +13,7 @@
   "dependencies": {
     "@radish-la/world-auth": "0.0.1-alpha.19",
     "@radix-ui/react-dialog": "^1.1.15",
+    "@upstash/redis": "^1.35.6",
     "@worldcoin/minikit-js": "^1.9.8",
     "blo": "^2.0.0",
     "class-variance-authority": "^0.7.1",

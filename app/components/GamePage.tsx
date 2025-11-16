@@ -16,7 +16,7 @@ import { FaHeart } from "react-icons/fa6"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
-import { appendSignatureResult, cn } from "@/lib/utils"
+import { appendSignatureResult, cn, jsonify } from "@/lib/utils"
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
 import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
 import { TOKENS } from "@/lib/tokens"
@@ -24,6 +24,7 @@ import { TOKENS } from "@/lib/tokens"
 import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
+import { useAllGames } from "../lib/games"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -32,6 +33,8 @@ export default function GamePage() {
   const { loadGame } = useEmulator()
   const { navigateHome } = useAppRouter()
   const searchParams = useSearchParams()
+
+  const { mutate: mutateGames } = useAllGames()
 
   const collectionId = searchParams.get("game")
   const { game, isOwned, markAsOwned } = useGame(collectionId || "")
@@ -90,6 +93,42 @@ export default function GamePage() {
     }
   }
 
+  async function handleLikeDislike(action: "like" | "dislike") {
+    const gameId = game?.collectionId
+    if (!gameId) return
+
+    jsonify<{ ok: boolean }>(
+      fetch(`/api/game/${gameId}/stats?action=${action}`, {
+        method: "POST",
+      })
+    )
+
+    const isLike = action === "like"
+    const isDislike = !isLike
+
+    mutateGames(
+      (current = []) => {
+        return current.map((game) => {
+          if (game.collectionId === gameId) {
+            // Update likes/dislikes count optimistically
+            const currentLikes = game.likes || 0
+            const currentDislikes = game.dislikes || 0
+            return {
+              ...game,
+              likes: isLike ? currentLikes + 1 : currentLikes,
+              dislikes: isDislike ? currentDislikes + 1 : currentDislikes,
+            }
+          }
+
+          return game
+        })
+      },
+      {
+        revalidate: false,
+      }
+    )
+  }
+
   const GALLERY = [game.nftImage, ...game.gallery]
 
   return (
@@ -108,18 +147,25 @@ export default function GamePage() {
 
         {/* Score Section */}
         <div className="flex items-center gap-6 mb-6 pb-4 border-b border-white/10">
-          <div className="flex items-center gap-2">
+          <button
+            onClick={() => handleLikeDislike("like")}
+            className="flex items-center gap-2"
+          >
             <AiOutlineLike className="text-rb-green text-xl" />
             <span className="text-white font-black">
               {localizeNumber(game.likes)}
             </span>
-          </div>
-          <div className="flex items-center gap-2">
+          </button>
+
+          <button
+            onClick={() => handleLikeDislike("dislike")}
+            className="flex items-center gap-2"
+          >
             <AiOutlineDislike className="text-red-400 text-xl" />
             <span className="text-white font-black">
               {localizeNumber(game.dislikes)}
             </span>
-          </div>
+          </button>
 
           <div className="flex items-center gap-2 ml-auto">
             <MdPerson className="text-white/60 text-xl" />

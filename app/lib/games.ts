@@ -1,6 +1,6 @@
 "use client"
 
-import type { TGameNFT } from "@/@types/game-nft"
+import type { TGameNFT, TLikes } from "@/@types/game-nft"
 import imageGallery from "@/public/image-gallery.json"
 import useSWR from "swr"
 
@@ -15,6 +15,7 @@ import {
   ZERO,
 } from "./constants"
 import { ABI_REGISTRY } from "./abi"
+import { jsonify } from "./utils"
 
 export interface Game {
   collectionId: Address
@@ -32,7 +33,7 @@ export interface Game {
 }
 
 export const useAllGames = () => {
-  const { data: games = [] } = useSWR(`all-games`, async () => {
+  const { data: games = [], mutate } = useSWR(`all-games`, async () => {
     const addresses = await clientWorldchain.readContract({
       address: ADDRESS_GAME_REGISTRY,
       abi: ABI_REGISTRY,
@@ -70,8 +71,11 @@ export const useAllGames = () => {
 
     return await Promise.all(
       filteredGames.map(async ({ collectionId, totalOwners, symbol }) => {
-        const [data, price] = await Promise.all([
-          fetch(`${BASE_REPO_URL}/games/${symbol}/data.json`),
+        const [gameData, likes, price] = await Promise.all([
+          jsonify<TGameNFT>(
+            fetch(`${BASE_REPO_URL}/games/${symbol}/data.json`)
+          ),
+          jsonify<TLikes>(fetch(`/api/game/${collectionId}/stats`)),
           clientWorldchain.readContract({
             abi: ABI_REGISTRY,
             address: ADDRESS_GAME_REGISTRY,
@@ -80,18 +84,14 @@ export const useAllGames = () => {
           }),
         ])
 
-        const {
-          emulator,
-          name: title,
-          image: nftImage,
-          description,
-        } = (await data.json()) as TGameNFT
-
+        console.debug({ likes, symbol, collectionId })
+        const { emulator, name: title, image: nftImage, description } = gameData
         const gallery: string[] = ((imageGallery as any)[symbol] || []).map(
           (path: string) => `${BASE_CDN_URL}/games/${symbol}/gallery${path}`
         )
 
         return {
+          ...likes,
           collectionId,
           symbol,
           price,
@@ -109,6 +109,7 @@ export const useAllGames = () => {
 
   return {
     games,
+    mutate,
   }
 }
 

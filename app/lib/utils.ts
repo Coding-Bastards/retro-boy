@@ -12,3 +12,9 @@ export const beautifyAddress = (addr: string, size = 4, separator = "...") =>
 /** Appends Minikit resulting signature placeholder */
 export const appendSignatureResult = (opts?: { slot: number }) =>
   `PERMIT2_SIGNATURE_PLACEHOLDER_${opts?.slot || 0}` as Hash
+
+export const jsonify = <T>(response: Response | Promise<Response>) => {
+  return response instanceof Response
+    ? (response.json() as Promise<T>)
+    : response.then((r) => r.json() as Promise<T>)
+}

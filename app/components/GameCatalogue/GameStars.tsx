@@ -1,17 +1,12 @@
+import type { TLikes } from "@/@types/game-nft"
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
 import { cn } from "@/lib/utils"
-
-interface GameStarsProps {
-  likes: number
-  dislikes: number
-  className?: string
-}
 
 export default function GameStars({
   likes,
   dislikes,
   className,
-}: GameStarsProps) {
+}: TLikes & { className?: string }) {
   const total = likes + dislikes
   const rating = total > 0 ? (likes / total) * 5 : 5 // Default to 5 stars
 
