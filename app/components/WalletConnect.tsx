@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
 
-import { FaClock } from "react-icons/fa"
-
 import { useAccountBalancess } from "@/hooks/balances"
 import { useGameStats } from "@/hooks/games"
 import { beautifyAddress } from "@/lib/utils"
@@ -70,10 +68,9 @@ export default function WalletConnect({
             <div className="font-black text-lg">
               {address ? beautifyAddress(address, 6, "") : "Not Connected"}
             </div>
-            <div className="flex items-center justify-center gap-1.5 text-white/60 text-sm mt-1">
-              <FaClock />
+            <div className="text-white/60 text-sm mt-1">
               <span>
-                Played: {formatTimePlayed(emulator.playTimeInSeconds)}
+                {formatTimePlayed(emulator.playTimeInSeconds)} ― Played
               </span>
             </div>
           </div>
