@@ -1,10 +1,11 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { useWorldAuth } from "@radish-la/world-auth"
 import { Joystick } from "react-joystick-component"
 
 import { cn } from "@/lib/utils"
-import { useAtomIsCatalogueOpen } from "@/lib/store"
+import { useAtomIsCatalogueOpen, useAtomTimePlayed } from "@/lib/store"
 import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 import { useEmulator } from "@/lib/EmulatorContext"
@@ -13,9 +14,20 @@ import MechanicalButton from "./MechanicalButton"
 
 export default function Emulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const gameStartTimeRef = useRef<number | null>(null)
+  const lastKeyPressedRef = useRef<number | null>(null)
+
+  const { address } = useWorldAuth()
   const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
-  const { isGameLoaded, sendJoyPadEvent, registerCanvas, gameCanvas } =
-    useEmulator()
+  const [, setTimePlayed] = useAtomTimePlayed()
+
+  const {
+    isGameLoaded,
+    currentGame,
+    sendJoyPadEvent,
+    registerCanvas,
+    gameCanvas,
+  } = useEmulator()
 
   const addActiveDirectionClsx = (direction: string) => {
     document.getElementById(direction)?.classList?.add("text-white/60")
@@ -33,8 +45,49 @@ export default function Emulator() {
     })
   }
 
-  const handleButtonPress = (joypadCode: number) => {
-    sendJoyPadEvent(joypadCode, true)
+  const trackActivity = (joyPadCode: number) => {
+    // Don't track if no game is loaded or NO address
+    const gameId = currentGame?.gameCollectionId
+    if (!gameId || !address) return
+
+    // Keep track of last key pressed
+    const lastKeyPressed = lastKeyPressedRef.current
+
+    // Update last key pressed without checks
+    lastKeyPressedRef.current = joyPadCode
+
+    // Do not track if the same key is pressed again
+    if (lastKeyPressed === joyPadCode) return
+
+    const now = Date.now()
+    const startTime = gameStartTimeRef.current || now
+    const timeDelta = now - startTime
+
+    // Update after 1s or when starting (ZERO prev time)
+    if (timeDelta >= 1_000 || timeDelta === 0) {
+      // Reset game start time
+      gameStartTimeRef.current = now
+
+      // Only update if time delta is reasonable (<5 seconds)
+      if (timeDelta > 5_000) return
+
+      setTimePlayed((prev) => {
+        const playerTime = prev?.[gameId]?.[address] || 0
+        return {
+          ...prev,
+          [gameId]: {
+            ...prev[gameId],
+            // Increment previous time played by seconds
+            [address]: playerTime + Math.floor(timeDelta / 1000),
+          },
+        }
+      })
+    }
+  }
+
+  const sendKeyDownEvent = (keyCode: number) => {
+    sendJoyPadEvent(keyCode, true)
+    trackActivity(keyCode)
   }
 
   const handleButtonRelease = (joypadCode: number) => {
@@ -45,16 +98,16 @@ export default function Emulator() {
     releaseAllDirections()
 
     if (data.direction === "RIGHT") {
-      sendJoyPadEvent(0, true)
+      sendKeyDownEvent(0)
       addActiveDirectionClsx("RIGHT")
     } else if (data.direction === "LEFT") {
-      sendJoyPadEvent(1, true)
+      sendKeyDownEvent(1)
       addActiveDirectionClsx("LEFT")
     } else if (data.direction === "FORWARD") {
-      sendJoyPadEvent(2, true)
+      sendKeyDownEvent(2)
       addActiveDirectionClsx("FORWARD")
     } else if (data.direction === "BACKWARD") {
-      sendJoyPadEvent(3, true)
+      sendKeyDownEvent(3)
       addActiveDirectionClsx("BACKWARD")
     }
   }
@@ -160,14 +213,14 @@ export default function Emulator() {
           <div className="flex mb-6 gap-4">
             <MechanicalButton
               className="mt-10"
-              onPress={() => handleButtonPress(5)}
+              onPress={() => sendKeyDownEvent(5)}
               onRelease={() => handleButtonRelease(5)}
             >
               B
             </MechanicalButton>
 
             <MechanicalButton
-              onPress={() => handleButtonPress(4)}
+              onPress={() => sendKeyDownEvent(4)}
               onRelease={() => handleButtonRelease(4)}
             >
               A
@@ -179,7 +232,7 @@ export default function Emulator() {
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={() => handleButtonPress(6)}
+            onPress={() => sendKeyDownEvent(6)}
             onRelease={() => handleButtonRelease(6)}
             variant="pill"
           >
@@ -187,7 +240,7 @@ export default function Emulator() {
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
-            onPress={() => handleButtonPress(7)}
+            onPress={() => sendKeyDownEvent(7)}
             onRelease={() => handleButtonRelease(7)}
             variant="pill"
           >

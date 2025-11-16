@@ -22,6 +22,7 @@ interface EmulatorContextValue {
   gameCanvas: HTMLCanvasElement | null
   getGameboyInstance: () => any
   sendJoyPadEvent: (code: number, isPressed: boolean) => void
+  getPressedKeys: () => number[]
 }
 
 const EmulatorContext = createContext<EmulatorContextValue | null>(null)
@@ -160,6 +161,18 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
     return gameboyInstanceRef.current
   }
 
+  const getPressedKeys = () => {
+    const joyPadValue = gameboyInstanceRef.current?.JoyPad || 0xff
+    const pressed = []
+
+    for (let i = 0; i < 8; i++) {
+      // Check if bit i is 0 (pressed)
+      if ((joyPadValue & (1 << i)) === 0) pressed.push(i)
+    }
+
+    return pressed
+  }
+
   const value: EmulatorContextValue = {
     currentGame,
     gameCanvas: canvasRef.current,
@@ -167,6 +180,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
     sendJoyPadEvent: (code: number, isPressed: boolean) => {
       gameboyInstanceRef.current?.JoyPadEvent(code, isPressed)
     },
+    getPressedKeys,
     isGameLoaded,
     registerCanvas,
     getGameboyInstance,

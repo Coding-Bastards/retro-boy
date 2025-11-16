@@ -2,14 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
-import AddressBlock from "./AddressBlock"
-import Dialog from "./Dialog"
-import Button from "./Button"
+
 import { FaClock } from "react-icons/fa"
 
 import { useAccountBalancess } from "@/hooks/balances"
+import { useGameStats } from "@/hooks/games"
 import { beautifyAddress } from "@/lib/utils"
 import { numberToShortWords } from "@/lib/numbers"
+import { formatTimePlayed } from "@/lib/date"
+
+import AddressBlock from "./AddressBlock"
+import Dialog from "./Dialog"
+import Button from "./Button"
 
 export default function WalletConnect({
   summaryToken = "RBC",
@@ -19,6 +23,7 @@ export default function WalletConnect({
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const { address, isConnected, signOut, signIn } = useWorldAuth()
+  const { emulator } = useGameStats()
   const { WLD, RBC } = useAccountBalancess(address)
 
   useEffect(() => {
@@ -67,7 +72,9 @@ export default function WalletConnect({
             </div>
             <div className="flex items-center justify-center gap-1.5 text-white/60 text-sm mt-1">
               <FaClock />
-              <span>12h 34m Played</span>
+              <span>
+                Played: {formatTimePlayed(emulator.playTimeInSeconds)}
+              </span>
             </div>
           </div>
         </div>

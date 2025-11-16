@@ -1,20 +1,28 @@
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAllGames, useOwnedGames } from "@/lib/games"
+import { useAtomTimePlayed } from "@/lib/store"
 
-export const useGameStats = (collectionId: string) => {
-  // TODO: Fetch real stats
+export const useGameStats = (collectionId?: string) => {
+  const [timePlayed] = useAtomTimePlayed()
   const { address } = useWorldAuth()
+
+  const playTimeInSeconds =
+    timePlayed?.[collectionId || ""]?.[address || ""] || 0
+
+  const allGamesTime = Object.values(timePlayed).reduce((acc, game) => {
+    return acc + (game[address || ""] || 0)
+  }, 0)
 
   return {
     gameStats: {
       /** Play time for this specific game */
-      playTimeInSeconds: 0,
+      playTimeInSeconds,
       /** Raw saved state data */
       lastSavedState: null,
     },
     emulator: {
       /** Total play time across all games */
-      playTimeInSeconds: 0,
+      playTimeInSeconds: allGamesTime,
     },
   }
 }

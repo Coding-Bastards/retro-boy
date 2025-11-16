@@ -5,6 +5,7 @@ import Image from "next/image"
 
 import { cn } from "@/lib/utils"
 import { useGameStats } from "@/hooks/games"
+import { formatTimePlayed } from "@/lib/date"
 
 import GameStars from "./GameStars"
 
@@ -53,7 +54,7 @@ export default function GameCard({
         <div className="flex items-center justify-between text-sm">
           <span className="text-white/60">
             {gameStats.playTimeInSeconds
-              ? gameStats.playTimeInSeconds
+              ? formatTimePlayed(gameStats.playTimeInSeconds)
               : "Never played"}
           </span>
           <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
