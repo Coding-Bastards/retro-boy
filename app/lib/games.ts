@@ -34,6 +34,9 @@ export interface Game {
 
 export const useAllGames = () => {
   const { data: games = [], mutate } = useSWR(`all-games`, async () => {
+    // TODO: Separate important data from less important (e.g., likes)
+    // Merge asynchronously post-fetch
+
     const addresses = await clientWorldchain.readContract({
       address: ADDRESS_GAME_REGISTRY,
       abi: ABI_REGISTRY,

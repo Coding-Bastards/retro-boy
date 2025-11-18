@@ -3,6 +3,8 @@ import type { Metadata, Viewport } from "next"
 
 import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/lib/EmulatorContext"
+
+import { AlertProvider } from "./components/Alert"
 import ErudaProvider from "@/components/ErudaProdiver"
 import WorldProvider from "./WorldProvider"
 
@@ -35,6 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nextFont.className} antialiased`}>
+        <AlertProvider />
         <ErudaProvider>
           <EmulatorProvider>
             <WorldProvider>{children}</WorldProvider>

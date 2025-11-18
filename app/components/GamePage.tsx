@@ -16,30 +16,32 @@ import { FaHeart } from "react-icons/fa6"
 import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
-import { appendSignatureResult, cn, jsonify } from "@/lib/utils"
+import { appendSignatureResult, cn } from "@/lib/utils"
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
+import { useLikesEngine } from "@/hooks/likes"
 import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
+import { runParty } from "@/lib/party"
 import { TOKENS } from "@/lib/tokens"
 
 import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
-import { useAllGames } from "../lib/games"
+import { useAlertModal } from "./Alert"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
+  const { showAlert } = useAlertModal()
 
   const { isConnected, signIn } = useWorldAuth()
   const { loadGame } = useEmulator()
   const { navigateHome } = useAppRouter()
   const searchParams = useSearchParams()
 
-  const { mutate: mutateGames } = useAllGames()
-
   const collectionId = searchParams.get("game")
   const { game, isOwned, markAsOwned } = useGame(collectionId || "")
-  if (!game) return null
+  const { vote } = useLikesEngine(collectionId || "")
 
+  if (!game) return null
   const PRICE = game.price
   const isFreeMint = PRICE <= 0
 
@@ -86,47 +88,28 @@ export default function GamePage() {
           ],
     })
 
-    console.debug({ finalPayload })
     if (finalPayload.status === "success") {
-      markAsOwned()
-      alert("Yaay!")
+      showAlert({
+        title: "🎉 CONGRATULATIONS",
+        description:
+          "You have successfully minted this collection. It's now available in your game library.",
+      })
+      // Wait for stack to be cleared
+      setTimeout(runParty)
+      return markAsOwned()
     }
   }
 
-  async function handleLikeDislike(action: "like" | "dislike") {
-    const gameId = game?.collectionId
-    if (!gameId) return
+  function handleVote(action: "like" | "dislike") {
+    if (isOwned) {
+      // Only allow voting if the user owns the game
+      return vote(action)
+    }
 
-    jsonify<{ ok: boolean }>(
-      fetch(`/api/game/${gameId}/stats?action=${action}`, {
-        method: "POST",
-      })
-    )
-
-    const isLike = action === "like"
-    const isDislike = !isLike
-
-    mutateGames(
-      (current = []) => {
-        return current.map((game) => {
-          if (game.collectionId === gameId) {
-            // Update likes/dislikes count optimistically
-            const currentLikes = game.likes || 0
-            const currentDislikes = game.dislikes || 0
-            return {
-              ...game,
-              likes: isLike ? currentLikes + 1 : currentLikes,
-              dislikes: isDislike ? currentDislikes + 1 : currentDislikes,
-            }
-          }
-
-          return game
-        })
-      },
-      {
-        revalidate: false,
-      }
-    )
+    showAlert({
+      title: "GAME REQUIRED",
+      description: "Only NFT owners can like or dislike this game.",
+    })
   }
 
   const GALLERY = [game.nftImage, ...game.gallery]
@@ -148,7 +131,7 @@ export default function GamePage() {
         {/* Score Section */}
         <div className="flex items-center gap-6 mb-6 pb-4 border-b border-white/10">
           <button
-            onClick={() => handleLikeDislike("like")}
+            onClick={() => handleVote("like")}
             className="flex items-center gap-2"
           >
             <AiOutlineLike className="text-rb-green text-xl" />
@@ -158,7 +141,7 @@ export default function GamePage() {
           </button>
 
           <button
-            onClick={() => handleLikeDislike("dislike")}
+            onClick={() => handleVote("dislike")}
             className="flex items-center gap-2"
           >
             <AiOutlineDislike className="text-red-400 text-xl" />

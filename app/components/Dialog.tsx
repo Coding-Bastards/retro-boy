@@ -10,7 +10,7 @@ import {
 import { cn } from "@/lib/utils"
 
 export type DialogProps = {
-  trigger: ReactNode
+  trigger?: ReactNode
   title?: ReactNode
   children?: ReactNode
   open?: boolean
@@ -28,7 +28,7 @@ export default function Dialog({
 }: DialogProps) {
   return (
     <DialogRoot open={open} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
       <DialogContent className={cn("pt-7", className)}>
         {title ? <DialogTitle>{title}</DialogTitle> : null}
         <section className="mt-3">{children}</section>
