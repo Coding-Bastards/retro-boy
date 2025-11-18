@@ -19,7 +19,7 @@ export default function Emulator() {
   const keyPressHistoryRef = useRef<number[]>([])
 
   const { address } = useWorldAuth()
-  const { addPoints } = useAccountPoints()
+  const { addPoints, syncPoints } = useAccountPoints()
 
   // Track current session (from app render) time played (in seconds)
   const [sessionTimePlayed, setSessionTimePlayed] = useState(0)
@@ -151,6 +151,11 @@ export default function Emulator() {
 
     return () => clearTimeout(timer)
   }, [sessionTimePlayed])
+
+  useEffect(() => {
+    // Sync points when changing cartridge
+    if (currentGame?.gameCollectionId) syncPoints()
+  }, [currentGame?.gameCollectionId])
 
   return (
     <div className="flex flex-col h-full">

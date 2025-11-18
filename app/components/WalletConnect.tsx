@@ -19,22 +19,22 @@ export default function WalletConnect({
 }: {
   summaryToken?: "WLD" | "RBC"
 }) {
-  const [dialogOpen, setDialogOpen] = useState(false)
+  const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const { points: RBC_POINTS } = useAccountPoints()
+  const { points: RBC_POINTS, syncPoints } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { emulator } = useGameStats()
-  const { WLD, RBC } = useAccountBalancess(address)
-
-  useEffect(() => {
-    // For debugging purposes
-    console.debug(`Address - ${address}`)
-  }, [address])
+  const { WLD } = useAccountBalancess(address)
 
   const handleDisconnect = () => {
     signOut?.()
     setDialogOpen(false)
   }
+
+  useEffect(() => {
+    // Try syncing points if dialog opens
+    if (isDialogOpen) syncPoints()
+  }, [isDialogOpen])
 
   const isWLDSummary = summaryToken === "WLD"
 
@@ -62,7 +62,7 @@ export default function WalletConnect({
 
   if (!isConnected) return TRIGGER
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
+    <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">
         {/* Profile Section */}
         <div className="flex flex-col items-center gap-3 py-4">
@@ -91,7 +91,7 @@ export default function WalletConnect({
           <div className="flex justify-between items-center">
             <span className="text-white/60 text-sm">RBC Balance</span>
             <span className="font-black text-rb-green">
-              {numberToShortWords(RBC.formatted)} RBC
+              {numberToShortWords(RBC_POINTS)} RBC
             </span>
           </div>
         </div>

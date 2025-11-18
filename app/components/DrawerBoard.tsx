@@ -1,6 +1,5 @@
 "use client"
 
-import type { Address } from "viem"
 import { Fragment } from "react/jsx-runtime"
 import { useWorldAuth } from "@radish-la/world-auth"
 import useSWR from "swr"
@@ -12,55 +11,31 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 
+import { formatTimePlayed } from "@/lib/date"
 import { useAtomIsBoardOpen } from "@/lib/store"
 import { beautifyAddress, cn } from "@/lib/utils"
+
+import {
+  type LeaderboardData,
+  useAccountLeaderboardData,
+  useLeaderboard,
+} from "@/hooks/leaderboard"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 
 import { MdPerson } from "react-icons/md"
 
 import { clientWorldchain } from "@/lib/world"
+import { formatUSDC } from "@/lib/usdc"
 import { ABI_REGISTRY } from "@/lib/abi"
 import { ADDRESS_GAME_REGISTRY } from "@/lib/constants"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
 
-interface Player {
-  address: Address
-  timePlayed: string
-  rbcPoints: number
-}
-
-const MOCK_PLAYERS: Player[] = [
-  {
-    address: "0x163f8c2467924be0ae7b5347228cabf260318753" as Address,
-    timePlayed: "24h 30m",
-    rbcPoints: 1250,
-  },
-  {
-    address: "0x2234567890123456789012345678901234567890" as Address,
-    timePlayed: "18h 45m",
-    rbcPoints: 980,
-  },
-  {
-    address: "0x3334567890123456789012345678901234567890" as Address,
-    timePlayed: "15h 20m",
-    rbcPoints: 750,
-  },
-  {
-    address: "0x4434567890123456789012345678901234567890" as Address,
-    timePlayed: "12h 10m",
-    rbcPoints: 620,
-  },
-  {
-    address: "0x5534567890123456789012345678901234567890" as Address,
-    timePlayed: "10h 05m",
-    rbcPoints: 510,
-  },
-]
-
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
+  const { leaderboard } = useLeaderboard()
+  const { data: accountData } = useAccountLeaderboardData()
   const { address } = useWorldAuth()
 
   const { data: totalUniquePlayers = 0 } = useSWR(
@@ -76,9 +51,7 @@ export default function DrawerBoard() {
     }
   )
 
-  const isInTopBoard = MOCK_PLAYERS.some((p) => p.address === address)
-
-  const BOARD = [...MOCK_PLAYERS, ...MOCK_PLAYERS]
+  const isInTopBoard = leaderboard.some((p) => p.address === address)
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
@@ -95,28 +68,17 @@ export default function DrawerBoard() {
         </DrawerHeader>
 
         <div className="grow flex flex-col gap-2 overflow-y-auto px-4">
-          {isInTopBoard || !address ? null : (
+          {isInTopBoard || !accountData ? null : (
             <Fragment>
-              <PlayerItem
-                isConnectedUser
-                isOutsideBoard
-                player={{
-                  address,
-                  rbcPoints: 4,
-                  timePlayed: "12h 34m", // Format to seconds later :/
-                }}
-                position={5420}
-              />
-
+              <PlayerItem isConnectedUser isOutsideBoard player={accountData} />
               <div className="h-px w-full shrink-0 bg-white/10 my-3" />
             </Fragment>
           )}
 
-          {BOARD.map((player, index) => (
+          {leaderboard.map((player, index) => (
             <PlayerItem
-              key={`board-player-${player.address}-${index}`}
               player={player}
-              position={index + 1}
+              key={`board-player-${player.address}-${index}`}
               isConnectedUser={player.address === address}
             />
           ))}
@@ -134,12 +96,10 @@ export default function DrawerBoard() {
 
 function PlayerItem({
   player,
-  position,
   isConnectedUser,
   isOutsideBoard,
 }: {
-  player: Player
-  position: number
+  player: LeaderboardData
   isConnectedUser?: boolean
   isOutsideBoard?: boolean
   className?: string
@@ -164,7 +124,7 @@ function PlayerItem({
             isOutsideBoard ? "text-base -mt-1 mr-2" : "text-xl w-8"
           )}
         >
-          #{position}
+          #{player.position || ">999"}
         </div>
       </div>
 
@@ -179,7 +139,9 @@ function PlayerItem({
             <span className="text-xs font-black text-rb-green">(YOU)</span>
           )}
         </div>
-        <div className="text-xs text-white/60">{player.timePlayed}</div>
+        <div className="text-xs text-white/60">
+          {formatTimePlayed(player.timePlayed)}
+        </div>
       </div>
 
       <div className="text-right">
@@ -189,7 +151,7 @@ function PlayerItem({
             isConnectedUser ? "text-rb-green" : "text-white"
           )}
         >
-          {localizeNumber(player.rbcPoints)}
+          {localizeNumber(formatUSDC(player.points))}
         </div>
         <div className="text-xs text-white/40">RBC</div>
       </div>

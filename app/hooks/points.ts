@@ -2,6 +2,10 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 
+import { updatePlayerData } from "@/components/Emulator/actions"
+import { useEmulator } from "@/lib/EmulatorContext"
+import { useGameStats } from "./games"
+
 const atomPoints = atomWithStorage(
   "rb.user-earned-rbc",
   {} as Record<string, number>
@@ -11,8 +15,22 @@ export const useAccountPoints = () => {
   const { address } = useWorldAuth()
   const [points, setPoints] = useAtom(atomPoints)
 
+  const { currentGame } = useEmulator()
+  const { emulator } = useGameStats(currentGame?.gameCollectionId)
+
+  function syncPoints() {
+    // Only update if user is connected
+    // And if user has gained more than 5 points or played 30s more
+    if (address) {
+      console.debug("Updating user data...")
+      updatePlayerData(address, points[address], emulator.playTimeInSeconds)
+    }
+  }
+
   return {
     points: address ? points[address] : 0,
+    /** Sync points with backend */
+    syncPoints,
     addPoints: (newPoints: number) => {
       if (address) {
         setPoints((current) => ({
@@ -25,7 +43,8 @@ export const useAccountPoints = () => {
 }
 
 export const calculatePointsMultiplier = (_keysPressed: number[]) => {
-  if (_keysPressed.length <= 0) return 0
+  // Early exit if insufficient data
+  if (_keysPressed.length <= 2) return 0
   const keysPressed = _keysPressed.slice(-20) // Take last 20 items
 
   // Key weights: Movement (0-3) = 0.25, B (5) = 0.5, A (4) = 0.5, SELECT/START (6,7) = 0
@@ -66,6 +85,6 @@ export const calculatePointsMultiplier = (_keysPressed: number[]) => {
   // Combine factors: 40% weight, 40% uniqueness, 20% entropy
   const score = avgWeight * 0.4 + uniquenessRatio * 0.4 + entropyRatio * 0.2
 
-  // Map to 10%-70% range
-  return 0.1 + score * 0.6
+  // Map to 5%-55% range
+  return 0.05 + score * 0.5
 }
