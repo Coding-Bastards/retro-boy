@@ -12,10 +12,10 @@ Retro Boy is a Mini App that brings on-chain emulation for retro gaming consoles
 
 - [ ] `Must have` Leaderboard
 - [ ] `Must have` Add claim points screen (and mechanism)
-- [ ] `Good to have` Pop sound on button press
 - [x] `Must have` Party popper when buying a game
 - [x] No like/dislike when game not owned + not logged in
 - [ ] Add welcome screen (explainer w/ 3 pages)
+- [ ] `Good to have` Pop sound on button press
 - [ ] Save/Load Game States
 - [ ] Screenshots + Social Sharing
 - [ ] Add more games (at least 6 - 3free, 3paid)

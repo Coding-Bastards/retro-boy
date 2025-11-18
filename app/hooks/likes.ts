@@ -48,7 +48,10 @@ export const useLikesEngine = (gameId: string) => {
         ...current,
         [keyProp]: (current[keyProp] || 0) + 1,
       }),
-      false
+      {
+        // Keep current data while revalidating
+        revalidate: false,
+      }
     )
 
     if (isLike) setLikedCollections((current) => [...current, gameId])

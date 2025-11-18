@@ -141,7 +141,7 @@ export default function GamePage() {
             onClick={() => handleVote("like")}
             className={cn(
               isSelfLiked ? "text-rb-green" : "text-white",
-              "flex items-center gap-2"
+              "flex items-center gap-2 active:scale-95"
             )}
           >
             {isSelfLiked ? (
@@ -156,7 +156,7 @@ export default function GamePage() {
             onClick={() => handleVote("dislike")}
             className={cn(
               isSelfDisliked ? "text-red-400" : "text-white",
-              "flex items-center gap-2"
+              "flex items-center gap-2 active:scale-95"
             )}
           >
             {isSelfDisliked ? (

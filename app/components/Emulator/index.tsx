@@ -10,7 +10,8 @@ import { RiArrowUpWideLine } from "react-icons/ri"
 import { ImFolderDownload } from "react-icons/im"
 import { useEmulator } from "@/lib/EmulatorContext"
 
-import MechanicalButton from "./MechanicalButton"
+import MechanicalButton from "@/components/MechanicalButton"
+import JoyPad from "./JoyPad"
 
 export default function Emulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -112,10 +113,6 @@ export default function Emulator() {
     }
   }
 
-  const handleJoystickStop = () => {
-    releaseAllDirections()
-  }
-
   // Register the canvas with the emulator context
   useEffect(() => {
     if (gameCanvas) return
@@ -146,7 +143,7 @@ export default function Emulator() {
             "border-[3px] rounded-xl bg-rb-lcd w-full h-auto"
           )}
           style={{
-            imageRendering: "pixelated",
+            imageRendering: "crisp-edges",
             aspectRatio: "160 / 144",
           }}
         />
@@ -155,59 +152,10 @@ export default function Emulator() {
       {/* Controls */}
       <div className="w-full mt-4 pb-4">
         <div className="flex justify-between items-center">
-          {/* Joystick Pad Keys */}
-          <div className="flex bg-white/1 border border-black/15 shadow-inner rounded-full joy-container items-center justify-center relative">
-            <div className="absolute pointer-events-none text-white/5 text-xl grid grid-cols-2 p-1 inset-0">
-              <div
-                id="FORWARD"
-                className="col-span-2 flex items-start justify-center"
-              >
-                <RiArrowUpWideLine />
-              </div>
-              <div id="LEFT" className="flex items-center justify-start">
-                <RiArrowUpWideLine className="-rotate-90" />
-              </div>
-              <div id="RIGHT" className="flex items-center justify-end">
-                <RiArrowUpWideLine className="rotate-90" />
-              </div>
-              <div
-                id="BACKWARD"
-                className="col-span-2 flex items-end justify-center"
-              >
-                <RiArrowUpWideLine className="rotate-180" />
-              </div>
-            </div>
-
-            <style scoped>{`
-              .joy-container button {
-                width: 100% !important;
-                height: 100% !important;
-              }
-
-              .joy-container button::after {
-                content: '';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                width: 58%;
-                height: 58%;
-                border-radius: 100%;
-                background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
-                box-shadow: 0 0px 4px 2px rgba(0,0,0,0.1), 0 0px 12px 0 rgba(0,0,0,0.4);
-              }
-            `}</style>
-
-            <Joystick
-              size={120}
-              baseColor="transparent"
-              stickColor="transparent"
-              move={handleJoystickMove}
-              stop={handleJoystickStop}
-              minDistance={5}
-              throttle={10}
-            />
-          </div>
+          <JoyPad
+            stop={() => releaseAllDirections()}
+            move={handleJoystickMove}
+          />
 
           {/* A/B Buttons */}
           <div className="flex mb-6 gap-4">
