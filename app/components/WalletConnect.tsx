@@ -12,6 +12,7 @@ import { formatTimePlayed } from "@/lib/date"
 import AddressBlock from "./AddressBlock"
 import Dialog from "./Dialog"
 import Button from "./Button"
+import { useAccountPoints } from "../hooks/points"
 
 export default function WalletConnect({
   summaryToken = "RBC",
@@ -20,6 +21,7 @@ export default function WalletConnect({
 }) {
   const [dialogOpen, setDialogOpen] = useState(false)
 
+  const { points: RBC_POINTS } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { emulator } = useGameStats()
   const { WLD, RBC } = useAccountBalancess(address)
@@ -34,7 +36,7 @@ export default function WalletConnect({
     setDialogOpen(false)
   }
 
-  const SUMMARY_TOKEN = summaryToken === "WLD" ? WLD : RBC
+  const isWLDSummary = summaryToken === "WLD"
 
   const TRIGGER = (
     <button
@@ -49,7 +51,8 @@ export default function WalletConnect({
           {address ? beautifyAddress(address, 3, "") : "CONN"}
         </div>
         <div className="text-xs -mt-0.5 text-rb-green">
-          {numberToShortWords(SUMMARY_TOKEN.formatted)} {summaryToken}
+          {numberToShortWords(isWLDSummary ? WLD.formatted : RBC_POINTS)}{" "}
+          {summaryToken}
         </div>
       </div>
 

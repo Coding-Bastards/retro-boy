@@ -1,14 +1,14 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
-import { Joystick } from "react-joystick-component"
 
 import { cn } from "@/lib/utils"
 import { useAtomIsCatalogueOpen, useAtomTimePlayed } from "@/lib/store"
-import { RiArrowUpWideLine } from "react-icons/ri"
-import { ImFolderDownload } from "react-icons/im"
+import { calculatePointsMultiplier, useAccountPoints } from "@/hooks/points"
 import { useEmulator } from "@/lib/EmulatorContext"
+
+import { ImFolderDownload } from "react-icons/im"
 
 import MechanicalButton from "@/components/MechanicalButton"
 import JoyPad from "./JoyPad"
@@ -16,9 +16,14 @@ import JoyPad from "./JoyPad"
 export default function Emulator() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const gameStartTimeRef = useRef<number | null>(null)
-  const lastKeyPressedRef = useRef<number | null>(null)
+  const keyPressHistoryRef = useRef<number[]>([])
 
   const { address } = useWorldAuth()
+  const { addPoints } = useAccountPoints()
+
+  // Track current session (from app render) time played (in seconds)
+  const [sessionTimePlayed, setSessionTimePlayed] = useState(0)
+
   const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
   const [, setTimePlayed] = useAtomTimePlayed()
 
@@ -51,11 +56,15 @@ export default function Emulator() {
     const gameId = currentGame?.gameCollectionId
     if (!gameId || !address) return
 
-    // Keep track of last key pressed
-    const lastKeyPressed = lastKeyPressedRef.current
+    // Get last key pressed from history
+    const lastKeyPressed =
+      keyPressHistoryRef.current[keyPressHistoryRef.current.length - 1]
 
-    // Update last key pressed without checks
-    lastKeyPressedRef.current = joyPadCode
+    // Add current key to history (MAX: 20)
+    keyPressHistoryRef.current = [
+      ...keyPressHistoryRef.current.slice(-19),
+      joyPadCode,
+    ]
 
     // Do not track if the same key is pressed again
     if (lastKeyPressed === joyPadCode) return
@@ -72,6 +81,11 @@ export default function Emulator() {
       // Only update if time delta is reasonable (<5 seconds)
       if (timeDelta > 5_000) return
 
+      // Update current session time played
+      const activityWindowInSeconds = Math.floor(timeDelta / 1000)
+      setSessionTimePlayed((prev) => prev + activityWindowInSeconds)
+
+      // Update global time played
       setTimePlayed((prev) => {
         const playerTime = prev?.[gameId]?.[address] || 0
         return {
@@ -79,7 +93,7 @@ export default function Emulator() {
           [gameId]: {
             ...prev[gameId],
             // Increment previous time played by seconds
-            [address]: playerTime + Math.floor(timeDelta / 1000),
+            [address]: playerTime + activityWindowInSeconds,
           },
         }
       })
@@ -118,6 +132,25 @@ export default function Emulator() {
     if (gameCanvas) return
     registerCanvas(canvasRef.current)
   })
+
+  useEffect(() => {
+    // Random timeout between 1.1s and 6.6s
+    const TIMEOUT = 1111 + Math.random() * 5555
+
+    const timer = setTimeout(() => {
+      // Check accumulated points earned at this point
+      const multiplier = calculatePointsMultiplier(keyPressHistoryRef.current)
+      const points = sessionTimePlayed * multiplier // 1RBC = 1s of "playtime"
+      if (points > 0) addPoints(points)
+
+      // Reset session time played
+      // And keys pressed for next session
+      setSessionTimePlayed(0)
+      keyPressHistoryRef.current = []
+    }, TIMEOUT)
+
+    return () => clearTimeout(timer)
+  }, [sessionTimePlayed])
 
   return (
     <div className="flex flex-col h-full">
