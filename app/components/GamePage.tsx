@@ -13,7 +13,12 @@ import { useGame } from "@/hooks/games"
 import { localizeNumber } from "@/lib/numbers"
 
 import { FaHeart } from "react-icons/fa6"
-import { AiOutlineLike, AiOutlineDislike } from "react-icons/ai"
+import {
+  AiOutlineLike,
+  AiFillLike,
+  AiFillDislike,
+  AiOutlineDislike,
+} from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
 import { appendSignatureResult, cn } from "@/lib/utils"
@@ -39,7 +44,9 @@ export default function GamePage() {
 
   const collectionId = searchParams.get("game")
   const { game, isOwned, markAsOwned } = useGame(collectionId || "")
-  const { vote } = useLikesEngine(collectionId || "")
+  const { vote, isSelfDisliked, isSelfLiked } = useLikesEngine(
+    collectionId || ""
+  )
 
   if (!game) return null
   const PRICE = game.price
@@ -120,7 +127,7 @@ export default function GamePage() {
         {/* Cover Image */}
         <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4 relative">
           {isOwned && (
-            <div className="absolute flex items-center gap-1.5 z-1 top-3 right-3 rounded-full bg-linear-to-tr border border-white/10 from-white/60 to-white/30 text-black px-3 py-1 text-xs font-black">
+            <div className="absolute mix-blend-color-dodge flex items-center gap-1.5 z-1 top-3 right-3 rounded-full bg-white text-black px-3 py-1.5 text-xs font-black">
               <span>OWNED</span>
               <FaHeart />
             </div>
@@ -132,25 +139,35 @@ export default function GamePage() {
         <div className="flex items-center gap-6 mb-6 pb-4 border-b border-white/10">
           <button
             onClick={() => handleVote("like")}
-            className="flex items-center gap-2"
+            className={cn(
+              isSelfLiked ? "text-rb-green" : "text-white",
+              "flex items-center gap-2"
+            )}
           >
-            <AiOutlineLike className="text-rb-green text-xl" />
-            <span className="text-white font-black">
-              {localizeNumber(game.likes)}
-            </span>
+            {isSelfLiked ? (
+              <AiFillLike className="text-rb-green text-xl" />
+            ) : (
+              <AiOutlineLike className="text-rb-green text-xl" />
+            )}
+            <span className="font-black">{localizeNumber(game.likes)}</span>
           </button>
 
           <button
             onClick={() => handleVote("dislike")}
-            className="flex items-center gap-2"
+            className={cn(
+              isSelfDisliked ? "text-red-400" : "text-white",
+              "flex items-center gap-2"
+            )}
           >
-            <AiOutlineDislike className="text-red-400 text-xl" />
-            <span className="text-white font-black">
-              {localizeNumber(game.dislikes)}
-            </span>
+            {isSelfDisliked ? (
+              <AiFillDislike className="text-red-400 text-xl" />
+            ) : (
+              <AiOutlineDislike className="text-red-400 text-xl" />
+            )}
+            <span className="font-black">{localizeNumber(game.dislikes)}</span>
           </button>
 
-          <div className="flex items-center gap-2 ml-auto">
+          <div className="flex items-center gap-1.5 ml-auto">
             <MdPerson className="text-white/60 text-xl" />
             <span className="text-white/80 whitespace-nowrap text-sm">
               {localizeNumber(game.totalOwners)}
