@@ -87,7 +87,6 @@ export const useAllGames = () => {
           }),
         ])
 
-        console.debug({ likes, symbol, collectionId })
         const { emulator, name: title, image: nftImage, description } = gameData
         const gallery: string[] = ((imageGallery as any)[symbol] || []).map(
           (path: string) => `${BASE_CDN_URL}/games/${symbol}/gallery${path}`

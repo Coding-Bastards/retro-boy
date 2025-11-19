@@ -1,6 +1,7 @@
 "use client"
 
 import { MiniKit } from "@worldcoin/minikit-js"
+import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { formatEther } from "viem"
 
@@ -12,7 +13,6 @@ import { useGame } from "@/hooks/games"
 
 import { localizeNumber } from "@/lib/numbers"
 
-import { FaHeart } from "react-icons/fa6"
 import {
   AiOutlineLike,
   AiFillLike,
@@ -32,6 +32,8 @@ import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
 import { useAlertModal } from "./Alert"
+
+import asset_owned from "@/assets/owned.svg"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -127,10 +129,9 @@ export default function GamePage() {
         {/* Cover Image */}
         <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4 relative">
           {isOwned && (
-            <div className="absolute mix-blend-color-dodge flex items-center gap-1.5 z-1 top-3 right-3 rounded-full bg-white text-black px-3 py-1.5 text-xs font-black">
-              <span>OWNED</span>
-              <FaHeart />
-            </div>
+            <figure className="w-18 rounded-full drop-shadow overflow-hidden absolute top-2.5 right-2.5">
+              <Image className="w-full" src={asset_owned} alt="" />
+            </figure>
           )}
           <img src={game.cover} className="w-full h-full object-cover" alt="" />
         </div>

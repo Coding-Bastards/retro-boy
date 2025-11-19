@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { atomWithStorage } from "jotai/utils"
+import { useAtom } from "jotai"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { cn } from "@/lib/utils"
 
@@ -8,15 +10,24 @@ import Dialog from "@/components/Dialog"
 import WalletConnect from "@/components/WalletConnect"
 import Button from "./Button"
 
+const atomFirstTimeOpen = atomWithStorage("rb.isFirstTimeOpened", true)
+
 export default function TopNavigation() {
   const { isGameLoaded } = useEmulator()
+
+  const [isFirstTimeOpen, setIsFirstTimeOpen] = useAtom(atomFirstTimeOpen)
   const [open, setOpen] = useState(false)
+
+  function handleDialogChange(open: boolean) {
+    if (isFirstTimeOpen) setIsFirstTimeOpen(false)
+    setOpen(open)
+  }
 
   return (
     <nav className="flex pb-4 items-center justify-between">
       <Dialog
-        open={open}
-        onOpenChange={setOpen}
+        open={open || isFirstTimeOpen}
+        onOpenChange={handleDialogChange}
         title="ABOUT RETRO BOY"
         trigger={
           <button
@@ -39,17 +50,23 @@ export default function TopNavigation() {
           </button>
         }
       >
-        <p className="text-sm">
-          <strong>Retro Boy</strong> is a Mini App that brings on-chain
-          emulation for retro gaming consoles directly to your phone.
+        <p className="text-sm mt-3">
+          <strong>Retro Boy 👾</strong> is a Mini App that brings the charm of
+          retro gaming to your phone.
+        </p>
+
+        <p className="text-sm mt-4">
+          Earn <strong>RBC tokens</strong> by playing. RBC represents a
+          proof-of-gameplay. It's a memecoin, we do not promote especulation
+          and/or any form of investment.
         </p>
 
         <Button
-          onClick={() => setOpen(false)}
+          onClick={() => handleDialogChange(false)}
           className="mt-7"
           variant="secondary"
         >
-          CLOSE
+          ACCEPT
         </Button>
       </Dialog>
 
