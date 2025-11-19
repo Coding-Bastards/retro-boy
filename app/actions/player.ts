@@ -5,6 +5,7 @@ import { redis } from "@/lib/redis"
 
 export type RedisUserData = {
   lastUpdated: number
+  /** Stored in 6 decimals 1 -> 1000000 */
   totalPoints: number
   totalTimePlayed: number
 }

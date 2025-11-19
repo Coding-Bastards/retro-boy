@@ -82,9 +82,9 @@ export const calculatePointsMultiplier = (_keysPressed: number[]) => {
   const maxEntropy = Math.log2(keysPressed.length) // Maximum possible entropy
   const entropyRatio = entropy / maxEntropy
 
-  // Combine factors: 40% weight, 40% uniqueness, 20% entropy
-  const score = avgWeight * 0.4 + uniquenessRatio * 0.4 + entropyRatio * 0.2
+  // Combine factors: 40% weight, 45% uniqueness, 15% entropy
+  const score = avgWeight * 0.4 + uniquenessRatio * 0.45 + entropyRatio * 0.15
 
-  // Map to 5%-55% range
-  return 0.05 + score * 0.5
+  // Map to 3%-49% range
+  return 0.03 + score * 0.46
 }

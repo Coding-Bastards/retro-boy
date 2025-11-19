@@ -1,32 +1,28 @@
 "use server"
 
-import {
-  type Address,
-  encodePacked,
-  keccak256,
-  parseAbi,
-  parseEther,
-} from "viem"
+import { type Address, encodePacked, keccak256 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { worldchain } from "viem/chains"
 
 import { clientWorldchain } from "@/lib/world"
-import { ADDRESS_DISPENSER } from "@/lib/constants"
+import { ADDRESS_DISPENSER, ZERO } from "@/lib/constants"
+import { ABI_DISPENSER } from "@/lib/abi"
+
 import { getPlayerData } from "./player"
 
 const account = privateKeyToAccount(
   process.env.PK_OFFCHAIN_SIGNER as `0x${string}`
 )
 
-const ABI_DISPENSER = parseAbi([
-  "function claim(uint256 amount, uint256 deadline, bytes calldata signature) external",
-  "function nonces(address) public view returns (uint256)",
-  "function claimed(address) view returns (uint256)",
-])
-
 export async function getDispenserPayload(address: Address) {
-  const [playerData, nonce] = await Promise.all([
+  const [playerData, claimed, nonce] = await Promise.all([
     getPlayerData(address),
+    clientWorldchain.readContract({
+      abi: ABI_DISPENSER,
+      functionName: "claimed",
+      address: ADDRESS_DISPENSER,
+      args: [address],
+    }),
     clientWorldchain.readContract({
       abi: ABI_DISPENSER,
       functionName: "nonces",
@@ -35,7 +31,9 @@ export async function getDispenserPayload(address: Address) {
     }),
   ])
 
-  const amount = parseEther(`${playerData?.totalPoints || 0}`)
+  // convert 6decimal to 18decimals
+  const totalPoints = BigInt(playerData?.totalPoints || 0) * BigInt(1e12)
+  const claimableAmount = totalPoints > claimed ? totalPoints - claimed : ZERO
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 300) // 5 minutes
   const encoded = encodePacked(
     [
@@ -53,7 +51,7 @@ export async function getDispenserPayload(address: Address) {
       ADDRESS_DISPENSER,
       address,
       nonce,
-      amount,
+      claimableAmount,
       deadline,
     ]
   )
@@ -62,5 +60,5 @@ export async function getDispenserPayload(address: Address) {
     message: { raw: keccak256(encoded) },
   })
 
-  return { signature, amount, deadline }
+  return { signature, amount: claimableAmount, deadline }
 }

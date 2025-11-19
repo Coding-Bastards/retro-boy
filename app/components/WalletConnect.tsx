@@ -1,18 +1,25 @@
 "use client"
 
-import { useState, useEffect, Fragment } from "react"
+import { useState, useEffect } from "react"
+import { MiniKit } from "@worldcoin/minikit-js"
 import { useWorldAuth } from "@radish-la/world-auth"
+import { toast } from "sonner"
 
-import { useAccountBalancess } from "@/hooks/balances"
+import { useAccountBalances, useClaimedRBCPoints } from "@/hooks/balances"
+import { useAccountPoints } from "@/hooks/points"
 import { useGameStats } from "@/hooks/games"
+
+import { getDispenserPayload } from "@/app/actions/dispenser"
 import { beautifyAddress } from "@/lib/utils"
 import { numberToShortWords } from "@/lib/numbers"
 import { formatTimePlayed } from "@/lib/date"
 
+import { ABI_DISPENSER } from "@/lib/abi"
+import { ADDRESS_DISPENSER } from "@/lib/constants"
+
 import AddressBlock from "./AddressBlock"
 import Dialog from "./Dialog"
 import Button from "./Button"
-import { useAccountPoints } from "../hooks/points"
 
 export default function WalletConnect({
   summaryToken = "RBC",
@@ -20,20 +27,28 @@ export default function WalletConnect({
   summaryToken?: "WLD" | "RBC"
 }) {
   const [isDialogOpen, setDialogOpen] = useState(false)
+  const [isClaimed, setIsClaimed] = useState(false)
 
   const { points: RBC_POINTS, syncPoints } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { emulator } = useGameStats()
-  const { WLD, RBC, isLoading } = useAccountBalancess(address)
 
+  const { WLD, RBC } = useAccountBalances(address)
+  const { claimed, isLoading: isLoadingClaimedPoints } =
+    useClaimedRBCPoints(address)
+
+  const closeDialog = () => setDialogOpen(false)
   const handleDisconnect = () => {
     signOut?.()
-    setDialogOpen(false)
+    closeDialog()
   }
 
   useEffect(() => {
     // Try syncing points if dialog opens
-    if (isDialogOpen) syncPoints()
+    if (isDialogOpen) {
+      syncPoints()
+      setIsClaimed(false)
+    }
   }, [isDialogOpen])
 
   const isWLDSummary = summaryToken === "WLD"
@@ -60,14 +75,51 @@ export default function WalletConnect({
     </button>
   )
 
+  const POINTS_TO_COLLECT =
+    RBC_POINTS > claimed.formatted ? RBC_POINTS - claimed.formatted : 0
+
+  async function handleClaim() {
+    if (POINTS_TO_COLLECT <= 0 || !address || isClaimed) {
+      // Early return for debugging
+      return console.debug({ POINTS_TO_COLLECT, address, isClaimed })
+    }
+
+    const { amount, deadline, signature } = await getDispenserPayload(address)
+    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+      transaction: [
+        {
+          abi: ABI_DISPENSER,
+          address: ADDRESS_DISPENSER,
+          functionName: "claim",
+          args: [amount, deadline, signature],
+        },
+      ],
+    })
+
+    if (finalPayload.status === "success") {
+      setIsClaimed(true)
+      return toast.success(
+        `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`
+      )
+    }
+
+    // Do not show error state if user denied the transaction
+    // Only if there was an error when executing the transaction
+    const isErrored = Boolean((finalPayload as any)?.details?.debugUrl)
+    if (isErrored) {
+      toast.error("Failed to claim. Please try again.")
+    }
+  }
+
   // Show claim action when diff >= 1 RBC
-  // And wallet is connected + fetch completed
   const showClaimAction =
-    !isLoading &&
+    !isClaimed &&
+    !isLoadingClaimedPoints &&
     isConnected &&
-    Math.abs(Number(RBC.formatted) - RBC_POINTS) >= 1
+    POINTS_TO_COLLECT >= 1
 
   if (!isConnected) return TRIGGER
+
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">
@@ -89,6 +141,13 @@ export default function WalletConnect({
         {/* Balances */}
         <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
           <div className="flex justify-between items-center">
+            <span className="text-white/60 text-sm">RBC Balance</span>
+            <span className="font-black text-rb-green">
+              {numberToShortWords(RBC.formatted)} RBC
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center">
             <span className="text-white/60 text-sm">WLD Balance</span>
             <span className="font-black">
               {numberToShortWords(WLD.formatted)} WLD
@@ -96,18 +155,21 @@ export default function WalletConnect({
           </div>
 
           <div className="flex justify-between items-center">
-            <span className="text-white/60 text-sm">RBC Balance</span>
-            <span className="font-black text-rb-green">
+            <span className="text-white/60 text-sm">Earned Points</span>
+            <span className="font-black">
               {numberToShortWords(RBC_POINTS)} RBC
             </span>
           </div>
         </div>
 
-        <div className="-my-2" />
+        <div className="my-1.5" />
 
         {showClaimAction && (
-          <Button className="bg-white -mb-1" onClick={handleDisconnect}>
-            COLLECT POINTS
+          <Button
+            className="bg-linear-to-tr from-white/95 to-white/80 -mb-1"
+            onClick={handleClaim}
+          >
+            COLLECT ({numberToShortWords(POINTS_TO_COLLECT)} RBC)
           </Button>
         )}
 

@@ -1,13 +1,16 @@
 "use client"
 
-import { erc20Abi, formatUnits, type Address } from "viem"
+import { erc20Abi, formatEther, formatUnits, type Address } from "viem"
 import useSWR from "swr"
 
 import { TOKENS } from "@/lib/tokens"
-import { ZERO } from "@/lib/constants"
+import { ADDRESS_DISPENSER, ZERO } from "@/lib/constants"
 import { clientWorldchain } from "@/lib/world"
+import { ABI_DISPENSER } from "@/lib/abi"
 
-export const useAccountBalancess = (address?: Address) => {
+import { useAccountPoints } from "./points"
+
+export const useAccountBalances = (address?: Address) => {
   const { data = null, ...query } = useSWR(
     address ? `balances.${address}` : null,
     async () => {
@@ -49,5 +52,35 @@ export const useAccountBalancess = (address?: Address) => {
     ...query,
     WLD: formatBalance(data?.WLD, TOKENS.WLD.DECIMALS),
     RBC: formatBalance(data?.RBC, TOKENS.RBC.DECIMALS),
+  }
+}
+
+export const useClaimedRBCPoints = (address?: Address) => {
+  const { points } = useAccountPoints()
+  const { data: claimedPoints = null, ...query } = useSWR(
+    // Revalidate when points change
+    address ? `claimed.fs.${address}.${Math.round(points)}` : null,
+    async () => {
+      if (!address) return null
+      const claimed = await clientWorldchain.readContract({
+        address: ADDRESS_DISPENSER,
+        functionName: "claimed",
+        abi: ABI_DISPENSER,
+        args: [address],
+      })
+
+      return {
+        formatted: Number(formatEther(claimed)),
+        value: claimed,
+      }
+    }
+  )
+
+  return {
+    ...query,
+    claimed: {
+      value: claimedPoints?.value || BigInt(0),
+      formatted: claimedPoints?.formatted || 0,
+    },
   }
 }

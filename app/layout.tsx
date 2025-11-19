@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next"
 
 import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/lib/EmulatorContext"
+import { Toaster } from "sonner"
 
 import { AlertProvider } from "./components/Alert"
 import ErudaProvider from "@/components/ErudaProdiver"
@@ -37,6 +38,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nextFont.className} antialiased`}>
+        <Toaster
+          swipeDirections={["left", "right", "bottom", "top"]}
+          theme="light"
+          toastOptions={{
+            classNames: {
+              toast: "rounded-full! pl-5!",
+            },
+          }}
+          position="top-center"
+        />
         <AlertProvider />
         <ErudaProvider>
           <EmulatorProvider>
