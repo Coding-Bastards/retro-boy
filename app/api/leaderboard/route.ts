@@ -1,5 +1,7 @@
 import type { Address } from "blo"
+import type { RedisUserData } from "@/app/actions/player"
 import type { LeaderboardData } from "@/app/hooks/leaderboard"
+
 import { getPlayerKey } from "@/components/Emulator/internals"
 import { redis } from "@/lib/redis"
 
@@ -22,7 +24,10 @@ export async function GET() {
     // Batch fetch player data using pipeline
     const pipeline = redis.pipeline()
     addresses.forEach((address) => {
-      pipeline.hget(getPlayerKey(address), "totalTimePlayed")
+      pipeline.hget(
+        getPlayerKey(address),
+        "totalTimePlayed" as keyof RedisUserData
+      )
     })
 
     const timePlayedResults = await pipeline.exec()

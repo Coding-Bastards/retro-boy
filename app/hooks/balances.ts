@@ -8,7 +8,7 @@ import { ZERO } from "@/lib/constants"
 import { clientWorldchain } from "@/lib/world"
 
 export const useAccountBalancess = (address?: Address) => {
-  const { data = null } = useSWR(
+  const { data = null, ...query } = useSWR(
     address ? `balances.${address}` : null,
     async () => {
       if (!address) return null
@@ -46,6 +46,7 @@ export const useAccountBalancess = (address?: Address) => {
   })
 
   return {
+    ...query,
     WLD: formatBalance(data?.WLD, TOKENS.WLD.DECIMALS),
     RBC: formatBalance(data?.RBC, TOKENS.RBC.DECIMALS),
   }

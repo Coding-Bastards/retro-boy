@@ -5,8 +5,8 @@ export const TOKENS = {
     DECIMALS: 18,
   },
   RBC: {
-    ADDRESS: "0x79A02482A880bCE3F13e09Da970dC34db4CD24d1",
+    ADDRESS: "0xFDB7197c6902daa68F6B2eD30A813F5d90Bf25F3",
     SYMBOL: "RBC",
-    DECIMALS: 6,
+    DECIMALS: 18,
   },
 } as const

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Fragment } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
 
 import { useAccountBalancess } from "@/hooks/balances"
@@ -24,7 +24,7 @@ export default function WalletConnect({
   const { points: RBC_POINTS, syncPoints } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { emulator } = useGameStats()
-  const { WLD } = useAccountBalancess(address)
+  const { WLD, RBC, isLoading } = useAccountBalancess(address)
 
   const handleDisconnect = () => {
     signOut?.()
@@ -59,6 +59,13 @@ export default function WalletConnect({
       <AddressBlock address={address} size={8} />
     </button>
   )
+
+  // Show claim action when diff >= 1 RBC
+  // And wallet is connected + fetch completed
+  const showClaimAction =
+    !isLoading &&
+    isConnected &&
+    Math.abs(Number(RBC.formatted) - RBC_POINTS) >= 1
 
   if (!isConnected) return TRIGGER
   return (
@@ -96,8 +103,16 @@ export default function WalletConnect({
           </div>
         </div>
 
+        <div className="-my-2" />
+
+        {showClaimAction && (
+          <Button className="bg-white -mb-1" onClick={handleDisconnect}>
+            COLLECT POINTS
+          </Button>
+        )}
+
         {/* Disconnect Button */}
-        <Button onClick={handleDisconnect} className="mt-2" variant="secondary">
+        <Button onClick={handleDisconnect} variant="secondary">
           DISCONNECT
         </Button>
       </div>

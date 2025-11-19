@@ -2,10 +2,8 @@ import type { Address } from "viem"
 import type { LeaderboardData } from "@/hooks/leaderboard"
 
 import { redis } from "@/lib/redis"
-import {
-  getPlayerKey,
-  KEY_LEADERBOARD,
-} from "@/app/components/Emulator/internals"
+import { KEY_LEADERBOARD } from "@/app/components/Emulator/internals"
+import { getPlayerData } from "@/app/actions/player"
 
 type Params = { params: Promise<{ address: string }> }
 
@@ -18,11 +16,7 @@ export async function GET(_: Request, { params }: Params) {
   const rank = await redis.zrevrank(KEY_LEADERBOARD, address)
 
   // Get player's additional data
-  const playerData = await redis.hgetall<{
-    lastUpdated: number
-    totalPoints: number
-    totalTimePlayed: number
-  }>(getPlayerKey(address as Address))
+  const playerData = await getPlayerData(address as Address)
 
   return Response.json(
     {
