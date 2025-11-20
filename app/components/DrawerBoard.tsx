@@ -67,24 +67,42 @@ export default function DrawerBoard() {
           </DrawerTitle>
         </DrawerHeader>
 
-        <div className="grow flex flex-col gap-2 overflow-y-auto px-4">
-          {isInTopBoard || !accountData ? null : (
-            <Fragment>
-              <PlayerItem isConnectedUser isOutsideBoard player={accountData} />
-              <div className="h-px w-full shrink-0 bg-white/10 my-3" />
-            </Fragment>
-          )}
+        {totalUniquePlayers >= 3 ? (
+          <section className="grow flex flex-col gap-2 overflow-y-auto px-4">
+            {isInTopBoard || !accountData ? null : (
+              <Fragment>
+                <PlayerItem
+                  isConnectedUser
+                  isOutsideBoard
+                  player={accountData}
+                />
+                <div className="h-px w-full shrink-0 bg-white/10 my-3" />
+              </Fragment>
+            )}
 
-          {leaderboard.map((player, index) => (
-            <PlayerItem
-              player={player}
-              key={`board-player-${player.address}-${index}`}
-              isConnectedUser={player.address === address}
-            />
-          ))}
+            {leaderboard.map((player, index) => (
+              <PlayerItem
+                player={player}
+                key={`board-player-${player.address}-${index}`}
+                isConnectedUser={player.address === address}
+              />
+            ))}
 
-          <div className="my-2" />
-        </div>
+            <div className="my-2" />
+          </section>
+        ) : (
+          <section className="grow flex gap-3 flex-col items-center px-4">
+            <div className="bg-white/10 animate-pulse w-full h-18 rounded-lg" />
+            <div className="bg-white/10 animate-pulse delay-150 w-full h-18 rounded-lg" />
+            <div className="bg-white/10 animate-pulse delay-300 w-full h-18 rounded-lg" />
+
+            <div className="bg-white/10 mt-8 mb-6 h-px w-full" />
+
+            <p className="text-sm text-white/60 text-center max-w-72">
+              Not enough data. Play more to get ranked on the leaderboard!
+            </p>
+          </section>
+        )}
 
         <div className="px-4 pt-3 pb-6">
           <Button onClick={() => setOpen(false)}>CONTINUE PLAYING</Button>

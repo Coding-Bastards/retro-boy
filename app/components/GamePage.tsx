@@ -99,7 +99,7 @@ export default function GamePage() {
       showAlert({
         title: "🎉 CONGRATULATIONS",
         description:
-          "You have successfully minted this collection. It's now available in your game library.",
+          "Collection minted successfully. Now available in your game library.",
       })
       // Wait for stack to be cleared
       setTimeout(runParty)
