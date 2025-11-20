@@ -1,7 +1,6 @@
 "use client"
 
 import { MiniKit } from "@worldcoin/minikit-js"
-import Image from "next/image"
 import { useSearchParams } from "next/navigation"
 import { formatEther } from "viem"
 
@@ -21,19 +20,18 @@ import {
 } from "react-icons/ai"
 import { MdPerson } from "react-icons/md"
 
-import { appendSignatureResult, cn } from "@/lib/utils"
-import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
-import { useLikesEngine } from "@/hooks/likes"
-import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
 import { runParty } from "@/lib/party"
+import { appendSignatureResult, cn } from "@/lib/utils"
+import { useAlertModal } from "@/components/Alert"
+import { useLikesEngine } from "@/hooks/likes"
+
+import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
+import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
 import { TOKENS } from "@/lib/tokens"
 
 import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
-import { useAlertModal } from "./Alert"
-
-import asset_owned from "@/assets/owned.svg"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -127,13 +125,17 @@ export default function GamePage() {
     <PageContainer title={game.title}>
       <div className="flex-1 overflow-auto p-5 pt-6">
         {/* Cover Image */}
-        <div className="w-full aspect-square rounded-xl overflow-hidden bg-rb-dark mb-4 relative">
+        <div className="w-full aspect-square rounded-xl overflow-hidden bg-white/7 mb-4 relative">
           {isOwned && (
-            <figure className="w-18 rounded-full drop-shadow overflow-hidden absolute top-2.5 right-2.5">
-              <Image className="w-full" src={asset_owned} alt="" />
-            </figure>
+            <div
+              className="
+            animate-in slide-in-from-bottom-3 slide-in-from-right-2 duration-150 fade-in-65 zoom-in-90
+            rounded-full shadow-inner tracking-wide text-sm py-0.5 px-3 font-black bg-rb-yellow drop-shadow overflow-hidden absolute top-3 right-3"
+            >
+              OWNED
+            </div>
           )}
-          <img src={game.cover} className="w-full h-full object-cover" alt="" />
+          <img src={game.cover} className="size-full object-cover" alt="" />
         </div>
 
         {/* Score Section */}
@@ -205,12 +207,12 @@ export default function GamePage() {
                       className={cn(
                         isNFTImage &&
                           "drop-shadow-[2px_2px_8px_rgba(255,255,0,0.4)]",
-                        "aspect-square rounded-3xl overflow-hidden bg-white/10"
+                        "aspect-square rounded-3xl overflow-hidden bg-white/7"
                       )}
                     >
                       <img
                         src={image}
-                        className="w-full h-full object-cover rounded-3xl"
+                        className="size-full object-cover rounded-3xl"
                         alt=""
                       />
                     </div>

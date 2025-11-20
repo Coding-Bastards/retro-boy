@@ -145,7 +145,7 @@ function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
       {/* Cover */}
       <div
         className={cn(
-          "w-full aspect-square bg-rb-darker relative",
+          "w-full aspect-square bg-white/3 relative",
           isOwned && "grayscale"
         )}
       >
@@ -158,7 +158,7 @@ function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
           </div>
         )}
 
-        <img src={game.cover} alt="" className="w-full h-full object-cover" />
+        <img src={game.cover} alt="" className="size-full object-cover" />
       </div>
 
       {/* Info */}
@@ -206,7 +206,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
       {/* Cover */}
       <div
         className={cn(
-          "size-28 rounded-xl overflow-hidden shrink-0 bg-rb-darker relative",
+          "size-28 rounded-xl overflow-hidden shrink-0 bg-white/5 relative",
           isOwned && "grayscale"
         )}
       >
@@ -219,7 +219,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
           </div>
         )}
 
-        <img src={game.cover} alt="" className="w-full h-full object-cover" />
+        <img src={game.cover} alt="" className="size-full object-cover" />
       </div>
 
       {/* Info */}

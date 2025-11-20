@@ -9,8 +9,6 @@ import { formatTimePlayed } from "@/lib/date"
 
 import GameStars from "./GameStars"
 
-import asset_default_cover from "@/public/default-cover.png"
-
 export default function GameCard({
   game,
   onSelect,
@@ -32,20 +30,16 @@ export default function GameCard({
       )}
     >
       {/* Cover Image */}
-      <figure className="rounded-4xl w-full overflow-hidden">
-        <Image
-          className="w-full aspect-square"
-          placeholder="blur"
-          blurDataURL={asset_default_cover.src}
-          onError={(e) => {
-            // Fallback to default cover image if loading fails
-            e.currentTarget.src = asset_default_cover.src
-          }}
-          width={800}
-          height={800}
-          alt=""
-          src={game?.cover || asset_default_cover.src}
-        />
+      <figure className="rounded-4xl w-full min-h-44 bg-white/5 overflow-hidden">
+        {game?.cover ? (
+          <Image
+            className="w-full aspect-square"
+            src={game.cover}
+            width={600}
+            height={600}
+            alt=""
+          />
+        ) : null}
       </figure>
 
       {/* Game Info */}
