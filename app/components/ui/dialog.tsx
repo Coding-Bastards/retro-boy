@@ -3,9 +3,24 @@
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { cn } from "@/lib/utils"
+import { useModalQueryHistory } from "@/hooks/history"
 import { IoCloseSharp } from "react-icons/io5"
 
-const Dialog = DialogPrimitive.Root
+interface DialogProps
+  extends React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root> {
+  id?: string
+}
+
+const Dialog = ({ id, open, onOpenChange, ...props }: DialogProps) => {
+  const historyProps = useModalQueryHistory({
+    queryName: "dialog",
+    onOpenChange,
+    open,
+    id,
+  })
+
+  return <DialogPrimitive.Root {...historyProps} {...props} />
+}
 
 const DialogTrigger = DialogPrimitive.Trigger
 

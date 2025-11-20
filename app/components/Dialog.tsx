@@ -1,6 +1,6 @@
 "use client"
 
-import type { ReactNode } from "react"
+import { useState, type ReactNode } from "react"
 import {
   Dialog as DialogRoot,
   DialogContent,
@@ -26,9 +26,24 @@ export default function Dialog({
   onOpenChange,
   className,
 }: DialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  // Use controlled state if provided, otherwise use internal state
+  const isControlled = open !== undefined
+  const isOpen = isControlled ? open : internalOpen
+
+  function handleOpenChange(newOpen: boolean) {
+    if (!isControlled) setInternalOpen(newOpen)
+    onOpenChange?.(newOpen)
+  }
+
   return (
-    <DialogRoot open={open} onOpenChange={onOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+    <DialogRoot open={isOpen} onOpenChange={handleOpenChange}>
+      {trigger ? (
+        <DialogTrigger onClick={() => handleOpenChange(!isOpen)} asChild>
+          {trigger}
+        </DialogTrigger>
+      ) : null}
       <DialogContent className={cn("pt-7", className)}>
         {title ? <DialogTitle>{title}</DialogTitle> : null}
         <section className="mt-3">{children}</section>

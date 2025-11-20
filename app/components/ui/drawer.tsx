@@ -4,22 +4,40 @@ import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
+import { useModalQueryHistory } from "@/app/hooks/history"
 
 const DrawerContext = React.createContext<{ modal: boolean }>({ modal: true })
 
 const Drawer = ({
   shouldScaleBackground = true,
   modal = true,
+  onOpenChange,
+  open,
+  id,
   ...props
-}: React.ComponentProps<typeof DrawerPrimitive.Root> & { modal?: boolean }) => (
-  <DrawerContext.Provider value={{ modal }}>
-    <DrawerPrimitive.Root
-      shouldScaleBackground={shouldScaleBackground}
-      modal={modal}
-      {...props}
-    />
-  </DrawerContext.Provider>
-)
+}: React.ComponentProps<typeof DrawerPrimitive.Root> & {
+  modal?: boolean
+  id?: string
+}) => {
+  const historyProps = useModalQueryHistory({
+    queryName: "drawer",
+    onOpenChange,
+    open,
+    id,
+  })
+
+  return (
+    <DrawerContext.Provider value={{ modal }}>
+      <DrawerPrimitive.Root
+        shouldScaleBackground={shouldScaleBackground}
+        modal={modal}
+        {...historyProps}
+        {...props}
+      />
+    </DrawerContext.Provider>
+  )
+}
+
 Drawer.displayName = "Drawer"
 
 const DrawerTrigger = DrawerPrimitive.Trigger
