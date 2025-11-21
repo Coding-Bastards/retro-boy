@@ -1,10 +1,10 @@
-import type { TLikes } from "@/@types/game-nft"
+"use client"
 
-import useSWR from "swr"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 
 import { jsonify } from "@/lib/utils"
+import { useAllGames } from "@/lib/games"
 import { useWorldAuth } from "@radish-la/world-auth"
 
 const atomLikedCollections = atomWithStorage<string[]>(
@@ -17,21 +17,18 @@ const atomDislikedCollections = atomWithStorage<string[]>(
   []
 )
 
-export const useLikesEngine = (gameId: string) => {
+export const useLikesEngine = (collectionId: string) => {
   const { isConnected } = useWorldAuth()
   const [likedCollections, setLikedCollections] = useAtom(atomLikedCollections)
   const [dislikedCollections, setDislikedCollections] = useAtom(
     atomDislikedCollections
   )
 
-  const isSelfLiked = likedCollections.includes(gameId)
-  const isSelfDisliked = dislikedCollections.includes(gameId)
+  const isSelfLiked = likedCollections.includes(collectionId)
+  const isSelfDisliked = dislikedCollections.includes(collectionId)
   const isSelfInteracted = isSelfLiked || isSelfDisliked
 
-  const { data = null, mutate } = useSWR(`like-data.${gameId}`, async () => {
-    if (!gameId) return null
-    return jsonify<TLikes>(fetch(`/api/game/${gameId}/stats`))
-  })
+  const { mutate } = useAllGames()
 
   const vote = async (action: "like" | "dislike") => {
     // Early exit if not connected
@@ -42,32 +39,30 @@ export const useLikesEngine = (gameId: string) => {
     const isLike = action === "like"
     const keyProp = isLike ? "likes" : "dislikes"
 
-    // Optimistic update
+    // Optimistic update (like/dislike count)
     mutate(
-      (current: any = {}) => ({
-        ...current,
-        [keyProp]: (current[keyProp] || 0) + 1,
-      }),
-      {
-        // Keep current data while revalidating
-        revalidate: false,
-      }
+      (games = []) =>
+        games.map((game) =>
+          game.collectionId === collectionId
+            ? // Increment likes or dislikes for this game
+              { ...game, [keyProp]: (game[keyProp] || 0) + 1 }
+            : game
+        ),
+      { revalidate: false }
     )
 
-    if (isLike) setLikedCollections((current) => [...current, gameId])
-    else setDislikedCollections((current) => [...current, gameId])
+    if (isLike) setLikedCollections((current) => [...current, collectionId])
+    else setDislikedCollections((current) => [...current, collectionId])
 
-    // Backend call
+    // Backend sync
     jsonify<{ ok: boolean }>(
-      fetch(`/api/game/${gameId}/stats?action=${action}`, {
+      fetch(`/api/game/${collectionId}/stats?action=${action}`, {
         method: "POST",
       })
     )
   }
 
   return {
-    likes: data?.likes || 0,
-    dislikes: data?.dislikes || 0,
     /** `true` if user liked or disliked the game */
     isSelfInteracted,
     isSelfDisliked,
