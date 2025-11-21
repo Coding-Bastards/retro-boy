@@ -77,7 +77,7 @@ export default function GameCatalogue() {
         },
         {
           threshold: 0.1,
-          rootMargin: "-45% 0px -45% 0px", // Vertical centered
+          rootMargin: "0px -40% 0px -40%", // Horizontal centered
         }
       )
 
