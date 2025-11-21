@@ -44,38 +44,46 @@ export default function GameCatalogue() {
   useEffect(() => {
     // Wait for drawer animation to complete
     const timer = setTimeout(() => {
-      const container = document.getElementById("game-container")
       const cards = Array.from(
-        container?.querySelectorAll("[data-game-id]") || []
+        document.querySelectorAll("[data-game-id]") || []
       )
-
-      if (!container) return
 
       const observer = new IntersectionObserver(
         (entries) => {
-          let maxRatio = 0
-          let mostVisibleId: string | null = null
+          let bestEntry: IntersectionObserverEntry = {} as any
+          let bestScore = -Infinity
+
+          const viewportCenter = window.innerWidth / 2
 
           entries.forEach((entry) => {
-            if (entry.intersectionRatio > maxRatio) {
-              maxRatio = entry.intersectionRatio
-              const gameId = entry.target.getAttribute("data-game-id")
-              if (gameId) mostVisibleId = gameId
+            if (!entry.isIntersecting) return
+
+            const rect = entry.target.getBoundingClientRect()
+            const cardCenter = rect.top + rect.height / 2
+
+            // Distance to vertical center
+            const distanceToCenter = Math.abs(cardCenter - viewportCenter)
+
+            // Weighted score: high intersection, low distance
+            const score = entry.intersectionRatio * 1000 - distanceToCenter
+            if (score > bestScore) {
+              bestScore = score
+              bestEntry = entry
             }
           })
 
-          if (mostVisibleId) setCenteredGameId(mostVisibleId)
+          const gameId = bestEntry?.target?.getAttribute("data-game-id")
+          if (gameId) setCenteredGameId(gameId)
         },
         {
-          root: container,
-          threshold: [0, 0.55, 0.8],
+          threshold: 0.1,
+          rootMargin: "-45% 0px -45% 0px", // Vertical centered
         }
       )
 
-      cards.forEach((e) => observer.observe(e))
-
+      cards.forEach((el) => observer.observe(el))
       return () => observer.disconnect()
-    }, 350)
+    }, 200)
 
     return () => clearTimeout(timer)
   }, [open])
@@ -134,10 +142,7 @@ export default function GameCatalogue() {
           </div>
         ) : (
           <Fragment>
-            <div
-              id="game-container"
-              className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory"
-            >
+            <div className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
               <div className="flex gap-4">
                 {ownedGames.map((game) => (
                   <GameCard

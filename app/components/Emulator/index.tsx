@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { type PropsWithChildren, useEffect, useRef, useState } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
 
 import { cn } from "@/lib/utils"
@@ -29,6 +29,7 @@ export default function Emulator() {
 
   const {
     isGameLoaded,
+    isLoading,
     currentGame,
     sendJoyPadEvent,
     registerCanvas,
@@ -165,11 +166,20 @@ export default function Emulator() {
         onClick={() => setCatalogueOpen(true)}
         className="flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all"
       >
-        {isGameLoaded ? null : (
-          <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">
-            <ImFolderDownload className="text-3xl" />
+        {isLoading ? (
+          <LoadingOverlay>
+            <figure className="size-9 grid place-items-center">
+              <div className="inline-block size-7 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
+            </figure>
+            <span className="text-sm font-black uppercase">LOADING NFT</span>
+          </LoadingOverlay>
+        ) : isGameLoaded ? null : (
+          <LoadingOverlay>
+            <figure className="size-9 grid place-items-center">
+              <ImFolderDownload className="text-3xl" />
+            </figure>
             <span className="text-sm font-black uppercase">LOAD GAME</span>
-          </div>
+          </LoadingOverlay>
         )}
 
         <canvas
@@ -236,6 +246,14 @@ export default function Emulator() {
       </div>
 
       <div className="grow" />
+    </div>
+  )
+}
+
+function LoadingOverlay({ children }: PropsWithChildren) {
+  return (
+    <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">
+      {children}
     </div>
   )
 }

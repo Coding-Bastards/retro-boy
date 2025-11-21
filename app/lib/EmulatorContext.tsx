@@ -8,6 +8,7 @@ import {
   useRef,
   type PropsWithChildren,
 } from "react"
+import { toast } from "sonner"
 
 interface GameCartridge {
   url: string
@@ -16,6 +17,7 @@ interface GameCartridge {
 
 interface EmulatorContextValue {
   currentGame: GameCartridge | null
+  isLoading: boolean
   loadGame: (remoteURL: string, gameCollectionId: string) => Promise<void>
   isGameLoaded: boolean
   registerCanvas: (canvas: HTMLCanvasElement | null) => void
@@ -32,6 +34,8 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
   const [audioClass, setAudioClass] = useState<any>(null)
   const [currentGame, setCurrentGame] = useState<GameCartridge | null>(null)
   const [isGameLoaded, setIsGameLoaded] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
   const gameboyInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
@@ -41,7 +45,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
     const loadEmulator = async () => {
       try {
         // Load our custom audio implementation
-        const audioModule = await import("../lib/audio")
+        const audioModule = await import("@/lib/audio")
         const GameBoyAudio = audioModule.default || (window as any).GameBoyAudio
 
         if (GameBoyAudio) {
@@ -50,7 +54,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
         }
 
         // Load GameBoy emulator
-        const module = await import("../lib/gameboy")
+        const module = await import("@/lib/gameboy")
         const GameBoyCore = module.default
         console.debug("GameBoy emulator loaded")
         setGameboy(() => GameBoyCore)
@@ -64,8 +68,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
 
   const loadGame = async (remoteURL: string, gameCollectionId: string) => {
     if (!gameboy || !canvasRef.current) {
-      console.warn("Emulator not ready or canvas not set")
-      return
+      return toast.warning("Setting up emulator. Try again shortly."), void 0
     }
 
     // Clean up previous instance if exists
@@ -74,6 +77,8 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
     }
 
     try {
+      setIsLoading(true)
+
       const response = await fetch(remoteURL)
       if (!response.ok) {
         throw new Error("Failed to fetch game")
@@ -103,6 +108,8 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
       // Start the emulator
       gb.start()
       setIsGameLoaded(true)
+      setIsLoading(false)
+
       setCurrentGame({ url: remoteURL, gameCollectionId })
 
       // Game loop with frame rendering
@@ -140,7 +147,10 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
 
       gameLoop()
     } catch (error) {
-      console.error("Failed to load ROM:", error)
+      console.error({ error })
+      toast.error("Failed to load. Please try again.")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -174,6 +184,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
   }
 
   const value: EmulatorContextValue = {
+    isLoading,
     currentGame,
     gameCanvas: canvasRef.current,
     loadGame,
