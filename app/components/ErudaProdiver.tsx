@@ -14,7 +14,7 @@ export default function ErudaProvider({ children }: PropsWithChildren) {
       // Show for dev address + dev envs
       require("eruda").init()
     }
-  }, [])
+  }, [address])
 
   return children
 }
