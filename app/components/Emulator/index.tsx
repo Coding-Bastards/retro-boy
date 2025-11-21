@@ -188,7 +188,7 @@ export default function Emulator() {
       </div>
 
       {/* Controls */}
-      <div className="w-full mt-4 pb-4">
+      <div className="w-full relative z-1 -mt-6 pt-10">
         <div className="flex justify-between items-center">
           <JoyPad
             stop={() => releaseAllDirections()}
