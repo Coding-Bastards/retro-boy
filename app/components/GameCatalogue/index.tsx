@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 
 import { useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -75,7 +75,7 @@ export default function GameCatalogue() {
       cards.forEach((e) => observer.observe(e))
 
       return () => observer.disconnect()
-    }, 300)
+    }, 350)
 
     return () => clearTimeout(timer)
   }, [open])
@@ -109,48 +109,54 @@ export default function GameCatalogue() {
         </DrawerHeader>
 
         {isEmpty ? (
-          <div className="flex grow p-5 gap-4 flex-col items-center justify-center">
-            <figure className="size-24 mt-5 text-white/90 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-green/15 to-rb-green/10 border-2 border-rb-green/15">
-              <PiHandbagSimpleFill className="text-5xl" />
+          <div className="flex grow p-4 gap-4 flex-col items-center justify-end">
+            <div className="grow" />
+
+            <figure className="size-24 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-yellow/10 to-rb-yellow/5 border border-rb-yellow/7">
+              <PiHandbagSimpleFill className="text-5xl text-white/90" />
             </figure>
 
-            <Link
-              className="mt-10 border group rounded-xl bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-3.5 pl-9 pr-8 gap-5 text-white inline-flex items-center font-black"
-              href="/?market"
-            >
-              <span>Open Market</span>
-              <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
-            </Link>
-
-            <p className="text-sm text-white/60 text-center max-w-72">
+            <p className="mb-6 mt-3 text-sm text-white/60 text-center max-w-72">
               Your game library is empty.
               <br />
               Get some games from the Market!
             </p>
+
+            <div className="grow" />
+
+            <Link
+              className="border group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
+              href="/?market"
+            >
+              <span>OPEN MARKET</span>
+              <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
+            </Link>
           </div>
         ) : (
-          <div
-            id="game-container"
-            className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory"
-          >
-            <div className="flex gap-4">
-              {ownedGames.map((game) => (
-                <GameCard
-                  game={game}
-                  onSelect={() => pushGamePage(game.collectionId)}
-                  key={`game-${game.collectionId}`}
-                  className={
-                    isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
-                  }
-                />
-              ))}
+          <Fragment>
+            <div
+              id="game-container"
+              className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory"
+            >
+              <div className="flex gap-4">
+                {ownedGames.map((game) => (
+                  <GameCard
+                    game={game}
+                    onSelect={() => pushGamePage(game.collectionId)}
+                    key={`game-${game.collectionId}`}
+                    className={
+                      isSingleGameOwned ? "" : "max-w-[calc(100%-2.5rem)]"
+                    }
+                  />
+                ))}
 
-              {isSingleGameOwned ? null : <div className="w-2 shrink-0" />}
+                {isSingleGameOwned ? null : <div className="w-2 shrink-0" />}
+              </div>
             </div>
-          </div>
-        )}
 
-        <div className="grow" />
+            <div className="grow" />
+          </Fragment>
+        )}
 
         <div className="px-4 pt-1 pb-6">
           <Button onClick={handleButtonClick}>

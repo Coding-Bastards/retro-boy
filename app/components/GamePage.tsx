@@ -231,11 +231,13 @@ export default function GamePage() {
       {/* Footer */}
       <div className="p-4 pt-1 pb-6">
         <Button onClick={handleAction}>
-          {isOwned
-            ? "PLAY NOW"
-            : isFreeMint
-            ? "MINT (FREE)"
-            : `MINT (${formatEther(PRICE)} WLD)`}
+          {isConnected
+            ? isOwned
+              ? "PLAY NOW"
+              : isFreeMint
+              ? "MINT (FREE)"
+              : `MINT (${formatEther(PRICE)} WLD)`
+            : "CONNECT WALLET"}
         </Button>
       </div>
     </PageContainer>

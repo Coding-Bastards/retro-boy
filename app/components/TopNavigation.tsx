@@ -57,8 +57,8 @@ export default function TopNavigation() {
 
         <p className="text-sm mt-4">
           Earn <strong>RBC tokens</strong> by playing. RBC represents a
-          proof-of-gameplay. It's a memecoin, we do not promote especulation
-          and/or any form of investment.
+          proof-of-gameplay. A memecoin, we do not promote speculation and/or
+          any form of investment.
         </p>
 
         <Button
