@@ -43,15 +43,61 @@ export default function WalletConnect({
     closeDialog()
   }
 
+  const POINTS_TO_COLLECT =
+    RBC_POINTS > claimed.formatted ? RBC_POINTS - claimed.formatted : 0
+
+  async function handleClaim() {
+    if (POINTS_TO_COLLECT <= 0 || !address || isClaimed) {
+      // Early return for debugging
+      return console.debug({ POINTS_TO_COLLECT, address, isClaimed })
+    }
+
+    const { amount, deadline, signature } = await getDispenserPayload(address)
+    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
+      transaction: [
+        {
+          abi: ABI_DISPENSER,
+          address: ADDRESS_DISPENSER,
+          functionName: "claim",
+          args: [amount, deadline, signature],
+        },
+      ],
+    })
+
+    // Sync claiming points with backend
+    // Don't care about tracking result
+    syncPoints()
+
+    if (finalPayload.status === "success") {
+      setIsClaimed(true)
+      return toast.success(
+        `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`
+      )
+    }
+
+    // Do not show error state if user denied the transaction
+    // Only if there was an error when executing the transaction
+    const isErrored = Boolean((finalPayload as any)?.details?.debugUrl)
+    if (isErrored) {
+      toast.error("Failed to claim. Please try again.")
+    }
+  }
+
   useEffect(() => {
-    // Try syncing points if dialog opens
     if (isDialogOpen) {
-      syncPoints()
+      // Reset claimed state
       setIsClaimed(false)
     }
   }, [isDialogOpen])
 
   const isWLDSummary = summaryToken === "WLD"
+
+  // Show claim action when diff >= 1 RBC
+  const showClaimAction =
+    !isClaimed &&
+    !isLoadingClaimedPoints &&
+    isConnected &&
+    POINTS_TO_COLLECT >= 1
 
   const TRIGGER = (
     <button
@@ -75,51 +121,7 @@ export default function WalletConnect({
     </button>
   )
 
-  const POINTS_TO_COLLECT =
-    RBC_POINTS > claimed.formatted ? RBC_POINTS - claimed.formatted : 0
-
-  async function handleClaim() {
-    if (POINTS_TO_COLLECT <= 0 || !address || isClaimed) {
-      // Early return for debugging
-      return console.debug({ POINTS_TO_COLLECT, address, isClaimed })
-    }
-
-    const { amount, deadline, signature } = await getDispenserPayload(address)
-    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-      transaction: [
-        {
-          abi: ABI_DISPENSER,
-          address: ADDRESS_DISPENSER,
-          functionName: "claim",
-          args: [amount, deadline, signature],
-        },
-      ],
-    })
-
-    if (finalPayload.status === "success") {
-      setIsClaimed(true)
-      return toast.success(
-        `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`
-      )
-    }
-
-    // Do not show error state if user denied the transaction
-    // Only if there was an error when executing the transaction
-    const isErrored = Boolean((finalPayload as any)?.details?.debugUrl)
-    if (isErrored) {
-      toast.error("Failed to claim. Please try again.")
-    }
-  }
-
-  // Show claim action when diff >= 1 RBC
-  const showClaimAction =
-    !isClaimed &&
-    !isLoadingClaimedPoints &&
-    isConnected &&
-    POINTS_TO_COLLECT >= 1
-
   if (!isConnected) return TRIGGER
-
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">

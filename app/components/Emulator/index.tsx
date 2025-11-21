@@ -153,7 +153,7 @@ export default function Emulator() {
   }, [sessionTimePlayed])
 
   useEffect(() => {
-    // Sync points when changing cartridge
+    // Try sync points when changing cartridge
     if (currentGame?.gameCollectionId) syncPoints()
   }, [currentGame?.gameCollectionId])
 
