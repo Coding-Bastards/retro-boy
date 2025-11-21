@@ -3,10 +3,10 @@ import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa"
 import { cn } from "@/lib/utils"
 
 export default function GameStars({
-  likes,
-  dislikes,
+  likes = 0,
+  dislikes = 0,
   className,
-}: TLikes & { className?: string }) {
+}: Partial<TLikes> & { className?: string }) {
   const total = likes + dislikes
   const rating = total > 0 ? (likes / total) * 5 : 5 // Default to 5 stars
 

@@ -92,7 +92,7 @@ export const useAllGames = () => {
           description,
           collectionId,
           cover: `${BASE_CDN_URL}/games/${symbol}/gallery/cover.png`,
-        } satisfies Game
+        } as Game
       })
     )
   })

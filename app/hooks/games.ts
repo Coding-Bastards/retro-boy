@@ -39,9 +39,17 @@ export const useGame = (collectionId: string) => {
     isOwned,
     markAsOwned: () => {
       mutateOwnedGames(
-        (current = []) => {
-          if (isOwned) return current
-          return game ? [...current, game] : current
+        (currentOwned = []) => {
+          return game && !isOwned
+            ? [
+                ...currentOwned,
+                // Append newly owned game (assume 1 copy)
+                {
+                  ...game,
+                  ownedCount: BigInt(1),
+                },
+              ]
+            : currentOwned
         },
         {
           revalidate: false,

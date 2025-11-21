@@ -31,12 +31,16 @@ export default function MarketPage() {
   const availableGames = allGames.sort((a, b) => {
     switch (sortBy) {
       case "minted":
-        return (b.totalOwners || 0) - (a.totalOwners || 0)
+        // More owners first
+        return (b?.totalOwners || 0) - (a?.totalOwners || 0)
       case "score":
-        const scoreA = (a.likes || 0) - (a.dislikes || 0)
-        const scoreB = (b.likes || 0) - (b.dislikes || 0)
+        // Higher score first
+        const scoreA = (a?.likes || 0) - (a?.dislikes || 0)
+        const scoreB = (b?.likes || 0) - (b?.dislikes || 0)
         return scoreB - scoreA
       case "price":
+        // Cheap to expensive
+        return a.price < b.price ? -1 : 1
       default:
         return 0
     }
@@ -168,17 +172,13 @@ function ItemGrid({ game, isOwned, onSelect }: MarketItemProps) {
         </h3>
 
         <nav className="mt-1">
-          <GameStars
-            className="text-xs"
-            likes={game.likes || 0}
-            dislikes={game.dislikes || 0}
-          />
+          <GameStars {...game} className="text-xs" />
         </nav>
 
         <div className="flex border-t mt-7 pt-2.5 -mx-3 px-3 border-white/15 items-center justify-between gap-2">
           <div className="flex items-center gap-1 text-xs text-white/60">
             <MdPerson />
-            <span>{localizeNumber(game.totalOwners)}</span>
+            <span>{localizeNumber(game?.totalOwners)}</span>
           </div>
           <div className="text-rb-green font-black whitespace-nowrap text-sm">
             {game.price > 0 ? `${formatEther(game.price)} WLD` : "FREE"}
@@ -240,11 +240,7 @@ function ItemList({ game, isOwned, onSelect }: MarketItemProps) {
 
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-3">
-            <GameStars
-              className="text-xs"
-              likes={game.likes || 0}
-              dislikes={game.dislikes || 0}
-            />
+            <GameStars {...game} className="text-xs" />
             <div className="flex items-center gap-1 text-xs text-white/60">
               <MdPerson />
               <span>{numberToShortWords(game?.totalOwners || 0)}</span>

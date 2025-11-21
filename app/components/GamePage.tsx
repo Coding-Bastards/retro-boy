@@ -152,7 +152,7 @@ export default function GamePage() {
             ) : (
               <AiOutlineLike className="text-rb-green text-xl" />
             )}
-            <span className="font-black">{localizeNumber(game.likes)}</span>
+            <span className="font-black">{localizeNumber(game?.likes)}</span>
           </button>
 
           <button
@@ -167,13 +167,13 @@ export default function GamePage() {
             ) : (
               <AiOutlineDislike className="text-red-400 text-xl" />
             )}
-            <span className="font-black">{localizeNumber(game.dislikes)}</span>
+            <span className="font-black">{localizeNumber(game?.dislikes)}</span>
           </button>
 
           <div className="flex items-center gap-1.5 ml-auto">
             <MdPerson className="text-white/60 text-xl" />
             <span className="text-white/80 whitespace-nowrap text-sm">
-              {localizeNumber(game.totalOwners)}
+              {localizeNumber(game?.totalOwners)}
             </span>
           </div>
         </div>

@@ -49,7 +49,7 @@ export default function GameCard({
               ? formatTimePlayed(gameStats.playTimeInSeconds)
               : "Never played"}
           </span>
-          <GameStars likes={game.likes || 0} dislikes={game.dislikes || 0} />
+          <GameStars {...game} />
         </div>
       </div>
     </button>
