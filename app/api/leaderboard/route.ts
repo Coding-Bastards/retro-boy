@@ -2,14 +2,14 @@ import type { Address } from "blo"
 import type { RedisUserData } from "@/app/actions/player"
 import type { LeaderboardData } from "@/app/hooks/leaderboard"
 
-import { getPlayerKey } from "@/components/Emulator/internals"
-import { redis } from "@/lib/redis"
+import { unstable_cache } from "next/cache"
+import { getPlayerKey, KEY_LEADERBOARD } from "@/components/Emulator/internals"
+import { redis } from "@/app/lib/redis"
 
 export const revalidate = 300 // Cache for 5 minutes
 
-const KEY_LEADERBOARD = "rb.leaderboard"
-export async function GET() {
-  try {
+const getLeaderBoard = unstable_cache(
+  async () => {
     const leaderboard = await redis.zrange(KEY_LEADERBOARD, 0, 9, {
       rev: true,
       withScores: true,
@@ -43,16 +43,24 @@ export async function GET() {
         } satisfies LeaderboardData)
     )
 
-    return Response.json(players, {
+    return players
+  },
+  ["rb-leaderboard"],
+  {
+    revalidate,
+  }
+)
+
+export async function GET() {
+  try {
+    const leaderboard = await getLeaderBoard()
+    return Response.json(leaderboard, {
       headers: {
         "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
       },
     })
   } catch (error) {
     console.error({ error })
-    return Response.json(
-      { error: "Failed to fetch leaderboard" },
-      { status: 500 }
-    )
+    return Response.json({ error: "Failed to fetch" }, { status: 500 })
   }
 }
