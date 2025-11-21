@@ -38,9 +38,9 @@ export default function PageContainer({
         <div className="px-5 border-b border-white/10 h-18 pt-1 flex items-center gap-4">
           <button
             onClick={handleBack}
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-white/80 group hover:text-white transition-colors"
           >
-            <IoArrowBack className="text-2xl" />
+            <IoArrowBack className="text-2xl group-active:-translate-x-px" />
           </button>
 
           <h1 className="text-white uppercase font-black text-xl flex-1 whitespace-nowrap overflow-hidden text-ellipsis">

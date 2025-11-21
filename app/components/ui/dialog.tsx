@@ -58,7 +58,7 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       <DialogClose asChild>
-        <button className="top-0 p-3 text-xl absolute right-0">
+        <button className="top-0 outline-none p-3 text-xl absolute right-0">
           <IoCloseSharp />
         </button>
       </DialogClose>

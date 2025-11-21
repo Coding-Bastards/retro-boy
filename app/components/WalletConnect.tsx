@@ -59,7 +59,7 @@ export default function WalletConnect({
         // undefined if connected so the dialog opens automatically
         isConnected ? undefined : signIn
       }
-      className="text-white flex gap-2 items-center"
+      className="text-white active:scale-98 flex gap-2 items-center"
     >
       <div className="text-right font-black">
         <div className="text-sm">

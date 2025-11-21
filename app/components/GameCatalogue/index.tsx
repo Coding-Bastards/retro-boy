@@ -109,17 +109,17 @@ export default function GameCatalogue() {
         </DrawerHeader>
 
         {isEmpty ? (
-          <div className="flex p-5 gap-4 flex-col items-center justify-center">
-            <figure className="size-24 text-white/90 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-green/15 to-rb-green/10 border-2 border-rb-green/15">
+          <div className="flex grow p-5 gap-4 flex-col items-center justify-center">
+            <figure className="size-24 mt-5 text-white/90 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-green/15 to-rb-green/10 border-2 border-rb-green/15">
               <PiHandbagSimpleFill className="text-5xl" />
             </figure>
 
             <Link
-              className="mt-8 text-white inline-flex items-center gap-1.5 font-black"
+              className="mt-10 border group rounded-xl bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-3.5 pl-9 pr-8 gap-5 text-white inline-flex items-center font-black"
               href="/?market"
             >
               <span>Open Market</span>
-              <IoMdArrowForward className="text-xl" />
+              <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
             </Link>
 
             <p className="text-sm text-white/60 text-center max-w-72">
