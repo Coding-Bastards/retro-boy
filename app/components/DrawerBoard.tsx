@@ -55,7 +55,7 @@ export default function DrawerBoard() {
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerContent className="max-w-md h-[calc(100vh-4rem)] mx-auto bg-rb-darker border-white/10">
+      <DrawerContent className="max-w-md h-[calc(100vh-4rem-var(--spacing-safe-bottom))] mx-auto bg-rb-darker border-white/10">
         <DrawerHeader className="pb-6">
           <DrawerTitle className="text-white text-center uppercase font-black">
             TOP PLAYERS (

@@ -1,15 +1,22 @@
 @import "tailwindcss";
 @plugin "tailwindcss-animate";
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 html,
 body {
-  background-color: var(--color-rb-black);
   touch-action: none;
   user-select: none;
 }
 
-* {
-  -webkit-tap-highlight-color: transparent;
+html {
+  background-color: black;
+}
+
+body {
+  background-color: var(--color-rb-black);
 }
 
 button,
@@ -27,4 +34,5 @@ a {
   --color-rb-darker: #1a1a1a;
   --color-rb-lcd: #8b956d;
   --scale-98: 0.98;
+  --spacing-safe-bottom: var(--safe-inset-bottom, 0px);
 }

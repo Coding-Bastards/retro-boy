@@ -22,7 +22,7 @@ export default function PageContainer({
   }
 
   return (
-    <div className="fixed inset-0 z-60 pointer-events-auto! bg-rb-darker">
+    <div className="fixed top-0 left-0 right-0 rounded-b-xl bottom-safe-bottom z-60 pointer-events-auto! bg-rb-darker">
       <div className="flex flex-col h-full max-w-md mx-auto">
         {/* Header */}
         <div className="px-5 border-b border-white/10 h-18 pt-1 flex items-center gap-4">

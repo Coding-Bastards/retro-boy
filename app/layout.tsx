@@ -5,7 +5,8 @@ import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/lib/EmulatorContext"
 import { Toaster } from "sonner"
 
-import { AlertProvider } from "./components/Alert"
+import { AlertProvider } from "@/components/Alert"
+import SafeInsetProvider from "@/components/SafeInsetProvider"
 import ErudaProvider from "@/components/ErudaProdiver"
 import WorldProvider from "./WorldProvider"
 
@@ -51,7 +52,9 @@ export default function RootLayout({
         <AlertProvider />
         <ErudaProvider>
           <EmulatorProvider>
-            <WorldProvider>{children}</WorldProvider>
+            <WorldProvider>
+              <SafeInsetProvider>{children}</SafeInsetProvider>
+            </WorldProvider>
           </EmulatorProvider>
         </ErudaProvider>
       </body>
