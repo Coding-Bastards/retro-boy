@@ -28,7 +28,7 @@ export interface Game {
 }
 
 export const useAllGames = () => {
-  const { data: intitialGames = [], mutate } = useSWR(`all-games`, async () => {
+  const { data: intitialGames = [] } = useSWR(`all-games`, async () => {
     const addresses = await clientWorldchain.readContract({
       address: ADDRESS_GAME_REGISTRY,
       abi: ABI_REGISTRY,
@@ -97,7 +97,7 @@ export const useAllGames = () => {
     )
   })
 
-  const { data: finalGames = intitialGames } = useSWR<Game[]>(
+  const { data: finalGames = intitialGames, mutate } = useSWR<Game[]>(
     `games-with-final-data-${intitialGames.length}`,
     async () => {
       /**
