@@ -1,15 +1,17 @@
 "use client"
 
-import { MiniKit } from "@worldcoin/minikit-js"
 import { useEffect, type PropsWithChildren } from "react"
+import { useDeviceSafeInsetBottom } from "@/hooks/window"
 
 export default function SafeInsetProvider({ children }: PropsWithChildren) {
+  const { safeInsetBottom } = useDeviceSafeInsetBottom()
+
   useEffect(() => {
-    const bottomInset = MiniKit.deviceProperties.safeAreaInsets?.bottom || 0
     document.documentElement.style.setProperty(
       "--safe-inset-bottom",
-      `${bottomInset}px`
+      `${safeInsetBottom}px`
     )
-  }, [])
+  }, [safeInsetBottom])
+
   return children
 }

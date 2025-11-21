@@ -28,7 +28,7 @@ export default function Home() {
       <GameCatalogue />
       <DrawerBoard />
 
-      <main className="max-w-md p-5 mx-auto">
+      <main className="max-w-md h-dvh overflow-hidden p-5 mx-auto">
         <TopNavigation />
         <Emulator />
       </main>
