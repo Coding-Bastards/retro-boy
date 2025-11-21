@@ -31,15 +31,13 @@ export default function GameCard({
     >
       {/* Cover Image */}
       <figure className="rounded-4xl w-full min-h-44 bg-white/5 overflow-hidden">
-        {game?.cover ? (
-          <Image
-            className="w-full aspect-square"
-            src={game.cover}
-            width={600}
-            height={600}
-            alt=""
-          />
-        ) : null}
+        <Image
+          alt=""
+          className="w-full aspect-square"
+          src={game.cover}
+          width={600}
+          height={600}
+        />
       </figure>
 
       {/* Game Info */}

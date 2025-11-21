@@ -8,12 +8,7 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
-import {
-  ADDRESS_GAME_REGISTRY,
-  BASE_REPO_URL,
-  BASE_CDN_URL,
-  ZERO,
-} from "./constants"
+import { ADDRESS_GAME_REGISTRY, BASE_CDN_URL, ZERO } from "./constants"
 import { ABI_REGISTRY } from "./abi"
 import { jsonify } from "./utils"
 
@@ -25,92 +20,121 @@ export interface Game {
   rom: string
   nftImage: string
   gallery: string[]
+  cover: string
   price: bigint
-  cover?: string
-  totalOwners: number
+  totalOwners?: number
   likes?: number
   dislikes?: number
 }
 
 export const useAllGames = () => {
-  const { data: games = [], mutate } = useSWR(`all-games`, async () => {
-    // TODO: Separate important data from less important (e.g., likes)
-    // Merge asynchronously post-fetch
-
+  const { data: intitialGames = [], mutate } = useSWR(`all-games`, async () => {
     const addresses = await clientWorldchain.readContract({
       address: ADDRESS_GAME_REGISTRY,
       abi: ABI_REGISTRY,
       functionName: "getGames",
     })
 
-    const rawGames = await clientWorldchain.multicall({
+    const onchainData = await clientWorldchain.multicall({
       contracts: [
         ...addresses.map((address) => ({
           address,
           abi: erc721Abi,
           functionName: "symbol",
         })),
-
-        // Get total owners for each game
         ...addresses.map((address) => ({
-          address,
-          abi: erc721Abi,
-          functionName: "totalSupply",
+          abi: ABI_REGISTRY,
+          address: ADDRESS_GAME_REGISTRY,
+          functionName: "getPrice",
+          args: [address],
         })),
       ],
     })
 
-    const filteredGames = rawGames
-      .map((rawGame, index) => ({
-        collectionId: addresses[index],
-        // Map total owners from multicall result
-        totalOwners: Number(rawGames[addresses.length + index]?.result || 0),
-        symbol: rawGame.result,
+    const filteredGames = addresses
+      .map((collectionId, index) => ({
+        collectionId,
+        price: onchainData[addresses.length + index]?.result,
+        symbol: onchainData[index]?.result,
       }))
       .filter(
-        (game) => typeof game?.symbol === "string"
-        // Filter out invalid games
-      ) as { collectionId: Address; symbol: string; totalOwners: number }[]
+        // Filter out invalid records
+        (g) => [g.price, g.symbol].every((v) => v !== undefined)
+      ) as {
+      symbol: keyof typeof imageGallery
+      collectionId: Address
+      price: bigint
+    }[]
 
     return await Promise.all(
-      filteredGames.map(async ({ collectionId, totalOwners, symbol }) => {
-        const [gameData, likes, price] = await Promise.all([
-          jsonify<TGameNFT>(
-            fetch(`${BASE_REPO_URL}/games/${symbol}/data.json`)
-          ),
-          jsonify<TLikes>(fetch(`/api/game/${collectionId}/stats`)),
-          clientWorldchain.readContract({
-            abi: ABI_REGISTRY,
-            address: ADDRESS_GAME_REGISTRY,
-            functionName: "getPrice",
-            args: [collectionId],
-          }),
-        ])
+      filteredGames.map(async ({ collectionId, price, symbol }) => {
+        const {
+          emulator: { rom },
+          name: title,
+          image: nftImage,
+          description,
+        } = await jsonify<TGameNFT>(
+          // Get NFT collection metadata
+          fetch(`${BASE_CDN_URL}/games/${symbol}/data.json`)
+        )
 
-        const { emulator, name: title, image: nftImage, description } = gameData
-        const gallery: string[] = ((imageGallery as any)[symbol] || []).map(
-          (path: string) => `${BASE_CDN_URL}/games/${symbol}/gallery${path}`
+        const gallery = (imageGallery[symbol] || []).map(
+          (imagePath) => `${BASE_CDN_URL}/games/${symbol}/gallery${imagePath}`
         )
 
         return {
-          ...likes,
-          collectionId,
+          rom,
           symbol,
           price,
+          gallery,
           title,
           nftImage,
           description,
-          totalOwners,
-          gallery,
+          collectionId,
           cover: `${BASE_CDN_URL}/games/${symbol}/gallery/cover.png`,
-          rom: emulator.rom,
-        } as Game
+        } satisfies Game
       })
     )
   })
 
+  const { data: finalGames = intitialGames } = useSWR<Game[]>(
+    `games-with-final-data-${intitialGames.length}`,
+    async () => {
+      /**
+       * To be more render optimistically a better state
+       * we show initial games data first (while loading final data)
+       * then we merge it with final (likes,totalOwners)
+       */
+      const gameSupplyPerGame = await clientWorldchain.multicall({
+        contracts: intitialGames.map((game) => ({
+          address: game.collectionId,
+          abi: erc721Abi,
+          // totalSupply = total accounts owning the NFT
+          functionName: "totalSupply",
+        })),
+      })
+
+      return await Promise.all(
+        intitialGames.map(async (game, index) => {
+          const likesData = await jsonify<TLikes>(
+            fetch(`/api/game/${game.collectionId}/stats`)
+          )
+
+          return {
+            ...game,
+            ...likesData,
+            totalOwners: Number(gameSupplyPerGame[index]?.result || ZERO),
+          }
+        })
+      )
+    },
+    {
+      fallbackData: intitialGames,
+    }
+  )
+
   return {
-    games,
+    games: finalGames,
     mutate,
   }
 }
@@ -120,7 +144,7 @@ export const useOwnedGames = () => {
   const { address: ownerAddress } = useWorldAuth()
   const { games: allGames } = useAllGames()
 
-  const { data: ownedGames = [], mutate } = useSWR(
+  const { data: games = [], mutate } = useSWR(
     ownerAddress ? `games.owned.${ownerAddress}.${allGames.length}` : null,
     async () => {
       if (!ownerAddress) return []
@@ -134,16 +158,29 @@ export const useOwnedGames = () => {
         })),
       })
 
-      return ownedNFTs
-        .map((nft, index) => {
-          const nftAddress = allGames[index].collectionId
-          const game = allGames.find((g) => g.collectionId === nftAddress)
-          const ownedBalance = BigInt(nft.result || ZERO)
-          return game && ownedBalance > 0 ? game : null
-        })
-        .filter(Boolean) as Game[]
+      return (
+        ownedNFTs
+          .map((nft, index) => {
+            const ownedCount = BigInt(nft.result || ZERO)
+            return {
+              // Conserve collection address to map back to game data
+              collectionId: allGames[index].collectionId,
+              ownedCount,
+            }
+          })
+          // Filter for "owned" games only
+          .filter(({ ownedCount }) => ownedCount > 0)
+      )
     }
   )
+
+  // Decouple owned games data from SWR response
+  const ownedGames = games
+    .map(
+      ({ collectionId: id }) =>
+        allGames.find((g) => g.collectionId === id) || null
+    )
+    .filter(Boolean) as Game[]
 
   return {
     mutate,
