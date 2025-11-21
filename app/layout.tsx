@@ -50,13 +50,14 @@ export default function RootLayout({
           position="top-center"
         />
         <AlertProvider />
-        <ErudaProvider>
-          <EmulatorProvider>
-            <WorldProvider>
+
+        <EmulatorProvider>
+          <WorldProvider>
+            <ErudaProvider>
               <SafeInsetProvider>{children}</SafeInsetProvider>
-            </WorldProvider>
-          </EmulatorProvider>
-        </ErudaProvider>
+            </ErudaProvider>
+          </WorldProvider>
+        </EmulatorProvider>
       </body>
     </html>
   )
