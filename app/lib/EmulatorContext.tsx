@@ -20,7 +20,11 @@ interface EmulatorContextValue {
   isLoading: boolean
   loadGame: (remoteURL: string, gameCollectionId: string) => Promise<void>
   isGameLoaded: boolean
-  registerCanvas: (canvas: HTMLCanvasElement | null) => void
+  registerCanvas: (
+    canvas: HTMLCanvasElement,
+    width: number,
+    height: number
+  ) => void
   gameCanvas: HTMLCanvasElement | null
   getGameboyInstance: () => any
   sendJoyPadEvent: (code: number, isPressed: boolean) => void
@@ -35,6 +39,10 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
   const [currentGame, setCurrentGame] = useState<GameCartridge | null>(null)
   const [isGameLoaded, setIsGameLoaded] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [canvasSize, setCanvasSize] = useState({
+    width: 160,
+    height: 144,
+  })
 
   const gameboyInstanceRef = useRef<any>(null)
   const animationIdRef = useRef<number>(0)
@@ -93,7 +101,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
       if (!ctx) throw new Error("Could not get canvas context")
 
       // Create ImageData for rendering
-      const imageData = ctx.createImageData(160, 144)
+      const imageData = ctx.createImageData(canvasSize.width, canvasSize.height)
 
       const gb = new gameboy(canvas, romData, {
         sound: audioClass,
@@ -125,7 +133,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
           const frameBuffer = gb.frameBuffer
           if (frameBuffer && frameBuffer.length > 0) {
             // Convert the Int32 color values to RGBA bytes
-            for (let i = 0; i < 160 * 144; i++) {
+            for (let i = 0; i < canvasSize.width * canvasSize.height; i++) {
               const color = frameBuffer[i]
               const pixelIndex = i * 4
               // Extract RGB from the packed int32 color
@@ -163,8 +171,9 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
     }
   }, [])
 
-  const registerCanvas = (canvas: HTMLCanvasElement | null) => {
+  const registerCanvas = (canvas: HTMLCanvasElement, w: number, h: number) => {
     canvasRef.current = canvas
+    setCanvasSize({ width: w, height: h })
   }
 
   const getGameboyInstance = () => {
@@ -186,7 +195,9 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
   const value: EmulatorContextValue = {
     isLoading,
     currentGame,
-    gameCanvas: canvasRef.current,
+    get gameCanvas() {
+      return canvasRef.current
+    },
     loadGame,
     sendJoyPadEvent: (code: number, isPressed: boolean) => {
       gameboyInstanceRef.current?.JoyPadEvent(code, isPressed)

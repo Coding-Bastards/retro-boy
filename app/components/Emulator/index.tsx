@@ -1,20 +1,17 @@
 "use client"
 
-import { type PropsWithChildren, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useWorldAuth } from "@radish-la/world-auth"
 
-import { cn } from "@/lib/utils"
-import { useAtomIsCatalogueOpen, useAtomTimePlayed } from "@/lib/store"
+import { useAtomTimePlayed } from "@/lib/store"
 import { calculatePointsMultiplier, useAccountPoints } from "@/hooks/points"
 import { useEmulator } from "@/lib/EmulatorContext"
 
-import { ImFolderDownload } from "react-icons/im"
-
 import MechanicalButton from "@/components/MechanicalButton"
 import JoyPad from "./JoyPad"
+import Screen from "./Screen"
 
 export default function Emulator() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const gameStartTimeRef = useRef<number | null>(null)
   const keyPressHistoryRef = useRef<number[]>([])
 
@@ -23,18 +20,9 @@ export default function Emulator() {
 
   // Track current session (from app render) time played (in seconds)
   const [sessionTimePlayed, setSessionTimePlayed] = useState(0)
-
-  const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
   const [, setTimePlayed] = useAtomTimePlayed()
 
-  const {
-    isGameLoaded,
-    isLoading,
-    currentGame,
-    sendJoyPadEvent,
-    registerCanvas,
-    gameCanvas,
-  } = useEmulator()
+  const { currentGame, sendJoyPadEvent } = useEmulator()
 
   const addActiveDirectionClsx = (direction: string) => {
     document.getElementById(direction)?.classList?.add("text-white/60")
@@ -128,12 +116,6 @@ export default function Emulator() {
     }
   }
 
-  // Register the canvas with the emulator context
-  useEffect(() => {
-    if (gameCanvas) return
-    registerCanvas(canvasRef.current)
-  })
-
   useEffect(() => {
     // Random timeout between 1.1s and 6.6s
     const TIMEOUT = 1111 + Math.random() * 5555
@@ -160,42 +142,7 @@ export default function Emulator() {
 
   return (
     <div className="flex flex-col h-full">
-      {/* Screen */}
-      <div
-        role="button"
-        onClick={() => setCatalogueOpen(true)}
-        className="flex-1 relative w-full flex items-center justify-center cursor-pointer transition-all"
-      >
-        {isLoading ? (
-          <LoadingOverlay>
-            <figure className="size-9 grid place-items-center">
-              <div className="inline-block size-7 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
-            </figure>
-            <span className="text-sm font-black uppercase">LOADING NFT</span>
-          </LoadingOverlay>
-        ) : isGameLoaded ? null : (
-          <LoadingOverlay>
-            <figure className="size-9 grid place-items-center">
-              <ImFolderDownload className="text-3xl" />
-            </figure>
-            <span className="text-sm font-black uppercase">LOAD GAME</span>
-          </LoadingOverlay>
-        )}
-
-        <canvas
-          ref={canvasRef}
-          width={160}
-          height={144}
-          className={cn(
-            isGameLoaded ? "border-black/75" : "border-black/45",
-            "border-[3px] rounded-xl bg-rb-lcd w-full h-auto"
-          )}
-          style={{
-            imageRendering: "crisp-edges",
-            aspectRatio: "160 / 144",
-          }}
-        />
-      </div>
+      <Screen />
 
       {/* Controls */}
       <div className="w-full relative z-1 -mt-6 pt-10">
@@ -246,14 +193,6 @@ export default function Emulator() {
       </div>
 
       <div className="grow" />
-    </div>
-  )
-}
-
-function LoadingOverlay({ children }: PropsWithChildren) {
-  return (
-    <div className="absolute inset-0 text-black/35 flex gap-1 flex-col items-center justify-center">
-      {children}
     </div>
   )
 }
