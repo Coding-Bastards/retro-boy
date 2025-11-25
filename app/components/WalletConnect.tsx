@@ -52,6 +52,8 @@ export default function WalletConnect({
       return console.debug({ POINTS_TO_COLLECT, address, isClaimed })
     }
 
+    // Sync claiming points with backend
+    await syncPoints()
     const { amount, deadline, signature } = await getDispenserPayload(address)
     const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
       transaction: [
@@ -64,10 +66,6 @@ export default function WalletConnect({
       ],
     })
 
-    // Sync claiming points with backend
-    // Don't care about tracking result
-    syncPoints()
-
     if (finalPayload.status === "success") {
       setIsClaimed(true)
       return toast.success(
@@ -77,9 +75,11 @@ export default function WalletConnect({
 
     // Do not show error state if user denied the transaction
     // Only if there was an error when executing the transaction
-    const isErrored = Boolean((finalPayload as any)?.details?.debugUrl)
+    const debugURL = (finalPayload as any)?.details?.debugUrl
+    const isErrored = Boolean(debugURL)
     if (isErrored) {
       toast.error("Failed to claim. Please try again.")
+      console.debug(debugURL)
     }
   }
 

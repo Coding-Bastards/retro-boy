@@ -18,12 +18,16 @@ export const useAccountPoints = () => {
   const { currentGame } = useEmulator()
   const { emulator } = useGameStats(currentGame?.gameCollectionId)
 
-  function syncPoints() {
+  async function syncPoints() {
     // Only update if user is connected
     // And if user has gained more than 5 points or played 30s more
     if (address) {
       console.debug("Updating user data...")
-      updatePlayerData(address, points[address], emulator.playTimeInSeconds)
+      await updatePlayerData(
+        address,
+        points[address],
+        emulator.playTimeInSeconds
+      )
     }
   }
 
