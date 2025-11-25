@@ -32,6 +32,8 @@ import { TOKENS } from "@/lib/tokens"
 import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
+import Link from "next/link"
+import { RiExternalLinkLine } from "react-icons/ri"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -190,10 +192,11 @@ export default function GamePage() {
 
         {/* Gallery */}
         <div className="mb-6">
-          <h3 className="text-white font-black uppercase text-sm mb-3 tracking-wider">
+          <h3 className="text-white font-black uppercase text-sm tracking-wider">
             Gallery
           </h3>
-          <div className="grid grid-cols-2 gap-3">
+
+          <div className="mt-4 grid grid-cols-2 gap-3">
             {GALLERY.map((image, index) => {
               const isNFTImage = index === 0
 
@@ -226,6 +229,40 @@ export default function GamePage() {
             })}
           </div>
         </div>
+
+        {/* Licenses */}
+        {Object.keys(game.licenses).length > 0 && (
+          <div className="mt-12 mb-6">
+            <h3 className="text-white font-black uppercase text-sm mb-3 tracking-wider">
+              LICENSES
+            </h3>
+            <div className="space-y-3">
+              {Object.entries(game.licenses).map(([key, license]) => (
+                <div key={key} className="bg-white/5 rounded-lg p-3">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <h4 className="text-white capitalize text-sm">
+                      <strong>{key}</strong>{" "}
+                      <span className="text-[90%]">({license.type})</span>
+                    </h4>
+
+                    <Link
+                      target="_blank"
+                      href={license.license_url}
+                      rel="noopener noreferrer"
+                      className="text-white"
+                    >
+                      <RiExternalLinkLine />
+                    </Link>
+                  </div>
+
+                  <p className="text-white/60 text-xs">
+                    By {license.creators.join(", ")}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Footer */}

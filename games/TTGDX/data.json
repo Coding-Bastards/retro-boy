@@ -11,12 +11,12 @@
     "game": {
       "type": "MIT",
       "creators": ["Tangram Games"],
-      "license_url": "https://opensource.org/licenses/MIT"
+      "license_url": "https://github.com/SimonLarsen/tobutobugirl-dx/blob/master/LICENSE"
     },
     "assets": {
       "type": "CC-BY-4.0",
       "creators": ["Tangram Games"],
-      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+      "license_url": "https://github.com/SimonLarsen/tobutobugirl-dx?tab=readme-ov-file#license"
     }
   },
   "attributes": [

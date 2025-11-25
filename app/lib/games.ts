@@ -8,7 +8,12 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
-import { ADDRESS_GAME_REGISTRY, BASE_CDN_URL, ZERO } from "./constants"
+import {
+  ADDRESS_GAME_REGISTRY,
+  BASE_CDN_URL,
+  BASE_REPO_URL,
+  ZERO,
+} from "./constants"
 import { ABI_REGISTRY } from "./abi"
 import { jsonify } from "./utils"
 
@@ -22,6 +27,18 @@ export interface Game {
   gallery: string[]
   cover: string
   price: bigint
+  licenses: {
+    game: {
+      type: string
+      creators: string[]
+      license_url: string
+    }
+    assets?: {
+      type: string
+      creators: string[]
+      license_url: string
+    }
+  }
   totalOwners?: number
   likes?: number
   dislikes?: number
@@ -72,10 +89,11 @@ export const useAllGames = () => {
           emulator: { rom },
           name: title,
           image: nftImage,
+          licenses,
           description,
         } = await jsonify<TGameNFT>(
           // Get NFT collection metadata
-          fetch(`${BASE_CDN_URL}/games/${symbol}/data.json`)
+          fetch(`${BASE_REPO_URL}/games/${symbol}/data.json`)
         )
 
         const gallery = (imageGallery[symbol] || []).map(
@@ -88,6 +106,7 @@ export const useAllGames = () => {
           price,
           gallery,
           title,
+          licenses,
           nftImage,
           description,
           collectionId,

@@ -10,8 +10,8 @@
   "licenses": {
     "game": {
       "type": "MIT",
-      "creators": ["Canight"],
-      "license_url": "https://opensource.org/licenses/MIT"
+      "creators": ["Canite"],
+      "license_url": "https://github.com/Canite/SlimeTrials/blob/main/LICENSE"
     }
   },
   "attributes": [
