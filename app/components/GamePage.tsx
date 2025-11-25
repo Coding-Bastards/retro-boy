@@ -3,6 +3,7 @@
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
 import { formatEther } from "viem"
+import Link from "next/link"
 
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -18,6 +19,8 @@ import {
   AiFillDislike,
   AiOutlineDislike,
 } from "react-icons/ai"
+
+import { RiExternalLinkLine } from "react-icons/ri"
 import { MdPerson } from "react-icons/md"
 
 import { runParty } from "@/lib/party"
@@ -32,8 +35,6 @@ import { TOKENS } from "@/lib/tokens"
 import Button from "./Button"
 import PageContainer from "./PageContainer"
 import Dialog from "./Dialog"
-import Link from "next/link"
-import { RiExternalLinkLine } from "react-icons/ri"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -238,8 +239,11 @@ export default function GamePage() {
             </h3>
             <div className="space-y-3">
               {Object.entries(game.licenses).map(([key, license]) => (
-                <div key={key} className="bg-white/5 rounded-lg p-3">
-                  <div className="flex items-start justify-between gap-2 mb-2">
+                <div
+                  key={`l-${key}`}
+                  className="bg-white/5 rounded-lg p-3.5 pl-4"
+                >
+                  <div className="flex items-start justify-between gap-2">
                     <h4 className="text-white capitalize text-sm">
                       <strong>{key}</strong>{" "}
                       <span className="text-[90%]">({license.type})</span>
@@ -249,13 +253,13 @@ export default function GamePage() {
                       target="_blank"
                       href={license.license_url}
                       rel="noopener noreferrer"
-                      className="text-white"
+                      className="text-white text-lg"
                     >
                       <RiExternalLinkLine />
                     </Link>
                   </div>
 
-                  <p className="text-white/60 text-xs">
+                  <p className="mt-1 text-white/60 text-xs">
                     By {license.creators.join(", ")}
                   </p>
                 </div>
