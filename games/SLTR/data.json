@@ -1,0 +1,32 @@
+{
+  "name": "Slime Trials",
+  "description": "This humble slime is every game's most basic enemy but this is no ordinary slime and they've got something to prove to all those flashy heroes barreling through the caves.",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/SLTR/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/SLTR/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/Canite/SlimeTrials",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["Canight"],
+      "license_url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Platformer"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1715810400,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "128 KB"
+    }
+  ]
+}

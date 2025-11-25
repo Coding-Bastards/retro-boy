@@ -1,0 +1,44 @@
+{
+  "name": "Dawn Will Come",
+  "description": "It's dark. How long has it been dark? Monsters prowl everywhere, supplies are scarce. Decide your tasks, carry them out, find more survivors to help, fight back the creatures that emerge from the Night. You must survive, because surely Dawn Will Come.",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DWLC/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DWLC/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/eishiya/DawnWillCome",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": [
+        "Chris Maltby (GBS engine code)",
+        "Eishiya (game-specific code)"
+      ],
+      "license_url": "https://opensource.org/licenses/MIT"
+    },
+    "assets": {
+      "type": "CC-BY-4.0",
+      "creators": [
+        "H0lyhandgrenade (art)",
+        "Eishiya (art)",
+        "Kezia Salmon (music)"
+      ],
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Survival"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1632088800,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "2 MB"
+    }
+  ]
+}
