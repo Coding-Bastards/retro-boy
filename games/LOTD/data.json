@@ -1,0 +1,32 @@
+{
+  "name": "Labyrinth of the Dragon",
+  "description": "A D&D inspired 8-bit RPG. Play as an adventurer who's been locked in a dungeon and work your way through eight floors, solving puzzles, fighting monsters, leveling up, and collecting treasure.",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/LOTD/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/LOTD/game.gbc",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/NesHacker/LabyrinthOfTheDragon",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["NesHacker"],
+      "license_url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "RPG"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1755554400,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "524 KB"
+    }
+  ]
+}

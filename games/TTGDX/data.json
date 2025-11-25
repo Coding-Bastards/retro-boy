@@ -1,0 +1,37 @@
+{
+  "name": "Tobu Tobu Girl Deluxe",
+  "description": "Your cat is drifting into the sky, and only you can save it. Jump, dash, and flap through dangerous obstacles to rescue your pet before time runs out!",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/TTGDX/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/TTGDX/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/SimonLarsen/tobutobugirl-dx",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["Tangram Games"],
+      "license_url": "https://opensource.org/licenses/MIT"
+    },
+    "assets": {
+      "type": "CC-BY-4.0",
+      "creators": ["Tangram Games"],
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Platformer"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1572220800,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "256 KB"
+    }
+  ]
+}
