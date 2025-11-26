@@ -1,0 +1,32 @@
+{
+  "name": "Wyrmhole",
+  "description": "It's the not-so-far future, and a new technology has just been invented - the ability to open wormholes to travel through both time and space. You are one of the first brave pioneers to use this new tech. There is only one goal in your mind - to go back 100 years and prevent a terrible war that decimates humanity. But what perils lie inside the wormhole?",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/WYRH/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/WYRH/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/QuinnPainter/Wyrmhole",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["Quinn Painter"],
+      "license_url": "https://github.com/QuinnPainter/Wyrmhole/blob/main/LICENSE"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Shooter"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1654984800,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "32 KB"
+    }
+  ]
+}

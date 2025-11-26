@@ -1,0 +1,32 @@
+{
+  "name": "Renegade Rush",
+  "description": "You've just pulled off the heist of a century. Now it's time to escape! Using your tricked-out car, smash the cops and do whatever it takes to get away!",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/RUSH/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/RUSH/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/QuinnPainter/Renegade-Rush",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["Quinn Painter"],
+      "license_url": "https://github.com/QuinnPainter/Renegade-Rush/blob/main/LICENSE"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Action"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1633039200,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "19 KB"
+    }
+  ]
+}
