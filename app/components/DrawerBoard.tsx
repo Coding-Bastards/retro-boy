@@ -2,7 +2,6 @@
 
 import { Fragment } from "react/jsx-runtime"
 import { useWorldAuth } from "@radish-la/world-auth"
-import useSWR from "swr"
 
 import {
   Drawer,
@@ -21,35 +20,18 @@ import {
   useLeaderboard,
 } from "@/hooks/leaderboard"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
+import { formatUSDC } from "@/lib/usdc"
 
 import { MdPerson } from "react-icons/md"
-
-import { clientWorldchain } from "@/lib/world"
-import { formatUSDC } from "@/lib/usdc"
-import { ABI_REGISTRY } from "@/lib/abi"
-import { ADDRESS_GAME_REGISTRY } from "@/lib/constants"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
-  const { leaderboard } = useLeaderboard()
+  const { leaderboard, totalUniquePlayers } = useLeaderboard()
   const { data: accountData } = useAccountLeaderboardData()
   const { address } = useWorldAuth()
-
-  const { data: totalUniquePlayers = 0 } = useSWR(
-    `unique-players`,
-    async () => {
-      const uniquePlayers = await clientWorldchain.readContract({
-        abi: ABI_REGISTRY,
-        functionName: "getUniqueUsersCount",
-        address: ADDRESS_GAME_REGISTRY,
-      })
-
-      return Number(uniquePlayers)
-    }
-  )
 
   const isInTopBoard = leaderboard.some((p) => p.address === address)
 
@@ -87,8 +69,10 @@ export default function DrawerBoard() {
                 isConnectedUser={player.address === address}
               />
             ))}
-
-            <div className="my-2" />
+            <p className="text-sm pt-8 pb-16 px-3 text-white/60 text-center">
+              Leaderboard updates every 30-45 minutes based on RBC points
+              earned.
+            </p>
           </section>
         ) : (
           <section className="grow flex gap-3 flex-col items-center px-4">

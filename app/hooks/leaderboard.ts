@@ -1,8 +1,12 @@
 import type { Address } from "viem"
+import useSWR from "swr"
+
+import { useWorldAuth } from "@radish-la/world-auth"
+import { clientWorldchain } from "@/lib/world"
 import { jsonify } from "@/lib/utils"
 
-import useSWR from "swr"
-import { useWorldAuth } from "@radish-la/world-auth"
+import { ADDRESS_GAME_REGISTRY } from "@/lib/constants"
+import { ABI_REGISTRY } from "@/lib/abi"
 
 export type LeaderboardData = {
   address: Address
@@ -30,11 +34,31 @@ export const useAccountLeaderboardData = () => {
 }
 
 export const useLeaderboard = () => {
-  const { data: leaderboard = [] } = useSWR(`leaderboard.top`, async () => {
-    return await jsonify<Array<LeaderboardData>>(fetch(`/api/leaderboard`))
-  })
+  const { data: totalUniquePlayers = 0 } = useSWR(
+    `unique-players`,
+    async () => {
+      const uniquePlayers = await clientWorldchain.readContract({
+        abi: ABI_REGISTRY,
+        functionName: "getUniqueUsersCount",
+        address: ADDRESS_GAME_REGISTRY,
+      })
+
+      return Number(uniquePlayers)
+    }
+  )
+
+  const { data: leaderboard = [] } = useSWR(
+    `leaderboard.top.${totalUniquePlayers}`,
+    async () => {
+      return await jsonify<Array<LeaderboardData>>(fetch(`/api/leaderboard`))
+    },
+    {
+      keepPreviousData: true,
+    }
+  )
 
   return {
+    totalUniquePlayers,
     leaderboard,
   }
 }
