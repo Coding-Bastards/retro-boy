@@ -64,6 +64,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
         // Load GameBoy emulator
         const module = await import("@/lib/gameboy")
         const GameBoyCore = module.default
+        console.debug("GameBoy module:", GameBoyCore, module)
         console.debug("GameBoy emulator loaded")
         setGameboy(() => GameBoyCore)
       } catch (error) {
@@ -106,6 +107,7 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
       const gb = new gameboy(canvas, romData, {
         sound: audioClass,
         volume: 0.7,
+        imageSmoothing: true,
         audioBufferMin: 10,
         audioBufferMax: 20,
       })

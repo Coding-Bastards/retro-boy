@@ -1,29 +1,22 @@
-import { EventEmitter } from "events"
+"use strict"
 
-var Emitter = EventEmitter
-
-export default GameBoyCore
+// Author (Grant Galitz @taisel) updated code + licenses
+// @see https://github.com/taisel/GameBoy-Online/blob/master/js/GameBoyCore.js
 
 /*
- * JavaScript GameBoy Color Emulator
- * Copyright (C) 2010 - 2012 Grant Galitz
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * version 2 as published by the Free Software Foundation.
- * The full license is available at http://www.gnu.org/licenses/gpl.html
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- */
-function GameBoyCore(canvas, ROMImage, opts) {
-  if (!(this instanceof GameBoyCore))
-    return new GameBoyCore(canvas, ROMImage, opts)
+  JavaScript GameBoy Color Emulator
+  Copyright (C) 2010-2016 Grant Galitz
+  Modifications made by Denny Portillo.
 
-  opts = opts || {}
+  Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+  The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+export default function GameBoyCore(canvas, ROMData, opts = {}) {
+  if (!(this instanceof GameBoyCore))
+    return new GameBoyCore(canvas, ROMData, opts)
+
   this.opts = {}
   this.opts.bootRom = false !== opts.bootRom
   this.opts.gbBootRom = !!opts.gbBootRom
@@ -45,8 +38,7 @@ function GameBoyCore(canvas, ROMImage, opts) {
   //Params, etc...
   this.canvas = canvas //Canvas DOM object for drawing out the graphics to.
   this.drawContext = null // LCD Context
-  this.ROMImage = ROMImage //The game's ROM.
-  this.ROMImageIsString = "string" == typeof ROMImage
+  this.ROMImage = ROMData //The game's ROM.
   //CPU Registers and Flags:
   this.registerA = 0x01 //Register A (Accumulator)
   this.FZero = true //Register F  - Result was zero
@@ -304,9 +296,6 @@ function GameBoyCore(canvas, ROMImage, opts) {
   //Initialize the white noise cache tables ahead of time:
   this.intializeWhiteNoise()
 }
-
-GameBoyCore.prototype = Emitter.prototype
-
 GameBoyCore.prototype.GBBOOTROM = [
   //GB BOOT ROM
   //Add 256 byte boot rom here if you are going to use it.
@@ -483,12 +472,10 @@ GameBoyCore.prototype.OPCODE = [
         //Speed change requested.
         if (parentObj.memory[0xff4d] > 0x7f) {
           //Go back to single speed mode.
-
           parentObj.doubleSpeedShifter = 0
           parentObj.memory[0xff4d] &= 0x7f //Clear the double speed mode flag.
         } else {
           //Go to double speed mode.
-
           parentObj.doubleSpeedShifter = 1
           parentObj.memory[0xff4d] |= 0x80 //Set the double speed mode flag.
         }
@@ -2368,7 +2355,7 @@ GameBoyCore.prototype.OPCODE = [
   //0xD3 - Illegal
   //#0xD3:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xD3 called"))
+    pause()
   },
   //CALL !FC, nn
   //#0xD4:
@@ -2500,7 +2487,7 @@ GameBoyCore.prototype.OPCODE = [
   //0xDB - Illegal
   //#0xDB:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xDB called"))
+    pause()
   },
   //CALL FC, nn
   //#0xDC:
@@ -2534,10 +2521,8 @@ GameBoyCore.prototype.OPCODE = [
   //0xDD - Illegal
   //#0xDD:
   function (parentObj) {
-    this.emit(
-      "error",
-      new Error("Illegal op code 0xDD called, pausing emulation.")
-    )
+    cout("Illegal op code 0xDD called, pausing emulation.", 2)
+    pause()
   },
   //SBC A, n
   //#0xDE:
@@ -2610,12 +2595,14 @@ GameBoyCore.prototype.OPCODE = [
   //0xE3 - Illegal
   //#0xE3:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xE3 called"))
+    cout("Illegal op code 0xE3 called, pausing emulation.", 2)
+    pause()
   },
   //0xE4 - Illegal
   //#0xE4:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xE4 called"))
+    cout("Illegal op code 0xE4 called, pausing emulation.", 2)
+    pause()
   },
   //PUSH HL
   //#0xE5:
@@ -2701,17 +2688,20 @@ GameBoyCore.prototype.OPCODE = [
   //0xEB - Illegal
   //#0xEB:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xEB called"))
+    cout("Illegal op code 0xEB called, pausing emulation.", 2)
+    pause()
   },
   //0xEC - Illegal
   //#0xEC:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xEC called"))
+    cout("Illegal op code 0xEC called, pausing emulation.", 2)
+    pause()
   },
   //0xED - Illegal
   //#0xED:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xED called"))
+    cout("Illegal op code 0xED called, pausing emulation.", 2)
+    pause()
   },
   //XOR n
   //#0xEE:
@@ -2785,7 +2775,8 @@ GameBoyCore.prototype.OPCODE = [
   //0xF4 - Illegal
   //#0xF4:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xF4 called"))
+    cout("Illegal op code 0xF4 called, pausing emulation.", 2)
+    pause()
   },
   //PUSH AF
   //#0xF5:
@@ -2884,12 +2875,14 @@ GameBoyCore.prototype.OPCODE = [
   //0xFC - Illegal
   //#0xFC:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xFC called"))
+    cout("Illegal op code 0xFC called, pausing emulation.", 2)
+    pause()
   },
   //0xFD - Illegal
   //#0xFD:
   function (parentObj) {
-    this.emit("error", new Error("Illegal op code 0xFD called"))
+    cout("Illegal op code 0xFD called, pausing emulation.", 2)
+    pause()
   },
   //CP n
   //#0xFE:
@@ -5901,7 +5894,6 @@ GameBoyCore.prototype.initSkipBootstrap = function () {
     this.memory[0xff74] = 0xff
   }
   //Start as an unset device:
-
   this.registerA = this.cGBC ? 0x11 : 0x1
   this.registerB = 0
   this.registerC = 0x13
@@ -6014,7 +6006,6 @@ GameBoyCore.prototype.initSkipBootstrap = function () {
 }
 GameBoyCore.prototype.initBootstrap = function () {
   //Start as an unset device:
-
   this.programCounter = 0
   this.stackPointer = 0
   this.IME = false
@@ -6060,82 +6051,39 @@ GameBoyCore.prototype.ROMLoad = function () {
   if (this.usedBootROM) {
     if (!this.opts.gbBootRom) {
       //Patch in the GBC boot ROM into the memory map:
-      if (this.ROMImageIsString) {
-        for (; romIndex < 0x100; ++romIndex) {
-          this.memory[romIndex] = this.GBCBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage.charCodeAt(romIndex) & 0xff //Decode the ROM binary for the switch out.
-        }
-        for (; romIndex < 0x200; ++romIndex) {
-          this.memory[romIndex] = this.ROM[romIndex] =
-            this.ROMImage.charCodeAt(romIndex) & 0xff //Load in the game ROM.
-        }
-        for (; romIndex < 0x900; ++romIndex) {
-          this.memory[romIndex] = this.GBCBOOTROM[romIndex - 0x100] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage.charCodeAt(romIndex) & 0xff //Decode the ROM binary for the switch out.
-        }
-      } else {
-        for (; romIndex < 0x100; ++romIndex) {
-          this.memory[romIndex] = this.GBCBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage[romIndex] //Decode the ROM binary for the switch out.
-        }
-        for (; romIndex < 0x200; ++romIndex) {
-          this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
-        }
-        for (; romIndex < 0x900; ++romIndex) {
-          this.memory[romIndex] = this.GBCBOOTROM[romIndex - 0x100] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage[romIndex] //Decode the ROM binary for the switch out.
-        }
+      for (; romIndex < 0x100; ++romIndex) {
+        this.memory[romIndex] = this.GBCBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
+        this.ROM[romIndex] = this.ROMImage[romIndex] //Decode the ROM binary for the switch out.
+      }
+      for (; romIndex < 0x200; ++romIndex) {
+        this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
+      }
+      for (; romIndex < 0x900; ++romIndex) {
+        this.memory[romIndex] = this.GBCBOOTROM[romIndex - 0x100] //Load in the GameBoy Color BOOT ROM.
+        this.ROM[romIndex] = this.ROMImage[romIndex] //Decode the ROM binary for the switch out.
       }
 
       this.usedGBCBootROM = true
     } else {
-      if (this.ROMImageIsString) {
-        //Patch in the GBC boot ROM into the memory map:
-        for (; romIndex < 0x100; ++romIndex) {
-          this.memory[romIndex] = this.GBBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage.charCodeAt(romIndex) & 0xff //Decode the ROM binary for the switch out.
-        }
-      } else {
-        //Patch in the GBC boot ROM into the memory map:
-        for (; romIndex < 0x100; ++romIndex) {
-          this.memory[romIndex] = this.GBBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
-          this.ROM[romIndex] = this.ROMImage.romIndex //Decode the ROM binary for the switch out.
-        }
+      //Patch in the GBC boot ROM into the memory map:
+      for (; romIndex < 0x100; ++romIndex) {
+        this.memory[romIndex] = this.GBBOOTROM[romIndex] //Load in the GameBoy Color BOOT ROM.
+        this.ROM[romIndex] = this.ROMImage.romIndex //Decode the ROM binary for the switch out.
       }
     }
-    if (this.ROMImageIsString) {
-      for (; romIndex < 0x4000; ++romIndex) {
-        this.memory[romIndex] = this.ROM[romIndex] =
-          this.ROMImage.charCodeAt(romIndex) & 0xff //Load in the game ROM.
-      }
-    } else {
-      for (; romIndex < 0x4000; ++romIndex) {
-        this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
-      }
+
+    for (; romIndex < 0x4000; ++romIndex) {
+      this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
     }
   } else {
-    if (this.ROMImageIsString) {
-      //Don't load in the boot ROM:
-      for (; romIndex < 0x4000; ++romIndex) {
-        this.memory[romIndex] = this.ROM[romIndex] =
-          this.ROMImage.charCodeAt(romIndex) & 0xff //Load in the game ROM.
-      }
-    } else {
-      //Don't load in the boot ROM:
-      for (; romIndex < 0x4000; ++romIndex) {
-        this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
-      }
+    for (; romIndex < 0x4000; ++romIndex) {
+      this.memory[romIndex] = this.ROM[romIndex] = this.ROMImage[romIndex] //Load in the game ROM.
     }
   }
   //Finish the decoding of the ROM binary:
-  if (this.ROMImageIsString) {
-    for (; romIndex < maxLength; ++romIndex) {
-      this.ROM[romIndex] = this.ROMImage.charCodeAt(romIndex) & 0xff
-    }
-  } else {
-    for (; romIndex < maxLength; ++romIndex) {
-      this.ROM[romIndex] = this.ROMImage[romIndex]
-    }
+
+  for (; romIndex < maxLength; ++romIndex) {
+    this.ROM[romIndex] = this.ROMImage[romIndex]
   }
   this.ROMBankEdge = Math.floor(this.ROM.length / 0x4000)
   //Set up the emulator for the cartidge specifics:
@@ -6155,43 +6103,23 @@ GameBoyCore.prototype.getROMImage = function () {
   return this.ROMImage
 }
 GameBoyCore.prototype.interpretCartridge = function () {
-  var extra
-
-  if (this.ROMImageIsString) {
-    // ROM name
-    for (var index = 0x134; index < 0x13f; index++) {
-      if (this.ROMImage[index] > 0) {
-        this.name += this.ROMImage[index]
-      }
+  // ROM name
+  for (var index = 0x134; index < 0x13f; index++) {
+    if (this.ROMImage[index] > 0) {
+      this.name += String.fromCharCode(this.ROMImage[index])
     }
-    // ROM game code (for newer games)
-    for (var index = 0x13f; index < 0x143; index++) {
-      if (this.ROMImage[index] > 0) {
-        this.gameCode += this.ROMImage[index]
-      }
-    }
-
-    extra = this.ROMImage[0x143]
-  } else {
-    // ROM name
-    for (var index = 0x134; index < 0x13f; index++) {
-      if (this.ROMImage[index] > 0) {
-        this.name += String.fromCharCode(this.ROMImage[index])
-      }
-    }
-    // ROM game code (for newer games)
-    for (var index = 0x13f; index < 0x143; index++) {
-      if (this.ROMImage[index] > 0) {
-        this.gameCode += String.fromCharCode(this.ROMImage[index])
-      }
-    }
-
-    extra = String.fromCharCode(this.ROMImage[0x143])
   }
+  // ROM game code (for newer games)
+  for (var index = 0x13f; index < 0x143; index++) {
+    if (this.ROMImage[index] > 0) {
+      this.gameCode += String.fromCharCode(this.ROMImage[index])
+    }
+  }
+
+  var extra = String.fromCharCode(this.ROMImage[0x143])
 
   // Cartridge type
   this.cartridgeType = this.ROM[0x147]
-
   //Map out ROM cartridge sub-types.
   var MBCType = ""
   switch (this.cartridgeType) {
@@ -6331,12 +6259,11 @@ GameBoyCore.prototype.interpretCartridge = function () {
       break
     default:
       MBCType = "Unknown"
-      this.emit("error", new Error("Cartridge type is unknown."))
+      cout("Cartridge type is unknown.", 2)
+      pause()
   }
-
   // ROM and RAM banks
   this.numROMBanks = this.ROMBanks[this.ROM[0x148]]
-
   switch (this.RAMBanks[this.ROM[0x149]]) {
     case 0:
       break
@@ -6353,7 +6280,6 @@ GameBoyCore.prototype.interpretCartridge = function () {
     switch (this.ROM[0x143]) {
       case 0x00: //Only GB mode
         this.cGBC = false
-
         break
       case 0x32: //Exception to the GBC identifying code:
         if (
@@ -6371,10 +6297,15 @@ GameBoyCore.prototype.interpretCartridge = function () {
         break
       case 0xc0: //Only GBC mode
         this.cGBC = true
-
         break
       default:
         this.cGBC = false
+        cout(
+          "Unknown GameBoy game type code #" +
+            this.ROM[0x143] +
+            ", defaulting to GB mode (Old games don't have a type code).",
+          1
+        )
     }
     this.inBootstrap = false
     this.setupRAM() //CPU/(V)RAM initialization.
@@ -6458,7 +6389,6 @@ GameBoyCore.prototype.setupRAM = function () {
       this.MBCRam = this.getTypedArray(this.numRAMBanks * 0x2000, 0, "uint8")
     }
   }
-
   this.returnFromRTCState()
   //Setup the RAM for GBC mode.
   if (this.cGBC) {
@@ -6482,7 +6412,11 @@ GameBoyCore.prototype.recomputeDimension = function () {
   //Cache some dimension info:
   this.onscreenWidth = this.canvas.width
   this.onscreenHeight = this.canvas.height
-  if ("undefined" != typeof window && window.mozRequestAnimationFrame) {
+  if (
+    (window && window.mozRequestAnimationFrame) ||
+    (navigator.userAgent.toLowerCase().indexOf("gecko") != -1 &&
+      navigator.userAgent.toLowerCase().indexOf("like gecko") == -1)
+  ) {
     //Firefox slowness hack:
     this.canvas.width = this.onscreenWidth = 160
     this.canvas.height = this.onscreenHeight = 144
@@ -6496,20 +6430,19 @@ GameBoyCore.prototype.recomputeDimension = function () {
 }
 GameBoyCore.prototype.initLCD = function () {
   this.recomputeDimension()
-  this.resizer = null
-  if ("undefined" != typeof document && document.createElement) {
+  if (this.offscreenRGBCount != 92160) {
+    //Only create the resizer handle if we need it:
+    this.compileResizeFrameBufferFunction()
+  } else {
+    //Resizer not needed:
+    this.resizer = null
+  }
+  try {
     this.canvasOffscreen = document.createElement("canvas")
     this.canvasOffscreen.width = this.offscreenWidth
     this.canvasOffscreen.height = this.offscreenHeight
-  } else {
-    // ugly hack to avoid different node-canvas versions
-    var ctor = this.canvas.constructor
-    this.canvasOffscreen = new ctor(this.offscreenWidth, this.offscreenHeight)
-  }
-
-  this.drawContextOffscreen = this.canvasOffscreen.getContext("2d")
-  this.drawContextOnscreen = this.canvas.getContext("2d")
-  if (this.canvas.setAttribute) {
+    this.drawContextOffscreen = this.canvasOffscreen.getContext("2d")
+    this.drawContextOnscreen = this.canvas.getContext("2d")
     this.canvas.setAttribute(
       "style",
       (this.canvas.getAttribute("style") || "") +
@@ -6526,44 +6459,58 @@ GameBoyCore.prototype.initLCD = function () {
         (this.opts.imageSmoothing ? "bicubic" : "nearest-neighbor") +
         ";"
     )
-  }
-  this.drawContextOffscreen.webkitImageSmoothingEnabled =
-    this.opts.imageSmoothing
-  this.drawContextOffscreen.mozImageSmoothingEnabled = this.opts.imageSmoothing
-  this.drawContextOnscreen.webkitImageSmoothingEnabled =
-    this.opts.imageSmoothing
-  this.drawContextOnscreen.mozImageSmoothingEnabled = this.opts.imageSmoothing
-  //Get a CanvasPixelArray buffer:
-  try {
-    this.canvasBuffer = this.drawContextOffscreen.createImageData(
-      this.offscreenWidth,
-      this.offscreenHeight
-    )
-  } catch (error) {
-    this.canvasBuffer = this.drawContextOffscreen.getImageData(
-      0,
-      0,
-      this.offscreenWidth,
-      this.offscreenHeight
-    )
-  }
-  var index = this.offscreenRGBCount
-  while (index > 0) {
-    this.canvasBuffer.data[(index -= 4)] = 0xf8
-    this.canvasBuffer.data[index + 1] = 0xf8
-    this.canvasBuffer.data[index + 2] = 0xf8
-    this.canvasBuffer.data[index + 3] = 0xff
-  }
-  this.graphicsBlit()
-  if (this.canvas.style) {
+    this.drawContextOffscreen.webkitImageSmoothingEnabled =
+      this.opts.imageSmoothing
+    this.drawContextOffscreen.mozImageSmoothingEnabled =
+      this.opts.imageSmoothing
+    this.drawContextOnscreen.webkitImageSmoothingEnabled =
+      this.opts.imageSmoothing
+    this.drawContextOnscreen.mozImageSmoothingEnabled = this.opts.imageSmoothing
+    //Get a CanvasPixelArray buffer:
+    try {
+      this.canvasBuffer = this.drawContextOffscreen.createImageData(
+        this.offscreenWidth,
+        this.offscreenHeight
+      )
+    } catch (error) {
+      cout(
+        'Falling back to the getImageData initialization (Error "' +
+          error.message +
+          '").',
+        1
+      )
+      this.canvasBuffer = this.drawContextOffscreen.getImageData(
+        0,
+        0,
+        this.offscreenWidth,
+        this.offscreenHeight
+      )
+    }
+    var index = this.offscreenRGBCount
+    while (index > 0) {
+      this.canvasBuffer.data[(index -= 4)] = 0xf8
+      this.canvasBuffer.data[index + 1] = 0xf8
+      this.canvasBuffer.data[index + 2] = 0xf8
+      this.canvasBuffer.data[index + 3] = 0xff
+    }
+    this.graphicsBlit()
     this.canvas.style.visibility = "visible"
+    if (this.swizzledFrame == null) {
+      this.swizzledFrame = this.getTypedArray(69120, 0xff, "uint8")
+    }
+    //Test the draw system and browser vblank latching:
+    this.drewFrame = true //Copy the latest graphics to buffer.
+    this.requestDraw()
+  } catch (error) {
+    throw new Error(
+      "HTML5 Canvas support required: " +
+        error.message +
+        "file: " +
+        error.fileName +
+        ", line: " +
+        error.lineNumber
+    )
   }
-  if (this.swizzledFrame == null) {
-    this.swizzledFrame = this.getTypedArray(69120, 0xff, "uint8")
-  }
-  //Test the draw system and browser vblank latching:
-  this.drewFrame = true //Copy the latest graphics to buffer.
-  this.requestDraw()
 }
 GameBoyCore.prototype.graphicsBlit = function () {
   if (
@@ -6630,13 +6577,10 @@ GameBoyCore.prototype.initSound = function () {
         8192
       ) << 1,
       null,
-      null,
-      null,
       this.opts.volume,
-      function () {
-        self.opts.sound = false
-      },
-      this.canvas
+      () => {
+        this.opts.sound = false
+      }
     )
     this.initAudioBuffer()
   } else if (this.audioHandle) {
@@ -7358,7 +7302,8 @@ GameBoyCore.prototype.run = function () {
       }
     } else {
       //We can only get here if there was an internal error, but the loop was restarted.
-      this.emit("error", new Error("Iterator restarted a faulted core."))
+      cout("Iterator restarted a faulted core.", 2)
+      pause()
     }
   }
 }
@@ -7847,7 +7792,7 @@ GameBoyCore.prototype.clockUpdate = function () {
           ++this.RTCHours
           if (this.RTCHours >= 24) {
             this.RTCHours -= 24
-            this.RTCDays++
+            ++this.RTCDays
             if (this.RTCDays >= 512) {
               this.RTCDays -= 512
               this.RTCDayOverFlow = true
@@ -7870,7 +7815,12 @@ GameBoyCore.prototype.requestDraw = function () {
 }
 GameBoyCore.prototype.dispatchDraw = function () {
   if (this.offscreenRGBCount > 0) {
-    this.processDraw(this.swizzledFrame)
+    //We actually updated the graphics internally, so copy out:
+    if (this.offscreenRGBCount == 92160) {
+      this.processDraw(this.swizzledFrame)
+    } else {
+      this.resizeFrameBuffer()
+    }
   }
 }
 GameBoyCore.prototype.processDraw = function (frameBuffer) {
@@ -7884,7 +7834,6 @@ GameBoyCore.prototype.processDraw = function (frameBuffer) {
   }
   this.graphicsBlit()
   this.drewFrame = false
-  if (this.opts.drawEvents) this.emit("draw")
 }
 GameBoyCore.prototype.swizzleFrameBuffer = function () {
   //Convert our dirty 24-bit (24-bit, with internal render flags above it) framebuffer to an 8-bit buffer with separate indices for the RGB channels:
@@ -7910,6 +7859,33 @@ GameBoyCore.prototype.clearFrameBuffer = function () {
       frameBuffer[bufferIndex++] = 255
       frameBuffer[bufferIndex++] = 222
     }
+  }
+}
+GameBoyCore.prototype.resizeFrameBuffer = function () {
+  //Resize in javascript with resize.js:
+  if (this.resizePathClear) {
+    this.resizePathClear = false
+    this.resizer.resize(this.swizzledFrame)
+  }
+}
+GameBoyCore.prototype.compileResizeFrameBufferFunction = function () {
+  if (this.offscreenRGBCount > 0) {
+    var parentObj = this
+    this.resizer = new Resize(
+      160,
+      144,
+      this.offscreenWidth,
+      this.offscreenHeight,
+      false,
+      this.opts.imageSmoothing,
+      false,
+      function (buffer) {
+        if ((buffer.length / 3) * 4 == parentObj.offscreenRGBCount) {
+          parentObj.processDraw(buffer)
+        }
+        parentObj.resizePathClear = true
+      }
+    )
   }
 }
 GameBoyCore.prototype.renderScanLine = function (scanlineToRender) {
@@ -8079,9 +8055,8 @@ GameBoyCore.prototype.RGBTint = function (value) {
 GameBoyCore.prototype.getGBCColor = function () {
   //GBC Colorization of DMG ROMs:
   //BG
-  var adjustedIndex
   for (var counter = 0; counter < 4; counter++) {
-    adjustedIndex = counter << 1
+    var adjustedIndex = counter << 1
     //BG
     this.cachedBGPaletteConversion[counter] = this.RGBTint(
       (this.gbcBGRawPalette[adjustedIndex | 1] << 8) |
@@ -9482,7 +9457,7 @@ GameBoyCore.prototype.launchIRQ = function () {
   } while (bitShift < 5)
 }
 /*
-  Check for IRQs to be fired while not in HALT:
+	Check for IRQs to be fired while not in HALT:
 */
 GameBoyCore.prototype.checkIRQMatching = function () {
   if (this.IME) {
@@ -9491,19 +9466,18 @@ GameBoyCore.prototype.checkIRQMatching = function () {
   }
 }
 /*
-  Handle the HALT opcode by predicting all IRQ cases correctly,
-  then selecting the next closest IRQ firing from the prediction to
-  clock up to. This prevents hacky looping that doesn't predict, but
-  instead just clocks through the core update procedure by one which
-  is very slow. Not many emulators do this because they have to cover
-  all the IRQ prediction cases and they usually get them wrong.
+	Handle the HALT opcode by predicting all IRQ cases correctly,
+	then selecting the next closest IRQ firing from the prediction to
+	clock up to. This prevents hacky looping that doesn't predict, but
+	instead just clocks through the core update procedure by one which
+	is very slow. Not many emulators do this because they have to cover
+	all the IRQ prediction cases and they usually get them wrong.
 */
 GameBoyCore.prototype.calculateHALTPeriod = function () {
   //Initialize our variables and start our prediction:
-  var currentClocks
   if (!this.halt) {
     this.halt = true
-    currentClocks = -1
+    var currentClocks = -1
     var temp_var = 0
     if (this.LCDisOn) {
       //If the LCD is enabled, then predict the LCD IRQs enabled:
@@ -9566,7 +9540,7 @@ GameBoyCore.prototype.calculateHALTPeriod = function () {
       }
     }
   } else {
-    currentClocks = this.remainingClocks
+    var currentClocks = this.remainingClocks
   }
   var maxClocks =
     (this.CPUCyclesTotal - this.emulatorTicks) << this.doubleSpeedShifter
@@ -10116,11 +10090,30 @@ GameBoyCore.prototype.memoryReadJumpCompile = function () {
           }
           break
         case 0xff76:
+          //Undocumented realtime PCM amplitude readback:
+          this.memoryHighReader[0x76] = this.memoryReader[0xff76] = function (
+            parentObj,
+            address
+          ) {
+            parentObj.audioJIT()
+            return (
+              (parentObj.channel2envelopeVolume << 4) |
+              parentObj.channel1envelopeVolume
+            )
+          }
+          break
         case 0xff77:
-          this.memoryHighReader[index & 0xff] = this.memoryReader[index] =
-            function (parentObj, address) {
-              return 0
-            }
+          //Undocumented realtime PCM amplitude readback:
+          this.memoryHighReader[0x77] = this.memoryReader[0xff77] = function (
+            parentObj,
+            address
+          ) {
+            parentObj.audioJIT()
+            return (
+              (parentObj.channel4envelopeVolume << 4) |
+              parentObj.channel3envelopeVolume
+            )
+          }
           break
         case 0xff78:
         case 0xff79:
@@ -10165,12 +10158,11 @@ GameBoyCore.prototype.memoryReadMBC = function (parentObj, address) {
   if (parentObj.MBCRAMBanksEnabled || this.opts.overrideMbc) {
     return parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition]
   }
-  //
   return 0xff
 }
 GameBoyCore.prototype.memoryReadMBC7 = function (parentObj, address) {
   //Switchable RAM
-  if (parentObj.MBCRAMBanksEnabled || this.opts.overrideMbc) {
+  if (parentObj.MBCRAMBanksEnabled || parentObj.opts.overrideMbc) {
     switch (address) {
       case 0xa000:
       case 0xa060:
@@ -10195,26 +10187,30 @@ GameBoyCore.prototype.memoryReadMBC7 = function (parentObj, address) {
         return parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition]
     }
   }
-  //
   return 0xff
 }
 GameBoyCore.prototype.memoryReadMBC3 = function (parentObj, address) {
   //Switchable RAM
-  if (parentObj.MBCRAMBanksEnabled || this.opts.overrideMbc) {
+  if (parentObj.MBCRAMBanksEnabled || parentObj.opts.overrideMbc) {
     switch (parentObj.currMBCRAMBank) {
       case 0x00:
       case 0x01:
       case 0x02:
       case 0x03:
         return parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition]
+        break
       case 0x08:
         return parentObj.latchedSeconds
+        break
       case 0x09:
         return parentObj.latchedMinutes
+        break
       case 0x0a:
         return parentObj.latchedHours
+        break
       case 0x0b:
         return parentObj.latchedLDays
+        break
       case 0x0c:
         return (
           (parentObj.RTCDayOverFlow ? 0x80 : 0) +
@@ -10223,7 +10219,6 @@ GameBoyCore.prototype.memoryReadMBC3 = function (parentObj, address) {
         )
     }
   }
-  //
   return 0xff
 }
 GameBoyCore.prototype.memoryReadGBCMemory = function (parentObj, address) {
@@ -10523,12 +10518,12 @@ GameBoyCore.prototype.memoryHighWriteNormal = function (
   parentObj.memory[0xff00 | address] = data
 }
 GameBoyCore.prototype.memoryWriteMBCRAM = function (parentObj, address, data) {
-  if (parentObj.MBCRAMBanksEnabled || this.opts.overrideMbc) {
+  if (parentObj.MBCRAMBanksEnabled || parentObj.opts.overrideMbc) {
     parentObj.MBCRam[address + parentObj.currMBCRAMBankPosition] = data
   }
 }
 GameBoyCore.prototype.memoryWriteMBC3RAM = function (parentObj, address, data) {
-  if (parentObj.MBCRAMBanksEnabled || this.opts.overrideMbc) {
+  if (parentObj.MBCRAMBanksEnabled || parentObj.opts.overrideMbc) {
     switch (parentObj.currMBCRAMBank) {
       case 0x00:
       case 0x01:
@@ -12101,6 +12096,7 @@ GameBoyCore.prototype.toTypedArray = function (baseArray, memtype) {
     }
     return typedArrayTemp
   } catch (error) {
+    cout("Could not convert an array to a typed array: " + error.message, 1)
     return baseArray
   }
 }
@@ -12123,23 +12119,22 @@ GameBoyCore.prototype.getTypedArray = function (
   defaultValue,
   numberType
 ) {
-  var arrayHandle
   try {
     if (!this.opts.typedArrays) {
       throw new Error("Settings forced typed arrays to be disabled.")
     }
     switch (numberType) {
       case "int8":
-        arrayHandle = new Int8Array(length)
+        var arrayHandle = new Int8Array(length)
         break
       case "uint8":
-        arrayHandle = new Uint8Array(length)
+        var arrayHandle = new Uint8Array(length)
         break
       case "int32":
-        arrayHandle = new Int32Array(length)
+        var arrayHandle = new Int32Array(length)
         break
       case "float32":
-        arrayHandle = new Float32Array(length)
+        var arrayHandle = new Float32Array(length)
     }
     if (defaultValue != 0) {
       var index = 0
