@@ -8,6 +8,7 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
+import { useEmulator } from "./EmulatorContext"
 import {
   ADDRESS_GAME_REGISTRY,
   BASE_CDN_URL,
@@ -165,11 +166,15 @@ export const useAllGames = () => {
 
 export const useOwnedGames = () => {
   // Fetch all games from registry
-  const { address: connectedAddress } = useWorldAuth()
+  const { address: connectedAddress, isMiniApp } = useWorldAuth()
   const { games: allGames } = useAllGames()
+  const { currentGame } = useEmulator()
 
-  // Use dev address in dev env + no wallet connected
-  const shouldUseDevAddress = isDev() && !connectedAddress
+  const findGame = (collectionId: string) =>
+    allGames.find((g) => g.collectionId === collectionId) || null
+
+  // Use dev address in (local dev) env + no wallet connected
+  const shouldUseDevAddress = isDev() && !connectedAddress && !isMiniApp
   const address = shouldUseDevAddress ? DEV_ADDRESS : connectedAddress
 
   const { data: games = [], mutate } = useSWR(
@@ -203,15 +208,19 @@ export const useOwnedGames = () => {
 
   // Decouple owned games data from SWR response
   const ownedGames = games
-    .map(
-      ({ collectionId: id }) =>
-        allGames.find((g) => g.collectionId === id) || null
-    )
+    .map(({ collectionId }) => findGame(collectionId))
     .filter(Boolean) as Game[]
 
+  const gameInEmulator = findGame(currentGame?.gameCollectionId || "")
+
+  const isZeroGamesOwned = ownedGames.length <= 0
+
+  // Empty when no owned games + no game loaded
+  const isEmpty = isZeroGamesOwned && !gameInEmulator
   return {
     mutate,
-    games: ownedGames,
-    isEmpty: ownedGames.length === 0,
+    isEmpty,
+    // If possible show at least the emulator loaded game
+    games: gameInEmulator && isZeroGamesOwned ? [gameInEmulator] : ownedGames,
   }
 }

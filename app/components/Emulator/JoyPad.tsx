@@ -51,8 +51,8 @@ export default function JoyPad(
         size={120}
         baseColor="transparent"
         stickColor="transparent"
-        minDistance={5}
-        throttle={10}
+        minDistance={3}
+        throttle={3}
       />
     </div>
   )

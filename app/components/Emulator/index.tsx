@@ -8,8 +8,10 @@ import { calculatePointsMultiplier, useAccountPoints } from "@/hooks/points"
 import { useEmulator } from "@/lib/EmulatorContext"
 
 import MechanicalButton from "@/components/MechanicalButton"
-import JoyPad from "./JoyPad"
+
 import Screen from "./Screen"
+import JoyPad from "./JoyPad"
+import ABGrid from "./ABGrid"
 
 export default function Emulator() {
   const gameStartTimeRef = useRef<number | null>(null)
@@ -146,40 +148,23 @@ export default function Emulator() {
             stop={() => releaseAllDirections()}
             move={handleJoystickMove}
           />
-
-          {/* A/B Buttons */}
-          <div className="flex mb-6 gap-4">
-            <MechanicalButton
-              className="mt-10"
-              onPress={() => sendKeyDownEvent(5)}
-              onRelease={() => handleButtonRelease(5)}
-            >
-              B
-            </MechanicalButton>
-
-            <MechanicalButton
-              onPress={() => sendKeyDownEvent(4)}
-              onRelease={() => handleButtonRelease(4)}
-            >
-              A
-            </MechanicalButton>
-          </div>
+          <ABGrid onKeyDown={sendKeyDownEvent} onKeyUp={handleButtonRelease} />
         </div>
 
         {/* Start/Select */}
         <div className="flex justify-center gap-4 mt-14">
           <MechanicalButton
             className="h-6"
-            onPress={() => sendKeyDownEvent(6)}
-            onRelease={() => handleButtonRelease(6)}
+            onTapStart={() => sendKeyDownEvent(6)}
+            onTapEnd={() => handleButtonRelease(6)}
             variant="pill"
           >
             SELECT
           </MechanicalButton>
           <MechanicalButton
             className="h-6"
-            onPress={() => sendKeyDownEvent(7)}
-            onRelease={() => handleButtonRelease(7)}
+            onTapStart={() => sendKeyDownEvent(7)}
+            onTapEnd={() => handleButtonRelease(7)}
             variant="pill"
           >
             START

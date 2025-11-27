@@ -34,5 +34,7 @@ a {
   --color-rb-darker: #1a1a1a;
   --color-rb-lcd: #8b956d;
   --scale-98: 0.98;
+  --shadow-rb-button-down: 0 2px 0 0 #0a0a0a, 0 3px 6px 0 rgba(0, 0, 0, 0.4);
+  --shadow-rb-button: 0 6px 0 0 #0a0a0a, 0 8px 12px 0 rgba(0, 0, 0, 0.4);
   --spacing-safe-bottom: var(--safe-inset-bottom, 0px);
 }
