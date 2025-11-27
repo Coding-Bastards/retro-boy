@@ -33,7 +33,7 @@ export default function TopNavigation() {
           <button
             type="button"
             aria-haspopup="dialog"
-            className="flex px-1.5 items-center outline-none focus-visible:ring-2 focus-visible:ring-rb-green/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black rounded-full"
+            className="flex px-1.5 items-center outline-none rounded-full"
           >
             <span
               aria-hidden="true"

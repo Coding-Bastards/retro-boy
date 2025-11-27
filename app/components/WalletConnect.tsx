@@ -119,7 +119,7 @@ export default function WalletConnect({
 
       <div className="relative">
         {showClaimAction && (
-          <div className="rounded-full pointer-events-none absolute z-1 -top-0.5 -right-0.5 size-2 bg-linear-to-tl border border-rb-yellow/50 from-rb-yellow/70 to-rb-yellow" />
+          <div className="rounded-full pointer-events-none absolute z-1 -top-0.5 -right-0.5 size-2 bg-linear-to-tl backdrop-blur-sm border border-rb-yellow/50 from-rb-yellow/70 to-rb-yellow" />
         )}
         <AddressBlock address={address} size={8} />
       </div>

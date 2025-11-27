@@ -91,20 +91,21 @@ export default function GameCatalogue() {
     })
   }, [open])
 
+  /** `true` when the emulator game is the active/centered item from the collection list */
+  const isEmulatorGameActive = currentGame?.gameCollectionId === centeredGameId
+
   const handleButtonClick = () => {
     // Close the catalogue drawer
     setOpen(false)
 
+    // Early exit if the emulator game is already active
+    if (isEmulatorGameActive) return
     if (centeredGameId) {
       const game = ownedGames.find((g) => g.collectionId === centeredGameId)
       // Load the game directly
       if (game?.rom) loadGame(game.rom, game.collectionId)
-      return // Exit early if game is found and loaded
     }
   }
-
-  /** `true` when the emulator game is the active/centered item from the collection list */
-  const isEmulatorGameActive = currentGame?.gameCollectionId === centeredGameId
 
   return (
     <Drawer modal={false} open={open} onOpenChange={setOpen}>
@@ -146,8 +147,8 @@ export default function GameCatalogue() {
           </div>
         ) : (
           <Fragment>
-            <div className="overflow-x-auto animate-in fade-in duration-350 shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
-              <div className="flex animate-in fade-in duration-300 gap-4">
+            <div className="overflow-x-auto animate-in fade-in duration-400 shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
+              <div className="flex animate-in fade-in duration-350 gap-4">
                 {ownedGames.map((game) => (
                   <GameCard
                     game={game}
@@ -178,6 +179,6 @@ export default function GameCatalogue() {
 }
 
 function waitForDrawerAnimation(cb: () => void) {
-  const timer = setTimeout(cb, 200)
+  const timer = setTimeout(cb, 100)
   return () => clearTimeout(timer)
 }
