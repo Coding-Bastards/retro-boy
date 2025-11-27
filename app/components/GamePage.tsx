@@ -56,13 +56,12 @@ export default function GamePage() {
   const isFreeMint = PRICE <= 0
 
   const handleAction = async () => {
+    if (!isConnected) return signIn()
     if (isOwned) {
       loadGame(game.rom, game.collectionId)
       setIsCatalogueOpen(false) // Close catalogue on game load
       return navigateHome()
     }
-
-    if (!isConnected) return signIn()
 
     // 1 hour in the future
     const DEADLINE = Math.floor(Date.now() / 1000) + ONE_HOUR_IN_SECONDS

@@ -12,10 +12,12 @@ import {
   ADDRESS_GAME_REGISTRY,
   BASE_CDN_URL,
   BASE_REPO_URL,
+  DEV_ADDRESS,
   ZERO,
 } from "./constants"
 import { ABI_REGISTRY } from "./abi"
 import { jsonify } from "./utils"
+import { isDev } from "./env"
 
 export interface Game {
   collectionId: Address
@@ -163,20 +165,23 @@ export const useAllGames = () => {
 
 export const useOwnedGames = () => {
   // Fetch all games from registry
-  const { address: ownerAddress } = useWorldAuth()
+  const { address: connectedAddress } = useWorldAuth()
   const { games: allGames } = useAllGames()
 
-  const { data: games = [], mutate } = useSWR(
-    ownerAddress ? `games.owned.${ownerAddress}.${allGames.length}` : null,
-    async () => {
-      if (!ownerAddress) return []
+  // Use dev address in dev env + no wallet connected
+  const shouldUseDevAddress = isDev() && !connectedAddress
+  const address = shouldUseDevAddress ? DEV_ADDRESS : connectedAddress
 
+  const { data: games = [], mutate } = useSWR(
+    address ? `games.owned.${address}.${allGames.length}` : null,
+    async () => {
+      if (!address) return []
       const ownedNFTs = await clientWorldchain.multicall({
         contracts: allGames.map((game) => ({
           address: game.collectionId,
           abi: erc721Abi,
           functionName: "balanceOf",
-          args: [ownerAddress],
+          args: [address],
         })),
       })
 
