@@ -29,21 +29,26 @@ export default function GameCatalogue() {
   const { loadGame, currentGame } = useEmulator()
   const isSingleGameOwned = ownedGames.length === 1
 
+  const [centeredGameId, setCenteredGameId] = useState<string | null>(null)
   const FIRST_GAME_ID = ownedGames[0]?.collectionId || null
-  const [centeredGameId, setCenteredGameId] = useState<string | null>(
-    FIRST_GAME_ID
-  )
 
   useEffect(() => {
     if (open) {
-      // Reset centered game to first game when opening
-      setCenteredGameId(FIRST_GAME_ID)
+      const centeredGameId = currentGame?.gameCollectionId || FIRST_GAME_ID
+      setCenteredGameId(centeredGameId)
+
+      if (centeredGameId) {
+        return waitForDrawerAnimation(() => {
+          document
+            .querySelector(`[data-game-id="${centeredGameId}"]`)
+            ?.scrollIntoView()
+        })
+      }
     }
-  }, [open])
+  }, [open, currentGame, FIRST_GAME_ID])
 
   useEffect(() => {
-    // Wait for drawer animation to complete
-    const timer = setTimeout(() => {
+    waitForDrawerAnimation(() => {
       const cards = Array.from(
         document.querySelectorAll("[data-game-id]") || []
       )
@@ -83,12 +88,8 @@ export default function GameCatalogue() {
 
       cards.forEach((el) => observer.observe(el))
       return () => observer.disconnect()
-    }, 200)
-
-    return () => clearTimeout(timer)
+    })
   }, [open])
-
-  const isActiveGameCentered = currentGame?.gameCollectionId === centeredGameId
 
   const handleButtonClick = () => {
     // Close the catalogue drawer
@@ -101,6 +102,9 @@ export default function GameCatalogue() {
       return // Exit early if game is found and loaded
     }
   }
+
+  /** `true` when the emulator game is the active/centered item from the collection list */
+  const isEmulatorGameActive = currentGame?.gameCollectionId === centeredGameId
 
   return (
     <Drawer modal={false} open={open} onOpenChange={setOpen}>
@@ -142,8 +146,8 @@ export default function GameCatalogue() {
           </div>
         ) : (
           <Fragment>
-            <div className="overflow-x-auto shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
-              <div className="flex gap-4">
+            <div className="overflow-x-auto animate-in fade-in duration-350 shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
+              <div className="flex animate-in fade-in duration-300 gap-4">
                 {ownedGames.map((game) => (
                   <GameCard
                     game={game}
@@ -165,10 +169,15 @@ export default function GameCatalogue() {
 
         <div className="px-4 pt-1 pb-6">
           <Button onClick={handleButtonClick}>
-            {isEmpty || isActiveGameCentered ? "CONTINUE PLAYING" : "PLAY NOW"}
+            {isEmpty || isEmulatorGameActive ? "CONTINUE PLAYING" : "PLAY NOW"}
           </Button>
         </div>
       </DrawerContent>
     </Drawer>
   )
+}
+
+function waitForDrawerAnimation(cb: () => void) {
+  const timer = setTimeout(cb, 200)
+  return () => clearTimeout(timer)
 }
