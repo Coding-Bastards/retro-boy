@@ -1,0 +1,32 @@
+{
+  "name": "Spiritfall",
+  "description": "When the dead rise, only spirits can save us! A strategic tower defense game where you command an army of mystical spirits to defend against waves of undead invaders! In this supernatural showdown, deploy six unique spirit types across three lanes to stop skeletons, wizards, pumpkin monsters, and floating skulls from reaching your sacred grounds.",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/SPRF/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/SPRF/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://bottomtextgames.itch.io/spiritfall",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["FRojas1"],
+      "license_url": "https://bottomtextgames.itch.io/spiritfall"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Action"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1761865200,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "32 KB"
+    }
+  ]
+}
