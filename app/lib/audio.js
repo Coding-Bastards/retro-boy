@@ -4,7 +4,7 @@
  * @see https://raw.githubusercontent.com/taisel/XAudioJS/master/XAudioServer.js
  */
 
-class GameBoyAudio {
+export default class GameBoyAudio {
   constructor(
     channels,
     sampleRate,
@@ -137,14 +137,4 @@ class GameBoyAudio {
       }
     }
   }
-}
-
-// Export for use
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = GameBoyAudio
-}
-
-// Also set as global for compatibility
-if (typeof window !== "undefined") {
-  window.GameBoyAudio = GameBoyAudio
 }

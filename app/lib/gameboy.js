@@ -1,5 +1,7 @@
 "use strict"
 
+import { EventEmitter } from "events"
+
 // Author (Grant Galitz @taisel) updated code + licenses
 // @see https://github.com/taisel/GameBoy-Online/blob/master/js/GameBoyCore.js
 
@@ -12,6 +14,18 @@
   The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
+
+var emitter = new EventEmitter()
+function emit(event, data) {
+  emitter.emit(event, data)
+
+  switch (event) {
+    case "error":
+      console.error("GameBoyCore Error:", data)
+    case "warn":
+      console.warn("GameBoyCore Warning:", data)
+  }
+}
 
 export default function GameBoyCore(canvas, ROMData, opts = {}) {
   if (!(this instanceof GameBoyCore))
@@ -296,6 +310,7 @@ export default function GameBoyCore(canvas, ROMData, opts = {}) {
   //Initialize the white noise cache tables ahead of time:
   this.intializeWhiteNoise()
 }
+
 GameBoyCore.prototype.GBBOOTROM = [
   //GB BOOT ROM
   //Add 256 byte boot rom here if you are going to use it.
@@ -2521,7 +2536,7 @@ GameBoyCore.prototype.OPCODE = [
   //0xDD - Illegal
   //#0xDD:
   function (parentObj) {
-    cout("Illegal op code 0xDD called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xDD called, pausing emulation.")
     pause()
   },
   //SBC A, n
@@ -2595,13 +2610,13 @@ GameBoyCore.prototype.OPCODE = [
   //0xE3 - Illegal
   //#0xE3:
   function (parentObj) {
-    cout("Illegal op code 0xE3 called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xE3 called, pausing emulation.")
     pause()
   },
   //0xE4 - Illegal
   //#0xE4:
   function (parentObj) {
-    cout("Illegal op code 0xE4 called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xE4 called, pausing emulation.")
     pause()
   },
   //PUSH HL
@@ -2688,19 +2703,19 @@ GameBoyCore.prototype.OPCODE = [
   //0xEB - Illegal
   //#0xEB:
   function (parentObj) {
-    cout("Illegal op code 0xEB called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xEB called, pausing emulation.")
     pause()
   },
   //0xEC - Illegal
   //#0xEC:
   function (parentObj) {
-    cout("Illegal op code 0xEC called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xEC called, pausing emulation.")
     pause()
   },
   //0xED - Illegal
   //#0xED:
   function (parentObj) {
-    cout("Illegal op code 0xED called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xED called, pausing emulation.")
     pause()
   },
   //XOR n
@@ -2775,7 +2790,7 @@ GameBoyCore.prototype.OPCODE = [
   //0xF4 - Illegal
   //#0xF4:
   function (parentObj) {
-    cout("Illegal op code 0xF4 called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xF4 called, pausing emulation.")
     pause()
   },
   //PUSH AF
@@ -2875,13 +2890,13 @@ GameBoyCore.prototype.OPCODE = [
   //0xFC - Illegal
   //#0xFC:
   function (parentObj) {
-    cout("Illegal op code 0xFC called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xFC called, pausing emulation.")
     pause()
   },
   //0xFD - Illegal
   //#0xFD:
   function (parentObj) {
-    cout("Illegal op code 0xFD called, pausing emulation.", 2)
+    emit("error", "Illegal op code 0xFD called, pausing emulation.")
     pause()
   },
   //CP n
@@ -6259,7 +6274,7 @@ GameBoyCore.prototype.interpretCartridge = function () {
       break
     default:
       MBCType = "Unknown"
-      cout("Cartridge type is unknown.", 2)
+      emit("error", "Cartridge type is unknown.")
       pause()
   }
   // ROM and RAM banks
@@ -6300,11 +6315,11 @@ GameBoyCore.prototype.interpretCartridge = function () {
         break
       default:
         this.cGBC = false
-        cout(
+        emit(
+          "warn",
           "Unknown GameBoy game type code #" +
             this.ROM[0x143] +
-            ", defaulting to GB mode (Old games don't have a type code).",
-          1
+            ", defaulting to GB mode (Old games don't have a type code)."
         )
     }
     this.inBootstrap = false
@@ -6473,11 +6488,11 @@ GameBoyCore.prototype.initLCD = function () {
         this.offscreenHeight
       )
     } catch (error) {
-      cout(
+      emit(
+        "warn",
         'Falling back to the getImageData initialization (Error "' +
           error.message +
-          '").',
-        1
+          '").'
       )
       this.canvasBuffer = this.drawContextOffscreen.getImageData(
         0,
@@ -7302,7 +7317,7 @@ GameBoyCore.prototype.run = function () {
       }
     } else {
       //We can only get here if there was an internal error, but the loop was restarted.
-      cout("Iterator restarted a faulted core.", 2)
+      emit("error", "Iterator restarted a faulted core.")
       pause()
     }
   }
@@ -12096,7 +12111,10 @@ GameBoyCore.prototype.toTypedArray = function (baseArray, memtype) {
     }
     return typedArrayTemp
   } catch (error) {
-    cout("Could not convert an array to a typed array: " + error.message, 1)
+    emit(
+      "error",
+      "Could not convert an array to a typed array: " + error.message
+    )
     return baseArray
   }
 }

@@ -52,23 +52,18 @@ export function EmulatorProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     const loadEmulator = async () => {
       try {
-        // Load our custom audio implementation
-        const audioModule = await import("@/lib/audio")
-        const GameBoyAudio = audioModule.default || (window as any).GameBoyAudio
+        const [GameBoyAudio, GameBoyCore] = await Promise.all(
+          [
+            // Load audio library
+            import("@/lib/audio"),
+            import("@/lib/gameboy"),
+          ].map((p) => p.then((mod) => mod.default))
+        )
 
-        if (GameBoyAudio) {
-          console.debug("GameBoy Audio loaded!")
-          setAudioClass(() => GameBoyAudio)
-        }
-
-        // Load GameBoy emulator
-        const module = await import("@/lib/gameboy")
-        const GameBoyCore = module.default
-        console.debug("GameBoy module:", GameBoyCore, module)
-        console.debug("GameBoy emulator loaded")
+        setAudioClass(() => GameBoyAudio)
         setGameboy(() => GameBoyCore)
       } catch (error) {
-        console.error("Failed to load GameBoy emulator:", error)
+        console.error("EmulatorContext::", error)
       }
     }
 
