@@ -118,11 +118,11 @@ export default function GameTray() {
         style={{
           display: isOpenSlotsGrid ? "block" : "hidden",
         }}
-        className="absolute animate-in fade-in pt-3 px-3 pb-1.5 bg-rb-black rounded-t-xl z-5 left-0 right-0 -bottom-px"
+        className="absolute animate-in fade-in pt-3 px-3 pb-1.5 bg-rb-black rounded-t-3xl z-5 left-0 right-0 -bottom-px"
       >
         <TickHandle
           isRotated
-          className="absolute -top-2.5 left-1/2 -translate-x-1/2"
+          className="absolute -top-2 left-1/2 -translate-x-1/2"
           onClick={() => setIsOpenSlotsGrid(false)}
         />
 
@@ -170,7 +170,7 @@ export default function GameTray() {
     </Fragment>
   ) : (
     <TickHandle
-      className="absolute z-3 -bottom-2 left-1/2 -translate-x-1/2"
+      className="absolute z-3 -bottom-2.5 left-1/2 -translate-x-1/2"
       onClick={() => setIsOpenSlotsGrid(true)}
     />
   )
@@ -200,13 +200,13 @@ function TickHandle({
     <button
       onClick={onClick}
       className={cn(
-        "bg-rb-black w-9 h-5 grid place-items-center rounded-t-md text-white border-t-black border-t",
+        "bg-rb-black w-9 h-5 grid place-items-center rounded-t-lg text-white border-t-black border-t",
         className
       )}
     >
       <TbChevronCompactUp
         className={cn(
-          "text-white -translate-y-0.5 scale-x-105 text-xl",
+          "text-amber-100/60 -translate-y-0.5 scale-x-105 text-xl",
           isRotated && "rotate-180"
         )}
       />
