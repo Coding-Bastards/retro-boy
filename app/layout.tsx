@@ -44,7 +44,7 @@ export default function RootLayout({
           theme="light"
           toastOptions={{
             classNames: {
-              toast: "rounded-full! pl-5!",
+              toast: "rounded-full! py-3! pl-5!",
             },
           }}
           position="top-center"
