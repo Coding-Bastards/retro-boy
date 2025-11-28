@@ -1,14 +1,11 @@
 "use client"
 
 import { type PropsWithChildren, Fragment, useCallback, useState } from "react"
-import { atomWithStorage } from "jotai/utils"
-import { useAtom } from "jotai"
 import { toast } from "sonner"
 import LZString from "lz-string"
 
-import { useWorldAuth } from "@radish-la/world-auth"
 import { useEmulator } from "@/lib/EmulatorContext"
-import { isDev } from "@/lib/env"
+import { useProFeatures } from "@/hooks/pro"
 import { cn } from "@/lib/utils"
 
 import { TbChevronCompactUp } from "react-icons/tb"
@@ -16,7 +13,7 @@ import { ImCross } from "react-icons/im"
 import { IoMdCodeDownload } from "react-icons/io"
 
 import { ASPECT_RATIO } from "./internals"
-import { DEV_ADDRESS } from "@/lib/constants"
+import DialogProPayment from "./DialogProPayment"
 
 interface StateSlot {
   state: string
@@ -24,25 +21,15 @@ interface StateSlot {
   timestamp: number
 }
 
-const atomIsFeatureStatesEnabled = atomWithStorage(
-  "rb.feature.save-states.enabled",
-  false
-)
-
 export default function GameTray() {
   const [, setUpdatedCount] = useState(0)
 
   const { gameCanvas, getGameboyInstance, currentGame } = useEmulator()
-  const { address } = useWorldAuth()
-
   const [isOpenSlotsGrid, setIsOpenSlotsGrid] = useState(false)
-  const [_isFeatureEnabled, setIsFeatureEnabled] = useAtom(
-    atomIsFeatureStatesEnabled
-  )
 
-  // Enabled for DEV env, if PRO user or DEV_ADDRESS
-  const isFeatureEnabled =
-    isDev() || _isFeatureEnabled || address === DEV_ADDRESS
+  // Pro Features - Save States
+  const { isProUser } = useProFeatures()
+  const [isOpenProPaymentDialog, setIsOpenProPaymentDialog] = useState(false)
 
   const getSlotAt = useCallback(
     (slot: number) =>
@@ -58,14 +45,14 @@ export default function GameTray() {
   }
 
   const handleSaveState = (slot: number) => {
-    if (!isFeatureEnabled) {
-      // TODO: Add pay wall modal
-      return toast.error("Only available for PRO users")
+    if (!isProUser) {
+      // Show pro payment dialog
+      return setIsOpenProPaymentDialog(true)
     }
 
     const gb = getGameboyInstance()
     if (!gb || !currentGame || !gameCanvas) {
-      return toast.error("Load a game to save your state")
+      return toast.error("Load a cartridge to save game state")
     }
 
     try {
@@ -87,7 +74,7 @@ export default function GameTray() {
   const handleLoadState = (slot: number) => {
     const gb = getGameboyInstance()
     if (!gb || !currentGame) {
-      return toast.error("Load a game to save your state")
+      return toast.error("Load a cartridge to save game state")
     }
 
     try {
@@ -105,74 +92,82 @@ export default function GameTray() {
     }
   }
 
-  return isOpenSlotsGrid ? (
+  return (
     <Fragment>
-      <div
-        onClick={() => setIsOpenSlotsGrid(false)}
-        className="fixed z-4 cursor-pointer inset-0"
+      <DialogProPayment
+        isOpen={isOpenProPaymentDialog}
+        onOpenChange={setIsOpenProPaymentDialog}
       />
+      {isOpenSlotsGrid ? (
+        <Fragment>
+          <div
+            onClick={() => setIsOpenSlotsGrid(false)}
+            className="fixed z-4 cursor-pointer inset-0"
+          />
 
-      <div className="absolute z-3 cursor-pointer animate-in fade-in inset-0 bg-black/30 backdrop-blur-sm rounded-xl" />
+          <div className="absolute z-3 cursor-pointer animate-in fade-in inset-0 bg-black/30 backdrop-blur-sm rounded-xl" />
 
-      <div
-        style={{
-          display: isOpenSlotsGrid ? "block" : "hidden",
-        }}
-        className="absolute animate-in fade-in pt-3 px-3 pb-1.5 bg-rb-black rounded-t-3xl z-5 left-0 right-0 -bottom-px"
-      >
+          <div
+            style={{
+              display: isOpenSlotsGrid ? "block" : "hidden",
+            }}
+            className="absolute animate-in fade-in pt-3 px-3 pb-1.5 bg-rb-black rounded-t-3xl z-5 left-0 right-0 -bottom-px"
+          >
+            <TickHandle
+              isRotated
+              className="absolute -top-2 left-1/2 -translate-x-1/2"
+              onClick={() => setIsOpenSlotsGrid(false)}
+            />
+
+            <h2 className="text-center text-sm">
+              <strong className="text-white">GAME STATES (PRO)</strong>
+            </h2>
+
+            <div className="grid mt-3.5 grid-cols-3 gap-2.5 text-white">
+              {Array.from({ length: 3 }).map((_, index) => {
+                const state = getSlotAt(index).value
+
+                return (
+                  <SlotItem
+                    key={`slot-item-${index}`}
+                    state={state}
+                    onClick={() =>
+                      // Save or Load depending on existing state
+                      (state ? handleLoadState : handleSaveState)(index)
+                    }
+                  >
+                    {state ? (
+                      <div className="absolute inset-0 rounded-md bg-linear-to-tr from-black/0 via-black/0 to-black/50">
+                        <button
+                          // Clean the slot
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            writeToSlot(index, null)
+                          }}
+                          className="absolute p-1 -top-1.5 -right-1.5 bg-white/10 border border-white/10 text-white backdrop-blur rounded-full"
+                        >
+                          <ImCross className="text-xs scale-80" />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="opacity-70 grid place-items-center">
+                        <IoMdCodeDownload className="text-xl" />
+                        <strong className="text-xs">SAVE</strong>
+                      </div>
+                    )}
+                  </SlotItem>
+                )
+              })}
+            </div>
+          </div>
+        </Fragment>
+      ) : (
         <TickHandle
-          isRotated
-          className="absolute -top-2 left-1/2 -translate-x-1/2"
-          onClick={() => setIsOpenSlotsGrid(false)}
+          className="absolute z-3 -bottom-2.5 left-1/2 -translate-x-1/2"
+          onClick={() => setIsOpenSlotsGrid(true)}
         />
-
-        <h2 className="text-center text-sm">
-          <strong className="text-white">GAME STATES (PRO)</strong>
-        </h2>
-
-        <div className="grid mt-3.5 grid-cols-3 gap-2.5 text-white">
-          {Array.from({ length: 3 }).map((_, index) => {
-            const state = getSlotAt(index).value
-
-            return (
-              <SlotItem
-                key={`slot-item-${index}`}
-                state={state}
-                onClick={() =>
-                  // Save or Load depending on existing state
-                  (state ? handleLoadState : handleSaveState)(index)
-                }
-              >
-                {state ? (
-                  <div className="absolute inset-0 rounded-md bg-linear-to-tr from-black/0 via-black/0 to-black/50">
-                    <button
-                      // Clean the slot
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        writeToSlot(index, null)
-                      }}
-                      className="absolute p-1 -top-1.5 -right-1.5 bg-white/10 border border-white/10 text-white backdrop-blur rounded-full"
-                    >
-                      <ImCross className="text-xs scale-80" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="opacity-70 grid place-items-center">
-                    <IoMdCodeDownload className="text-xl" />
-                    <strong className="text-xs">SAVE</strong>
-                  </div>
-                )}
-              </SlotItem>
-            )
-          })}
-        </div>
-      </div>
+      )}
     </Fragment>
-  ) : (
-    <TickHandle
-      className="absolute z-3 -bottom-2.5 left-1/2 -translate-x-1/2"
-      onClick={() => setIsOpenSlotsGrid(true)}
-    />
   )
 }
 
