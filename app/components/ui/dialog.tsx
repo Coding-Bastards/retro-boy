@@ -19,7 +19,7 @@ const Dialog = ({ id, open, onOpenChange, ...props }: DialogProps) => {
     id,
   })
 
-  return <DialogPrimitive.Root {...historyProps} {...props} />
+  return <DialogPrimitive.Root {...props} {...historyProps} />
 }
 
 const DialogTrigger = DialogPrimitive.Trigger

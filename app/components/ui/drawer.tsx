@@ -31,8 +31,8 @@ const Drawer = ({
       <DrawerPrimitive.Root
         shouldScaleBackground={shouldScaleBackground}
         modal={modal}
-        {...historyProps}
         {...props}
+        {...historyProps}
       />
     </DrawerContext.Provider>
   )

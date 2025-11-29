@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { atom, useAtom } from "jotai"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo } from "react"
 import { generateUUID } from "@/lib/utils"
 
 const atomHistory = atom<string[]>([])
@@ -56,7 +56,6 @@ export const useModalQueryHistory = ({
   queryName: string
   onOpenChange?: (open: boolean) => void
 }) => {
-  const [ready, setReady] = useState(false)
   const { historySize, ...router } = useTrackableRouter()
 
   const ID = useMemo(() => {
@@ -68,33 +67,6 @@ export const useModalQueryHistory = ({
   const getOpenDialogKeys = () => {
     return getWindowParams().get(queryName)?.split(",").filter(Boolean) || []
   }
-
-  useEffect(() => {
-    // Workaround to avoid hydration issues + wait for jotai
-    const timer = setTimeout(() => setReady(true), 300)
-    return () => clearTimeout(timer)
-  }, [ID])
-
-  useEffect(() => {
-    // Early exit if not ready
-    if (!ready) return
-
-    const params = getWindowParams()
-    const openDialogKeys = getOpenDialogKeys()
-    const isLastOpenedDialog = openDialogKeys.at(-1) === ID
-
-    if (open) {
-      // Remove duplicate keys for ID
-      const filteredKeys = openDialogKeys.filter((k) => k !== ID)
-      const keys = open ? [...filteredKeys, ID] : filteredKeys
-      params.set(queryName, keys.join(","))
-      router.push(`?${params.toString()}`)
-    } else if (isLastOpenedDialog && historySize > 0) {
-      // Navitate back if this is the last opened dialog
-      // And there is history to go back to
-      router.back()
-    }
-  }, [open, ready])
 
   useEffect(() => {
     function handleRouteChange(_: PopStateEvent) {
@@ -115,8 +87,27 @@ export const useModalQueryHistory = ({
     }
   }, [ID, open, queryName])
 
+  function onOpenChangeWrapper(willOpen: boolean) {
+    onOpenChange?.(willOpen)
+
+    const params = getWindowParams()
+    const openDialogKeys = getOpenDialogKeys()
+    const isLastOpenedDialog = openDialogKeys.at(-1) === ID
+
+    if (willOpen) {
+      // Remove duplicate keys for ID + force last position
+      const keys = [...openDialogKeys.filter((k) => k !== ID), ID]
+      params.set(queryName, keys.join(","))
+      router.push(`?${params.toString()}`)
+    } else if (isLastOpenedDialog && historySize > 0) {
+      // Navitate back if this is the last opened dialog
+      // And there is history to go back to
+      router.back()
+    }
+  }
+
   return {
     open,
-    onOpenChange,
+    onOpenChange: onOpenChangeWrapper,
   }
 }
