@@ -1,0 +1,37 @@
+{
+  "name": "Dusky Dungeon",
+  "description": "You are the latest apprentice of the Cat School for Swordplay and Wizardry. As your first task you have to face the many horrors of the Dusky Dungeon.",
+  "image": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DUDO/nft.png",
+  "emulator": {
+    "rom": "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/games/DUDO/game.gb",
+    "romVersion": "1"
+  },
+  "source_or_author_url": "https://github.com/inverted-hat/duskyDungeon",
+  "licenses": {
+    "game": {
+      "type": "MIT",
+      "creators": ["Jan Klečka"],
+      "license_url": "https://github.com/inverted-hat/duskyDungeon/blob/master/LICENSE-MIT.md"
+    },
+    "assets": {
+      "type": "CC-BY-4.0",
+      "creators": ["Jan Klečka"],
+      "license_url": "https://github.com/inverted-hat/duskyDungeon/blob/master/LICENSE-CC-BY"
+    }
+  },
+  "attributes": [
+    {
+      "trait_type": "Genre",
+      "value": "Action"
+    },
+    {
+      "trait_type": "Release Date",
+      "value": 1655762400,
+      "display_type": "date"
+    },
+    {
+      "trait_type": "ROM Size",
+      "value": "524 KB"
+    }
+  ]
+}
