@@ -3,9 +3,9 @@
 import { useWorldAuth } from "@radish-la/world-auth"
 import { toast } from "sonner"
 
-import { useProFeatures } from "@/app/hooks/pro"
+import { useProFeatures } from "@/hooks/pro"
 import { executeWorldPayment } from "@/app/actions/payments"
-import { DEV_ADDRESS } from "@/app/lib/constants"
+import { DEV_ADDRESS } from "@/lib/constants"
 
 import Dialog from "@/components/Dialog"
 import Button from "@/components/Button"
@@ -17,7 +17,7 @@ export default function DialogProPayment({
   isOpen: boolean
   onOpenChange: (open: boolean) => void
 }) {
-  const { isProUser } = useProFeatures()
+  const { isProUser, migrateToPro } = useProFeatures()
   const { address, signIn } = useWorldAuth()
 
   // Devs get a discount
@@ -38,6 +38,7 @@ export default function DialogProPayment({
 
     if (paymentTX) {
       toast.success("Welcome to PRO!")
+      migrateToPro()
       closeDialog()
     }
   }

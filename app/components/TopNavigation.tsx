@@ -44,9 +44,14 @@ export default function TopNavigation() {
                 "rounded-full size-2 transition-all duration-300"
               )}
             />
-            <span className="text-lg relative px-2.5 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
-              RETRO BOY
-            </span>
+            <nav className="flex gap-0.5 items-center">
+              <span className="text-lg relative px-2.5 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
+                RETRO BOY
+              </span>
+              <div className="bg-white/15 text-white/80 text-[10px] px-1 font-black rounded-full">
+                PRO
+              </div>
+            </nav>
           </button>
         }
       >
