@@ -4,6 +4,7 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { toast } from "sonner"
 
 import { useProFeatures } from "@/hooks/pro"
+import { runParty } from "@/lib/party"
 import { executeWorldPayment } from "@/app/actions/payments"
 import { DEV_ADDRESS } from "@/lib/constants"
 
@@ -38,6 +39,7 @@ export default function DialogProPayment({
 
     if (paymentTX) {
       toast.success("Welcome to PRO!")
+      runParty()
       migrateToPro()
       closeDialog()
     }

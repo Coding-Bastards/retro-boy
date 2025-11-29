@@ -3,6 +3,7 @@
 import { type PropsWithChildren, Fragment, useCallback, useState } from "react"
 import { toast } from "sonner"
 import LZString from "lz-string"
+import dynamic from "next/dynamic"
 
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useProFeatures } from "@/hooks/pro"
@@ -13,13 +14,16 @@ import { ImCross } from "react-icons/im"
 import { IoMdCodeDownload } from "react-icons/io"
 
 import { ASPECT_RATIO } from "./internals"
-import DialogProPayment from "./DialogProPayment"
 
 interface StateSlot {
   state: string
   snapshot: string
   timestamp: number
 }
+
+const DialogProPayment = dynamic(() => import("./DialogProPayment"), {
+  ssr: false,
+})
 
 export default function GameTray() {
   const [, setUpdatedCount] = useState(0)
