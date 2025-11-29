@@ -1,24 +1,32 @@
+import type { Address } from "viem"
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAllGames, useOwnedGames } from "@/lib/games"
 import { useAtomTimePlayed } from "@/lib/store"
 
-export const useGameStats = (collectionId?: string) => {
+export const useTimePlayed = (address?: Address) => {
   const [timePlayed] = useAtomTimePlayed()
+
+  /** Return the time played in seconds */
+  const getTimePlayed = (collectionId: string) => {
+    return timePlayed?.[collectionId]?.[address || ""] || 0
+  }
+
+  return { getTimePlayed, allTimePlayedRecords: timePlayed }
+}
+
+export const useGameStats = (collectionId?: string) => {
   const { address } = useWorldAuth()
+  const { getTimePlayed, allTimePlayedRecords } = useTimePlayed(address)
 
-  const playTimeInSeconds =
-    timePlayed?.[collectionId || ""]?.[address || ""] || 0
-
-  const allGamesTime = Object.values(timePlayed).reduce((acc, game) => {
-    return acc + (game[address || ""] || 0)
-  }, 0)
+  const allGamesTime = Object.values(allTimePlayedRecords).reduce(
+    (acc, game) => acc + (game[address || ""] || 0),
+    0
+  )
 
   return {
     gameStats: {
       /** Play time for this specific game */
-      playTimeInSeconds,
-      /** Raw saved state data */
-      lastSavedState: null,
+      playTimeInSeconds: getTimePlayed(collectionId || ""),
     },
     emulator: {
       /** Total play time across all games */

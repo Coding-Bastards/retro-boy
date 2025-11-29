@@ -30,6 +30,7 @@ import { useLikesEngine } from "@/hooks/likes"
 
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
 import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
+import { useAccountBalances } from "@/hooks/balances"
 import { TOKENS } from "@/lib/tokens"
 
 import Button from "./Button"
@@ -42,6 +43,7 @@ export default function GamePage() {
 
   const { isConnected, signIn } = useWorldAuth()
   const { loadGame } = useEmulator()
+  const { WLD } = useAccountBalances()
   const { navigateHome } = useAppRouter()
   const searchParams = useSearchParams()
 
@@ -61,6 +63,15 @@ export default function GamePage() {
       loadGame(game.rom, game.collectionId)
       setIsCatalogueOpen(false) // Close catalogue on game load
       return navigateHome()
+    }
+
+    // Verify sufficient balance
+    // We safe against free mints (value is never negative)
+    if (WLD.value < PRICE) {
+      return showAlert({
+        title: "INSUFFICIENT BALANCE",
+        description: "You don't have enough WLD to mint this collection.",
+      })
     }
 
     // 1 hour in the future
