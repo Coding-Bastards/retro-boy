@@ -1,6 +1,7 @@
 "use client"
 
 import { Fragment } from "react/jsx-runtime"
+import dynamic from "next/dynamic"
 
 import Emulator from "@/components/Emulator"
 import MarketPage from "@/components/MarketPage"
@@ -8,10 +9,18 @@ import GamePage from "@/components/GamePage"
 
 import GameCatalogue from "./components/GameCatalogue"
 import DrawerBoard from "./components/DrawerBoard"
-import TopNavigation from "./components/TopNavigation"
 import QueryRouter from "./QueryRouter"
 
 import Footer from "./Footer"
+
+const TopNavigation = dynamic(() => import("./components/TopNavigation"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-13 flex pb-5 px-px w-full">
+      <div className="w-full animate-pulse rounded-lg bg-white/5" />
+    </div>
+  ),
+})
 
 export default function Home() {
   return (

@@ -4,7 +4,7 @@ import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
 import { cn } from "@/lib/utils"
-import { useModalQueryHistory } from "@/app/hooks/history"
+import { useModalQueryHistory } from "@/hooks/history"
 
 const DrawerContext = React.createContext<{ modal: boolean }>({ modal: true })
 
@@ -12,6 +12,7 @@ const Drawer = ({
   shouldScaleBackground = true,
   modal = true,
   onOpenChange,
+  children,
   open,
   id,
   ...props
@@ -33,7 +34,9 @@ const Drawer = ({
         modal={modal}
         {...props}
         {...historyProps}
-      />
+      >
+        {children}
+      </DrawerPrimitive.Root>
     </DrawerContext.Provider>
   )
 }

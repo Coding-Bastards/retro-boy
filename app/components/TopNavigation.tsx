@@ -26,7 +26,7 @@ export default function TopNavigation() {
   }
 
   return (
-    <nav className="flex pb-4 items-center justify-between">
+    <nav className="flex min-h-13 pb-4 items-center justify-between">
       <Dialog
         open={open || isFirstTimeOpen}
         onOpenChange={handleDialogChange}

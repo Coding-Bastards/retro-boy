@@ -1,11 +1,7 @@
 "use client"
 
-import {
-  Suspense,
-  useEffect,
-  type PropsWithChildren,
-  type ReactNode,
-} from "react"
+import type { PropsWithChildren, ReactNode } from "react"
+import { Suspense, useEffect } from "react"
 import { atom, useAtom } from "jotai"
 
 import { useSearchParams } from "next/navigation"
@@ -36,7 +32,7 @@ function QueryPage({
 const atomIsClearedUp = atom(false)
 export default function QueryRouter({ children }: PropsWithChildren) {
   const [isCleared, setIsCleared] = useAtom(atomIsClearedUp)
-  const { history, replace } = useTrackableRouter()
+  const { history, ...router } = useTrackableRouter()
 
   useEffect(() => {
     // Early exit if we have pushed any history
@@ -47,9 +43,12 @@ export default function QueryRouter({ children }: PropsWithChildren) {
     const entries = Array.from(params.entries())
     if (entries.length > 0) {
       setIsCleared(true)
-      replace("/")
+      // Append a fresh history entrypoint
+      // This is a work around for mini app envs that
+      // stale browser history when re-opening the app
+      router.push("/")
     }
-  }, [history, isCleared])
+  }, [isCleared, history])
 
   return <Suspense fallback={null}>{children}</Suspense>
 }

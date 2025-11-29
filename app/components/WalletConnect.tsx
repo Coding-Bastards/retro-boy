@@ -18,6 +18,7 @@ import { formatTimePlayed } from "@/lib/date"
 import { ABI_DISPENSER } from "@/lib/abi"
 import { ADDRESS_DISPENSER, DEV_ADDRESS } from "@/lib/constants"
 
+import { initializeEruda } from "./ErudaProdiver"
 import AddressBlock from "./AddressBlock"
 import Dialog from "./Dialog"
 import Button from "./Button"
@@ -93,6 +94,7 @@ export default function WalletConnect({
   }, [isDialogOpen])
 
   const isWLDSummary = summaryToken === "WLD"
+  const isDeveloper = address === DEV_ADDRESS
 
   // Show claim action when diff >= 1 RBC
   const showClaimAction =
@@ -128,7 +130,7 @@ export default function WalletConnect({
     </button>
   )
 
-  if (!isConnected) return TRIGGER
+  //if (!isConnected) return TRIGGER
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">
@@ -183,6 +185,13 @@ export default function WalletConnect({
             onClick={handleClaim}
           >
             COLLECT ({numberToShortWords(POINTS_TO_COLLECT)} RBC)
+          </Button>
+        )}
+
+        {/* Developer Settings */}
+        {isDeveloper && (
+          <Button onClick={initializeEruda} variant="secondary">
+            OPEN DEBUGGER
           </Button>
         )}
 

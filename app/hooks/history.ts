@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { atom, useAtom } from "jotai"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { generateUUID } from "@/lib/utils"
 
 const atomHistory = atom<string[]>([])
@@ -25,8 +25,13 @@ export const useTrackableRouter = () => {
         currentHistorySize: historySize,
         nextHistorySize: Math.max(0, historySize - 1),
       })
-      // Remove last history entry
-      setHistory((prev) => prev.slice(0, -1))
+
+      // Try remove last history entry
+      setHistory((prev) => {
+        const isAppEntryPoint = prev.length === 1 && prev.at(0) === "/"
+        // Prevent removing the initial entrypoint
+        return isAppEntryPoint ? prev : prev.slice(0, -1)
+      })
     }
 
     window.addEventListener("popstate", handlePopState)
@@ -47,7 +52,8 @@ export const useTrackableRouter = () => {
 
 export const useModalQueryHistory = ({
   id,
-  open,
+  // Force controlled open state
+  open = false,
   onOpenChange,
   queryName,
 }: {
@@ -56,6 +62,7 @@ export const useModalQueryHistory = ({
   queryName: string
   onOpenChange?: (open: boolean) => void
 }) => {
+  const [ready, setReady] = useState(false)
   const { historySize, ...router } = useTrackableRouter()
 
   const ID = useMemo(() => {
@@ -67,6 +74,38 @@ export const useModalQueryHistory = ({
   const getOpenDialogKeys = () => {
     return getWindowParams().get(queryName)?.split(",").filter(Boolean) || []
   }
+
+  function onOpenChangeWrapper(willOpen: boolean) {
+    // Regular onOpenChange callback
+    onOpenChange?.(willOpen)
+
+    // Early exit - Handled by useEffect when opening
+    if (willOpen) return
+
+    const openKeys = getOpenDialogKeys()
+    const isLastPushedKey = openKeys.at(-1) === ID
+    if (isLastPushedKey && historySize > 0) {
+      // Navitate back if this is the last opened item
+      // And there is history to go back to
+      router.back()
+    }
+  }
+
+  useEffect(() => {
+    // Early exit if not ready
+    if (!ready) return
+
+    const openDialogKeys = getOpenDialogKeys()
+    const isNotInURL = !openDialogKeys.includes(ID)
+
+    // Sync URL when open prop changes externally
+    if (open && isNotInURL) {
+      const params = getWindowParams()
+      const keys = [...openDialogKeys.filter((k) => k !== ID), ID]
+      params.set(queryName, keys.join(","))
+      router.push(`?${params.toString()}`)
+    }
+  }, [open, ID, queryName, ready])
 
   useEffect(() => {
     function handleRouteChange(_: PopStateEvent) {
@@ -87,24 +126,11 @@ export const useModalQueryHistory = ({
     }
   }, [ID, open, queryName])
 
-  function onOpenChangeWrapper(willOpen: boolean) {
-    onOpenChange?.(willOpen)
-
-    const params = getWindowParams()
-    const openDialogKeys = getOpenDialogKeys()
-    const isLastOpenedDialog = openDialogKeys.at(-1) === ID
-
-    if (willOpen) {
-      // Remove duplicate keys for ID + force last position
-      const keys = [...openDialogKeys.filter((k) => k !== ID), ID]
-      params.set(queryName, keys.join(","))
-      router.push(`?${params.toString()}`)
-    } else if (isLastOpenedDialog && historySize > 0) {
-      // Navitate back if this is the last opened dialog
-      // And there is history to go back to
-      router.back()
-    }
-  }
+  useEffect(() => {
+    // Wait for initial load + jotai sync
+    const timer = setTimeout(() => setReady(true), 150)
+    return () => clearTimeout(timer)
+  }, [])
 
   return {
     open,
