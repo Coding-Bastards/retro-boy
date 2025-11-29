@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Fragment } from "react"
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useWorldAuth } from "@radish-la/world-auth"
 import { toast } from "sonner"
@@ -17,6 +17,7 @@ import { formatTimePlayed } from "@/lib/date"
 
 import { ABI_DISPENSER } from "@/lib/abi"
 import { ADDRESS_DISPENSER, DEV_ADDRESS } from "@/lib/constants"
+import { isDev } from "@/lib/env"
 
 import { initializeEruda } from "./ErudaProdiver"
 import AddressBlock from "./AddressBlock"
@@ -130,7 +131,8 @@ export default function WalletConnect({
     </button>
   )
 
-  //if (!isConnected) return TRIGGER
+  // Always show dialog in dev mode for testing
+  if (!isDev() && !isConnected) return TRIGGER
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">
@@ -188,17 +190,24 @@ export default function WalletConnect({
           </Button>
         )}
 
-        {/* Developer Settings */}
-        {isDeveloper && (
-          <Button onClick={initializeEruda} variant="secondary">
-            OPEN DEBUGGER
-          </Button>
-        )}
-
         {/* Disconnect Button */}
         <Button onClick={handleDisconnect} variant="secondary">
           DISCONNECT
         </Button>
+
+        {/* Developer Settings */}
+        {isDeveloper && (
+          <Fragment>
+            <div className="h-px bg-white/10 w-full" />
+            <Button
+              className="bg-white text-black"
+              onClick={initializeEruda}
+              variant="secondary"
+            >
+              OPEN DEBUGGER
+            </Button>
+          </Fragment>
+        )}
       </div>
     </Dialog>
   )

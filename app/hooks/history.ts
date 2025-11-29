@@ -22,6 +22,7 @@ export const useTrackableRouter = () => {
   useEffect(() => {
     function handlePopState(_: PopStateEvent) {
       console.debug("Pop state detected", {
+        history,
         currentHistorySize: historySize,
         nextHistorySize: Math.max(0, historySize - 1),
       })
