@@ -6,8 +6,10 @@ import {
   type PropsWithChildren,
   type ReactNode,
 } from "react"
-import { useTrackableRouter } from "@/hooks/history"
+import { atom, useAtom } from "jotai"
+
 import { useSearchParams } from "next/navigation"
+import { useTrackableRouter } from "@/hooks/history"
 
 function QueryPage({
   param,
@@ -31,17 +33,23 @@ function QueryPage({
   return isActive ? children : null
 }
 
+const atomIsClearedUp = atom(false)
 export default function QueryRouter({ children }: PropsWithChildren) {
+  const [isCleared, setIsCleared] = useAtom(atomIsClearedUp)
   const { history, replace } = useTrackableRouter()
 
   useEffect(() => {
     // Early exit if we have pushed any history
-    if (history.length > 0) return
+    // Or if we already cleared up
+    if (history.length > 0 || isCleared) return
 
     const params = new URLSearchParams(location.search)
     const entries = Array.from(params.entries())
-    if (entries.length > 0) replace("/")
-  }, [history])
+    if (entries.length > 0) {
+      setIsCleared(true)
+      replace("/")
+    }
+  }, [history, isCleared])
 
   return <Suspense fallback={null}>{children}</Suspense>
 }
