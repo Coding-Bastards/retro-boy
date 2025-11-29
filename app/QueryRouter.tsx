@@ -16,27 +16,13 @@ function QueryPage({
   param: string
   children: ReactNode
 }) {
-  const { history, historySize, nextRouter } = useTrackableRouter()
+  const { history } = useTrackableRouter()
   const searchParams = useSearchParams()
 
   const isPartOfParams = searchParams.has(param)
   const isInTrackableHistory = history.some((path) =>
     path.includes(`${param}=`)
   )
-
-  useEffect(() => {
-    // Only replace at start of app (when no history)
-    if (historySize > 1) return
-    if (isPartOfParams && !isInTrackableHistory) {
-      // Remove param if not part of trackable history
-      const params = new URLSearchParams(searchParams.toString())
-      params.delete(param)
-
-      nextRouter.replace(`${window.location.pathname}?${params.toString()}`, {
-        scroll: false,
-      })
-    }
-  }, [isPartOfParams, param, historySize, searchParams, isInTrackableHistory])
 
   const isActive =
     // Ensure to only show when internal router was pushed
@@ -46,6 +32,17 @@ function QueryPage({
 }
 
 export default function QueryRouter({ children }: PropsWithChildren) {
+  const { history, replace } = useTrackableRouter()
+
+  useEffect(() => {
+    // Early exit if we have pushed any history
+    if (history.length > 0) return
+
+    const params = new URLSearchParams(location.search)
+    const entries = Array.from(params.entries())
+    if (entries.length > 0) replace("/")
+  }, [history])
+
   return <Suspense fallback={null}>{children}</Suspense>
 }
 

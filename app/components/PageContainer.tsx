@@ -24,7 +24,7 @@ export default function PageContainer({
 
   const handleBack = () => {
     // If there's history, go back. Else render main page
-    if (historySize > 1) return router.back()
+    if (historySize > 0) return router.back()
     router.replace("/")
   }
 
