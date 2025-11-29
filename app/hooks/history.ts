@@ -57,7 +57,7 @@ export const useModalQueryHistory = ({
   onOpenChange?: (open: boolean) => void
 }) => {
   const [ready, setReady] = useState(false)
-  const router = useTrackableRouter()
+  const { historySize, ...router } = useTrackableRouter()
 
   const ID = useMemo(() => {
     // Freaking react id was sooo annoying to use here
@@ -89,7 +89,7 @@ export const useModalQueryHistory = ({
       const keys = open ? [...filteredKeys, ID] : filteredKeys
       params.set(queryName, keys.join(","))
       router.push(`?${params.toString()}`)
-    } else if (isLastOpenedDialog && history.length > 1) {
+    } else if (isLastOpenedDialog && historySize > 0) {
       // Navitate back if this is the last opened dialog
       // And there is history to go back to
       router.back()
