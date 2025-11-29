@@ -7,6 +7,7 @@ import { toast } from "sonner"
 
 import { useAccountBalances, useClaimedRBCPoints } from "@/hooks/balances"
 import { useAccountPoints } from "@/hooks/points"
+import { useProFeatures } from "@/hooks/pro"
 import { useGameStats } from "@/hooks/games"
 
 import { getDispenserPayload } from "@/app/actions/dispenser"
@@ -31,6 +32,7 @@ export default function WalletConnect({
 
   const { points: RBC_POINTS, syncPoints } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
+  const { isProUser } = useProFeatures()
   const { emulator } = useGameStats()
 
   const { WLD, RBC } = useAccountBalances(address)
@@ -134,9 +136,13 @@ export default function WalletConnect({
         <div className="flex flex-col items-center gap-3 py-4">
           <AddressBlock address={address} size={18} />
           <div className="text-center">
-            <div className="font-black text-lg">
-              {address ? beautifyAddress(address, 6, "") : "Not Connected"}
-            </div>
+            <nav className="flex justify-center items-center gap-1.5">
+              <div className="font-black text-lg">
+                {address ? beautifyAddress(address, 6, "") : "Not Connected"}
+              </div>
+
+              {isProUser && <ProBadge />}
+            </nav>
             <div className="text-white/60 text-sm mt-1">
               <span>
                 {formatTimePlayed(emulator.playTimeInSeconds)} ― Played
@@ -186,5 +192,13 @@ export default function WalletConnect({
         </Button>
       </div>
     </Dialog>
+  )
+}
+
+export function ProBadge() {
+  return (
+    <div className="bg-white/15 text-white/80 text-xs px-1.5 py-px font-black rounded-full">
+      PRO
+    </div>
   )
 }

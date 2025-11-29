@@ -8,7 +8,7 @@ import { useProFeatures } from "@/hooks/pro"
 import { cn } from "@/lib/utils"
 
 import Dialog from "@/components/Dialog"
-import WalletConnect from "@/components/WalletConnect"
+import WalletConnect, { ProBadge } from "@/components/WalletConnect"
 import Button from "./Button"
 
 const atomFirstTimeOpen = atomWithStorage("rb.isFirstTimeOpened", true)
@@ -50,11 +50,7 @@ export default function TopNavigation() {
               <span className="text-lg relative px-2.5 italic font-black text-transparent bg-clip-text bg-linear-to-b from-white/25 via-white/40 to-white/25">
                 RETRO BOY
               </span>
-              {isProUser && (
-                <div className="bg-white/15 text-white/80 text-[10px] px-1 font-black rounded-full">
-                  PRO
-                </div>
-              )}
+              {isProUser && <ProBadge />}
             </nav>
           </button>
         }

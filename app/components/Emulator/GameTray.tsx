@@ -7,6 +7,7 @@ import dynamic from "next/dynamic"
 
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useProFeatures } from "@/hooks/pro"
+import { useAtomIsCatalogueOpen } from "@/app/lib/store"
 import { cn } from "@/lib/utils"
 
 import { TbChevronCompactUp } from "react-icons/tb"
@@ -30,6 +31,7 @@ export default function GameTray() {
 
   const { gameCanvas, getGameboyInstance, currentGame } = useEmulator()
   const [isOpenSlotsGrid, setIsOpenSlotsGrid] = useState(false)
+  const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
 
   // Pro Features - Save States
   const { isProUser } = useProFeatures()
@@ -42,6 +44,9 @@ export default function GameTray() {
     [currentGame?.gameCollectionId]
   )
 
+  const openGamesCatalogue = () => setIsCatalogueOpen(true)
+  const closeSlotsGrid = () => setIsOpenSlotsGrid(false)
+
   const writeToSlot = (slot: number, state: StateSlot | null) => {
     getSlotAt(slot).write(state)
     // Sync state slots w/ UI
@@ -49,14 +54,18 @@ export default function GameTray() {
   }
 
   const handleSaveState = (slot: number) => {
+    // Asume emulator is not initialized
+    if (!gameCanvas) return
     if (!isProUser) {
       // Show pro payment dialog
       return setIsOpenProPaymentDialog(true)
     }
 
     const gb = getGameboyInstance()
-    if (!gb || !currentGame || !gameCanvas) {
-      return toast.error("Load a cartridge to save game state")
+    // Don't block the user - show solution: Games Catalogue
+    if (!gb || !currentGame) {
+      // Close slots tray so user learns about the "required" flow
+      return closeSlotsGrid(), openGamesCatalogue()
     }
 
     try {
@@ -71,25 +80,23 @@ export default function GameTray() {
       })
     } catch (error) {
       console.error({ error })
-      toast.error("Failed to save")
+      toast.error("Oops... something went wrong")
     }
   }
 
   const handleLoadState = (slot: number) => {
     const gb = getGameboyInstance()
-    if (!gb || !currentGame) {
-      return toast.error("Load a cartridge to save game state")
-    }
+    if (!gb || !currentGame) return openGamesCatalogue()
 
     try {
       const storedState = getSlotAt(slot).value
       const decompressed = LZString.decompress(storedState?.state || "")
 
-      if (!decompressed) throw new Error("Failed to load state")
+      if (!decompressed) throw new Error("Decompression failed")
       gb.returnFromState(JSON.parse(decompressed))
 
       // Close slots tray
-      setIsOpenSlotsGrid(false)
+      closeSlotsGrid()
     } catch (error) {
       console.error({ error })
       toast.error("Failed to load")
@@ -105,7 +112,7 @@ export default function GameTray() {
       {isOpenSlotsGrid ? (
         <Fragment>
           <div
-            onClick={() => setIsOpenSlotsGrid(false)}
+            onClick={closeSlotsGrid}
             className="fixed z-4 cursor-pointer inset-0"
           />
 
@@ -119,8 +126,8 @@ export default function GameTray() {
           >
             <TickHandle
               isRotated
+              onClick={closeSlotsGrid}
               className="absolute -top-2 left-1/2 -translate-x-1/2"
-              onClick={() => setIsOpenSlotsGrid(false)}
             />
 
             <h2 className="text-center text-sm">
