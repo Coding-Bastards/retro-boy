@@ -1,7 +1,8 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useEffect, useId } from "react"
+import { useEffect, useMemo } from "react"
+import { generateUUID } from "@/lib/utils"
 
 export const useModalQueryHistory = ({
   id,
@@ -15,8 +16,11 @@ export const useModalQueryHistory = ({
   onOpenChange?: (open: boolean) => void
 }) => {
   const router = useRouter()
-  const reactId = useId()
-  const ID = id || reactId
+
+  const ID = useMemo(() => {
+    // Freaking react id was sooo annoying to use here
+    return id ? id : generateUUID().slice(0, 6)
+  }, [id])
 
   const getWindowParams = () => new URLSearchParams(location.search)
   const getOpenDialogKeys = () => {
@@ -36,11 +40,12 @@ export const useModalQueryHistory = ({
       router.push(`?${params.toString()}`, {
         scroll: false,
       })
-    } else if (isLastOpenedDialog) {
+    } else if (isLastOpenedDialog && history.length > 1) {
       // Navitate back if this is the last opened dialog
+      // And there is history to go back to
       router.back()
     }
-  }, [ID, open, queryName])
+  }, [open])
 
   useEffect(() => {
     console.debug(`Listening route changes for ${queryName}: ${ID}`)

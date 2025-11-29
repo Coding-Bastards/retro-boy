@@ -29,14 +29,16 @@ export default function MechanicalButton({
   variant,
   className,
   isPressed,
+  onTapEnd,
+  onTapStart,
   ...props
 }: MechanicalButtonProps) {
   return (
     <button
-      onTouchStart={props.onTapStart}
-      onTouchEnd={props.onTapEnd}
-      onMouseDown={props.onTapStart}
-      onMouseUp={props.onTapEnd}
+      onTouchStart={onTapStart}
+      onTouchEnd={onTapEnd}
+      onMouseDown={onTapStart}
+      onMouseUp={onTapEnd}
       className={cn(
         buttonVariants({ variant }),
         className,
