@@ -1,10 +1,10 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useRouter } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 import { useDeviceSafeInsetBottom } from "@/hooks/window"
+import { useTrackableRouter } from "@/hooks/history"
 
 import { IoArrowBack } from "react-icons/io5"
 
@@ -20,10 +20,12 @@ export default function PageContainer({
   endTitleEnhancer,
 }: PageContainerProps) {
   const { safeInsetBottom } = useDeviceSafeInsetBottom()
-  const router = useRouter()
+  const { historySize, ...router } = useTrackableRouter()
 
   const handleBack = () => {
-    router.back()
+    // If there's history, go back. Else render main page
+    if (historySize > 1) return router.back()
+    router.replace("/")
   }
 
   return (
