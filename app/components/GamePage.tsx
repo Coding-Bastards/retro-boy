@@ -54,9 +54,9 @@ export default function GamePage() {
   )
 
   if (!game) return null
+
   const PRICE = game.price
   const isFreeMint = PRICE <= 0
-
   const handleAction = async () => {
     if (!isConnected) return signIn()
     if (isOwned) {

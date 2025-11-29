@@ -2,12 +2,13 @@
 
 import { useRouter } from "next/navigation"
 import { atom, useAtom } from "jotai"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { generateUUID } from "@/lib/utils"
 
 const atomHistory = atom<string[]>([])
 export const useTrackableRouter = () => {
   const router = useRouter()
+
   const [history, setHistory] = useAtom(atomHistory)
   const historySize = history.length
 
@@ -35,9 +36,10 @@ export const useTrackableRouter = () => {
   }, [historySize])
 
   return {
+    nextRouter: router,
     replace: router.replace,
     back: router.back,
-    historySize: history.length,
+    historySize,
     history,
     push,
   }
@@ -54,7 +56,9 @@ export const useModalQueryHistory = ({
   queryName: string
   onOpenChange?: (open: boolean) => void
 }) => {
+  const [ready, setReady] = useState(false)
   const router = useTrackableRouter()
+
   const ID = useMemo(() => {
     // Freaking react id was sooo annoying to use here
     return id ? id : generateUUID().slice(0, 6)
@@ -66,6 +70,15 @@ export const useModalQueryHistory = ({
   }
 
   useEffect(() => {
+    // Workaround to avoid hydration issues + wait for jotai
+    const timer = setTimeout(() => setReady(true), 300)
+    return () => clearTimeout(timer)
+  }, [ID])
+
+  useEffect(() => {
+    // Early exit if not ready
+    if (!ready) return
+
     const params = getWindowParams()
     const openDialogKeys = getOpenDialogKeys()
     const isLastOpenedDialog = openDialogKeys.at(-1) === ID
@@ -81,7 +94,7 @@ export const useModalQueryHistory = ({
       // And there is history to go back to
       router.back()
     }
-  }, [open])
+  }, [open, ready])
 
   useEffect(() => {
     function handleRouteChange(_: PopStateEvent) {
