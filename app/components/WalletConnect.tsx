@@ -16,7 +16,7 @@ import { numberToShortWords } from "@/lib/numbers"
 import { formatTimePlayed } from "@/lib/date"
 
 import { ABI_DISPENSER } from "@/lib/abi"
-import { ADDRESS_DISPENSER } from "@/lib/constants"
+import { ADDRESS_DISPENSER, DEV_ADDRESS } from "@/lib/constants"
 
 import AddressBlock from "./AddressBlock"
 import Dialog from "./Dialog"
@@ -138,7 +138,7 @@ export default function WalletConnect({
           <div className="text-center">
             <nav className="flex justify-center items-center gap-1.5">
               <div className="font-black text-lg">
-                {address ? beautifyAddress(address, 6, "") : "Not Connected"}
+                {address ? beautifyAddress(address, 5, "") : "Not Connected"}
               </div>
 
               {isProUser && <ProBadge />}
