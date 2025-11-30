@@ -52,12 +52,12 @@ export default function MarketPage() {
       endTitleEnhancer={<WalletConnect summaryToken="WLD" />}
     >
       {/* Filters */}
-      <div className="px-5 py-4 flex items-center justify-between gap-4">
-        <div className="flex border border-white/10 rounded-lg overflow-hidden bg-rb-dark text-white/60">
+      <div className="px-5 pt-4 pb-1 flex items-center justify-between gap-4">
+        <div className="flex gap-px p-0.5 border border-white/10 rounded-xl overflow-hidden bg-rb-dark text-white/60">
           <button
             onClick={() => setViewMode("grid")}
             className={cn(
-              "size-8 grid place-items-center pl-0.5 transition-colors",
+              "size-7.5 grid place-items-center rounded-lg transition-colors",
               viewMode === "grid"
                 ? "bg-rb-green-light text-black"
                 : "hover:text-white"
@@ -69,7 +69,7 @@ export default function MarketPage() {
           <button
             onClick={() => setViewMode("list")}
             className={cn(
-              "size-8 grid place-items-center pr-0.5 transition-colors",
+              "size-7.5 grid place-items-center rounded-lg transition-colors",
               viewMode === "list"
                 ? "bg-rb-green-light text-black/85"
                 : "hover:text-white"
@@ -100,6 +100,7 @@ export default function MarketPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto px-5 pb-4">
+        <div className="bg-linear-to-b pointer-events-none from-rb-darker via-rb-darker/85 to-rb-darker/0 w-full h-4 sticky z-1 top-0" />
         <div
           className={cn(
             "grid gap-3",

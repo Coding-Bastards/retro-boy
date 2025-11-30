@@ -200,7 +200,7 @@ export default function WalletConnect({
           <Fragment>
             <div className="h-px bg-white/10 w-full" />
             <Button
-              className="bg-white text-black"
+              className="bg-transparent"
               onClick={initializeEruda}
               variant="secondary"
             >
