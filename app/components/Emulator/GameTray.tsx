@@ -1,6 +1,12 @@
 "use client"
 
-import { type PropsWithChildren, Fragment, useCallback, useState } from "react"
+import {
+  type PropsWithChildren,
+  Fragment,
+  useCallback,
+  useEffect,
+  useState,
+} from "react"
 import { toast } from "sonner"
 import LZString from "lz-string"
 import dynamic from "next/dynamic"
@@ -15,6 +21,8 @@ import { ImCross } from "react-icons/im"
 import { IoMdCodeDownload } from "react-icons/io"
 
 import { ASPECT_RATIO } from "./internals"
+import { atomWithStorage } from "jotai/utils"
+import { useAtom } from "jotai"
 
 interface StateSlot {
   state: string
@@ -26,7 +34,9 @@ const DialogProPayment = dynamic(() => import("./DialogProPayment"), {
   ssr: false,
 })
 
+const atomIsTutorialDone = atomWithStorage("rb.isTrayDemoCompleted", false)
 export default function GameTray() {
+  const [isTutorialDone, setIsTutorialDone] = useAtom(atomIsTutorialDone)
   const [, setUpdatedCount] = useState(0)
 
   const { gameCanvas, getGameboyInstance, currentGame } = useEmulator()
@@ -37,15 +47,20 @@ export default function GameTray() {
   const { isProUser } = useProFeatures()
   const [isOpenProPaymentDialog, setIsOpenProPaymentDialog] = useState(false)
 
+  const COLLECTION_ID = currentGame?.gameCollectionId
   const getSlotAt = useCallback(
     (slot: number) =>
       // NONE as deafult to avoid issues when no game is loaded
-      getStateManager(currentGame?.gameCollectionId || "NONE", slot),
-    [currentGame?.gameCollectionId]
+      getStateManager(COLLECTION_ID || "NONE", slot),
+    [COLLECTION_ID]
   )
 
   const openGamesCatalogue = () => setIsCatalogueOpen(true)
-  const closeSlotsGrid = () => setIsOpenSlotsGrid(false)
+  const closeSlotsGrid = () => {
+    // Mark tutorial as done (when game is loaded)
+    if (!isTutorialDone && COLLECTION_ID) setIsTutorialDone(true)
+    setIsOpenSlotsGrid(false)
+  }
 
   const writeToSlot = (slot: number, state: StateSlot | null) => {
     getSlotAt(slot).write(state)
@@ -102,6 +117,15 @@ export default function GameTray() {
       toast.error("Failed to load")
     }
   }
+
+  useEffect(() => {
+    // Early exit if no game or tutorial done
+    if (isTutorialDone || !COLLECTION_ID) return
+
+    // Open tray after first time a game is loaded
+    // To "demo" this pro feature
+    setIsOpenSlotsGrid(true)
+  }, [COLLECTION_ID, isTutorialDone])
 
   return (
     <Fragment>

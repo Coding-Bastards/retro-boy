@@ -1,6 +1,7 @@
 "use client"
 
-import { Fragment, useEffect, useState } from "react"
+import { Fragment, PropsWithChildren, useEffect, useState } from "react"
+import { useWorldAuth } from "@radish-la/world-auth"
 
 import { useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -14,17 +15,19 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer"
 import Button from "@/components/Button"
+import { useAppRouter } from "@/lib/routes"
 
-import GameCard from "./GameCard"
 import { PiHandbagSimpleFill } from "react-icons/pi"
-import Link from "next/link"
 import { IoMdArrowForward } from "react-icons/io"
-import { useAppRouter } from "@/app/lib/routes"
+import { RiPokerSpadesFill } from "react-icons/ri"
+import GameCard from "./GameCard"
+import { isDev } from "@/app/lib/env"
 
 export default function GameCatalogue() {
   const [open, setOpen] = useAtomIsCatalogueOpen()
+  const { isConnected, signIn } = useWorldAuth()
 
-  const { pushGamePage } = useAppRouter()
+  const { pushGamePage, pushMarketPage } = useAppRouter()
   const { games: ownedGames, isEmpty } = useOwnedGames()
   const { loadGame, currentGame } = useEmulator()
   const isSingleGameOwned = ownedGames.length === 1
@@ -107,13 +110,16 @@ export default function GameCatalogue() {
     }
   }
 
+  // Force connected state in dev mode
+  const isDisconnected = !isDev() && !isConnected
+
   return (
     <Drawer modal={false} open={open} onOpenChange={setOpen}>
       <DrawerContent className="max-w-md min-h-[calc(85vh-4rem)] mx-auto bg-rb-darker border-white/10">
         <DrawerHeader>
           <DrawerTitle
             className={cn(
-              isEmpty && "hidden",
+              (isEmpty || isDisconnected) && "opacity-0",
               "text-white text-center uppercase font-black"
             )}
           >
@@ -121,30 +127,26 @@ export default function GameCatalogue() {
           </DrawerTitle>
         </DrawerHeader>
 
-        {isEmpty ? (
-          <div className="flex grow p-4 gap-4 flex-col items-center justify-end">
-            <div className="grow" />
-
-            <figure className="size-24 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-yellow/10 to-rb-yellow/5 border border-rb-yellow/7">
-              <PiHandbagSimpleFill className="text-5xl text-white/90" />
-            </figure>
-
-            <p className="mb-6 mt-3 text-sm text-white/60 text-center max-w-72">
-              Your game library is empty.
-              <br />
-              Get some games from the Market!
-            </p>
-
-            <div className="grow" />
-
-            <Link
-              className="border group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
-              href="/?market"
-            >
-              <span>OPEN MARKET</span>
-              <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
-            </Link>
-          </div>
+        {isDisconnected ? (
+          <DrawerEmptyState
+            onActionPress={signIn}
+            actionLabel="CONNECT WALLET"
+            icon={
+              <RiPokerSpadesFill className="text-5xl scale-105 text-white/90" />
+            }
+          >
+            Connect your wallet to access the game library.
+          </DrawerEmptyState>
+        ) : isEmpty ? (
+          <DrawerEmptyState
+            onActionPress={pushMarketPage}
+            actionLabel="OPEN MARKET"
+            icon={<PiHandbagSimpleFill className="text-5xl text-white/90" />}
+          >
+            Your game library is empty.
+            <br />
+            Get some games from the Market!
+          </DrawerEmptyState>
         ) : (
           <Fragment>
             <div className="overflow-x-auto animate-in fade-in duration-400 shrink-0 px-4 pb-6 pt-2 snap-x snap-mandatory">
@@ -170,11 +172,47 @@ export default function GameCatalogue() {
 
         <div className="px-4 pt-1 pb-6">
           <Button onClick={handleButtonClick}>
-            {isEmpty || isEmulatorGameActive ? "CONTINUE PLAYING" : "PLAY NOW"}
+            {isEmpty || isDisconnected || isEmulatorGameActive
+              ? "CONTINUE PLAYING"
+              : "PLAY NOW"}
           </Button>
         </div>
       </DrawerContent>
     </Drawer>
+  )
+}
+
+function DrawerEmptyState({
+  onActionPress,
+  actionLabel,
+  icon,
+  children,
+}: PropsWithChildren<{
+  onActionPress: () => void
+  actionLabel: string
+  icon: React.ReactNode
+}>) {
+  return (
+    <div className="flex grow p-4 gap-4 flex-col items-center justify-end">
+      <div className="grow" />
+
+      <figure className="size-24 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-yellow/10 to-rb-yellow/5 border border-rb-yellow/7">
+        {icon}
+      </figure>
+
+      <p className="mb-6 mt-3 text-sm text-white/60 text-center max-w-72">
+        {children}
+      </p>
+
+      <div className="grow" />
+      <button
+        className="border group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
+        onClick={onActionPress}
+      >
+        <span>{actionLabel}</span>
+        <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
+      </button>
+    </div>
   )
 }
 

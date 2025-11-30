@@ -1,6 +1,8 @@
 "use client"
 
 import { type PropsWithChildren, useEffect, useRef } from "react"
+import { useWorldAuth } from "@radish-la/world-auth"
+import dynamic from "next/dynamic"
 
 import { cn } from "@/lib/utils"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -8,13 +10,19 @@ import { useEmulator } from "@/lib/EmulatorContext"
 
 import { ImFolderDownload } from "react-icons/im"
 import { ASPECT_RATIO, CANVAS_HEIGHT, CANVAS_WIDTH } from "./internals"
-import GameTray from "./GameTray"
 
+const GameTray = dynamic(() => import("./GameTray"), { ssr: false })
 export default function Screen() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  const { isConnected, signIn } = useWorldAuth()
   const { isGameLoaded, isLoading, gameCanvas, registerCanvas } = useEmulator()
   const [, setCatalogueOpen] = useAtomIsCatalogueOpen()
+
+  function handleOpenCatalogue() {
+    if (!isConnected) return signIn()
+    setCatalogueOpen(true)
+  }
 
   // Register the canvas @ emulator context
   useEffect(() => {
@@ -27,7 +35,7 @@ export default function Screen() {
     <section className="relative">
       <div
         role="button"
-        onClick={() => setCatalogueOpen(true)}
+        onClick={handleOpenCatalogue}
         className={cn(
           "border-[3px] rounded-xl bg-rb-lcd",
           isGameLoaded ? "border-black/75" : "border-black/45",
