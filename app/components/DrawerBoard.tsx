@@ -19,6 +19,7 @@ import {
   useAccountLeaderboardData,
   useLeaderboard,
 } from "@/hooks/leaderboard"
+import { useProFeatures, useRemoteProStatus } from "@/hooks/pro"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { formatUSDC } from "@/lib/usdc"
 
@@ -26,6 +27,8 @@ import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
+import { ProBadge } from "./WalletConnect"
+import { useAlertModal } from "./Alert"
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
@@ -106,6 +109,17 @@ function PlayerItem({
   isOutsideBoard?: boolean
   className?: string
 }) {
+  const { showAlert } = useAlertModal()
+  const { isProUser: isConnectedUserPro } = useProFeatures()
+  const { status: remoteProStatus } = useRemoteProStatus(
+    isConnectedUser ? null : player.address
+  )
+
+  const showProBadge = Boolean(
+    // Fetch from remote when not the connected user
+    isConnectedUser ? isConnectedUserPro : remoteProStatus?.isProUser
+  )
+
   return (
     <div
       className={cn(
@@ -134,9 +148,24 @@ function PlayerItem({
 
       <div className="flex-1 grow">
         <div className="flex items-center gap-2">
-          <span className="text-white font-black text-sm">
-            {beautifyAddress(player.address, 4, "")}
-          </span>
+          <nav className="flex gap-2 items-center">
+            <div className="text-white font-black text-sm">
+              {beautifyAddress(player.address, 4, "")}
+            </div>
+            {showProBadge && (
+              <button
+                onClick={() => {
+                  showAlert({
+                    title: "RETRO BOY PRO",
+                    description:
+                      "This user account is subscribed to Retro Boy Pro!",
+                  })
+                }}
+              >
+                <ProBadge />
+              </button>
+            )}
+          </nav>
           {isConnectedUser && (
             <span className="text-xs font-black text-rb-green">(YOU)</span>
           )}

@@ -3,7 +3,7 @@ import { redis } from "@/lib/redis"
 
 type Params = { params: Promise<{ address: string }> }
 
-export const revalidate = 30 // Cache for 30 seconds
+export const revalidate = 60 // Cache for 60 seconds
 
 export async function GET(_: Request, { params }: Params) {
   const { address } = await params

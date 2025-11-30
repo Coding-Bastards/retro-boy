@@ -4,9 +4,9 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { toast } from "sonner"
 
 import { useProFeatures } from "@/hooks/pro"
+import { getProPrice } from "@/app/lib/pro"
 import { runParty } from "@/lib/party"
 import { executeWorldPayment } from "@/app/actions/payments"
-import { DEV_ADDRESS } from "@/lib/constants"
 
 import Dialog from "@/components/Dialog"
 import Button from "@/components/Button"
@@ -21,8 +21,7 @@ export default function DialogProPayment({
   const { isProUser, migrateToPro } = useProFeatures()
   const { address, signIn } = useWorldAuth()
 
-  // Devs get a discount
-  const AMOUNT = address === DEV_ADDRESS ? 0.1 : 3.99
+  const AMOUNT = getProPrice(address)
   const closeDialog = () => onOpenChange(false)
 
   async function handleGoPro() {
