@@ -19,7 +19,7 @@ import {
 } from "./constants"
 import { ABI_REGISTRY } from "./abi"
 import { jsonify } from "./utils"
-import { isDev } from "./env"
+import { isDevEnv } from "./env"
 
 export interface Game {
   collectionId: Address
@@ -172,7 +172,7 @@ export const useOwnedGames = () => {
   const { currentGame } = useEmulator()
 
   // Use dev address in (local dev) env + no wallet connected
-  const shouldUseDevAddress = isDev() && !connectedAddress && !isMiniApp
+  const shouldUseDevAddress = isDevEnv() && !connectedAddress && !isMiniApp
   const address = shouldUseDevAddress ? DEV_ADDRESS : connectedAddress
 
   const { getTimePlayed } = useTimePlayed(address)

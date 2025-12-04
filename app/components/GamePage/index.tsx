@@ -1,9 +1,9 @@
 "use client"
 
+import Link from "next/link"
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
 import { formatEther } from "viem"
-import Link from "next/link"
 
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
@@ -33,9 +33,10 @@ import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
 import { useAccountBalances } from "@/hooks/balances"
 import { TOKENS } from "@/lib/tokens"
 
-import Button from "./Button"
-import PageContainer from "./PageContainer"
-import Dialog from "./Dialog"
+import Button from "@/components/Button"
+import PageContainer from "@/components/PageContainer"
+import Dialog from "@/components/Dialog"
+import ActionMenu from "./ActionMenu"
 
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
@@ -135,7 +136,10 @@ export default function GamePage() {
   const GALLERY = [game.nftImage, ...game.gallery]
 
   return (
-    <PageContainer title={game.title}>
+    <PageContainer
+      title={game.title}
+      endTitleEnhancer={<ActionMenu gameCollectionId={game.collectionId} />}
+    >
       <div className="flex-1 overflow-auto p-5 pt-6">
         {/* Cover Image */}
         <div className="w-full aspect-square rounded-xl overflow-hidden bg-white/7 mb-4 relative">

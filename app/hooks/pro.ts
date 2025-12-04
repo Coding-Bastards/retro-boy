@@ -5,7 +5,7 @@ import { useAtom } from "jotai"
 import { useWorldAuth } from "@radish-la/world-auth"
 import { atomWithStorage } from "jotai/utils"
 
-import { isDev } from "@/lib/env"
+import { isDevEnv } from "@/lib/env"
 import { jsonify } from "@/lib/utils"
 
 const atomIsFeatureStatesEnabled = atomWithStorage(
@@ -22,7 +22,7 @@ export const useProFeatures = () => {
   )
 
   // Pro when in local env, or user bought it
-  const isProUser = remoteData?.isProUser || isFeatureEnabled || isDev()
+  const isProUser = remoteData?.isProUser || isFeatureEnabled || isDevEnv()
   return {
     migrateToPro: () => setIsFeatureEnabled(true),
     isProUser,

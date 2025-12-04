@@ -17,7 +17,7 @@ import { formatTimePlayed } from "@/lib/date"
 
 import { ABI_DISPENSER } from "@/lib/abi"
 import { ADDRESS_DISPENSER, DEV_ADDRESS } from "@/lib/constants"
-import { isDev } from "@/lib/env"
+import { isDevEnv } from "@/lib/env"
 
 import { initializeEruda } from "./ErudaProdiver"
 import AddressBlock from "./AddressBlock"
@@ -132,7 +132,7 @@ export default function WalletConnect({
   )
 
   // Always show dialog in dev mode for testing
-  if (!isDev() && !isConnected) return TRIGGER
+  if (!isDevEnv() && !isConnected) return TRIGGER
   return (
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">

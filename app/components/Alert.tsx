@@ -5,10 +5,16 @@ import { atom, useAtom } from "jotai"
 import Dialog from "@/components/Dialog"
 import Button from "./Button"
 
+type ModalAction = {
+  label: string
+  onClick: () => void
+}
+
 const modalState = atom({
   isOpen: false,
   title: "",
   description: "",
+  action: {} as ModalAction | undefined,
 })
 
 export const useAlertModal = () => {
@@ -17,10 +23,12 @@ export const useAlertModal = () => {
   const showAlert = ({
     title,
     description,
+    action,
   }: {
     title: string
     description: string
-  }) => setState({ isOpen: true, title, description })
+    action?: ModalAction
+  }) => setState({ isOpen: true, title, description, action })
 
   return { showAlert }
 }
@@ -37,11 +45,14 @@ export function AlertProvider() {
       <p className="text-sm">{state.description}</p>
 
       <Button
-        onClick={() => setState((prev) => ({ ...prev, isOpen: false }))}
-        className="mt-7"
+        onClick={() => {
+          state.action?.onClick?.()
+          setState((prev) => ({ ...prev, isOpen: false }))
+        }}
+        className="mt-7 uppercase"
         variant="secondary"
       >
-        CLOSE
+        {state.action?.label || "CLOSE"}
       </Button>
     </Dialog>
   )

@@ -1,4 +1,6 @@
 export const ZERO = BigInt(0)
+export const ADDRESS_DEAD =
+  "0x000000000000000000000000000000000000dEaD" as const
 export const DEV_ADDRESS = "0x4c46f6d2314a41915324af999685ac447cbb79d9"
 
 export const ADDRESS_GAME_REGISTRY =

@@ -6,6 +6,7 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { useOwnedGames } from "@/lib/games"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
 import { useEmulator } from "@/lib/EmulatorContext"
+import { isDevEnv } from "@/lib/env"
 import { cn } from "@/lib/utils"
 
 import {
@@ -21,7 +22,6 @@ import { PiHandbagSimpleFill } from "react-icons/pi"
 import { IoMdArrowForward } from "react-icons/io"
 import { RiPokerSpadesFill } from "react-icons/ri"
 import GameCard from "./GameCard"
-import { isDev } from "@/app/lib/env"
 
 export default function GameCatalogue() {
   const [open, setOpen] = useAtomIsCatalogueOpen()
@@ -111,7 +111,7 @@ export default function GameCatalogue() {
   }
 
   // Force connected state in dev mode
-  const isDisconnected = !isDev() && !isConnected
+  const isDisconnected = !isDevEnv() && !isConnected
 
   return (
     <Drawer modal={false} open={open} onOpenChange={setOpen}>

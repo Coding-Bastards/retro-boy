@@ -1,7 +1,7 @@
 "use client"
 
 import { type PropsWithChildren, useEffect } from "react"
-import { isDev } from "@/lib/env"
+import { isDevEnv } from "@/lib/env"
 
 export function initializeEruda() {
   // Already initialized
@@ -12,7 +12,7 @@ export function initializeEruda() {
 export default function ErudaProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     // Show on local dev
-    if (isDev()) initializeEruda()
+    if (isDevEnv()) initializeEruda()
   }, [])
 
   return children
