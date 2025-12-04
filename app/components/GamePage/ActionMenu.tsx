@@ -33,9 +33,7 @@ export default function ActionMenu({
     if (!address) return signIn()
 
     try {
-      const {
-        finalPayload: { status },
-      } = await MiniKit.commandsAsync.sendTransaction({
+      const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
         transaction: [
           {
             address: gameCollectionId,
@@ -47,7 +45,10 @@ export default function ActionMenu({
         ],
       })
 
-      if (status === "success") {
+      const debugURL = (finalPayload as any)?.details?.debugUrl
+      if (debugURL) console.debug(debugURL)
+
+      if (finalPayload.status === "success") {
         mutateOwnedGames(
           (currentOwned = []) =>
             currentOwned.filter((g) => g.collectionId !== gameCollectionId),
@@ -90,7 +91,7 @@ export default function ActionMenu({
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="border-2 animate-in fade-in zoom-in-90 group text-white border-white text-lg rounded-lg p-1"
+        className="border animate-in fade-in zoom-in-90 group text-white border-white/10 text-lg rounded-lg p-1.5"
       >
         <RiSettingsFill className="rotate-90 transition group-focus-within:rotate-180 scale-105" />
       </button>
