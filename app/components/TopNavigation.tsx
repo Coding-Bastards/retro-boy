@@ -12,12 +12,13 @@ import WalletConnect, { ProBadge } from "@/components/WalletConnect"
 import Button from "./Button"
 
 const atomFirstTimeOpen = atomWithStorage("rb.isFirstTimeOpened", true)
-
+/** Expose if it's the first time app is opened */
+export const useIsFirstTimeOpen = () => useAtom(atomFirstTimeOpen)
 export default function TopNavigation() {
   const { isGameLoaded } = useEmulator()
   const { isProUser } = useProFeatures()
 
-  const [isFirstTimeOpen, setIsFirstTimeOpen] = useAtom(atomFirstTimeOpen)
+  const [isFirstTimeOpen, setIsFirstTimeOpen] = useIsFirstTimeOpen()
   const [open, setOpen] = useState(false)
 
   function handleDialogChange(open: boolean) {

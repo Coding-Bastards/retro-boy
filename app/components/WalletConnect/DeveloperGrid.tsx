@@ -2,7 +2,7 @@ import { initializeEruda } from "@/components/ErudaProdiver"
 
 export default function DeveloperGrid() {
   return (
-    <div className="border text-sm font-black flex gap-2 items-center -mt-2 border-white/10 rounded-lg p-2">
+    <div className="border text-sm font-black flex gap-3.5 items-center -mt-2 border-white/10 rounded-lg p-2">
       <div>DEV</div>
       <button
         onClick={initializeEruda}
