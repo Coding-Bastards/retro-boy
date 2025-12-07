@@ -31,13 +31,15 @@ export const useProFeatures = () => {
 
 export const useRemoteProStatus = (address?: string | null) => {
   const { data: status = null } = useSWR(
-    address ? `/api/features/pro/${address}` : null,
-    async (url) => {
-      // Fetch remote status on-chain
+    address ? `is.pro.${address}` : null,
+    async () => {
+      if (!address) return null
+
+      // Fetch remote status @ alchemy SDK
       return await jsonify<{
         isProUser: boolean
         price: string
-      }>(fetch(url))
+      }>(fetch(`/api/features/pro/${address}`))
     }
   )
 
