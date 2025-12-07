@@ -2,7 +2,7 @@
 
 import useSWR from "swr"
 import { isAddress, type Address } from "viem"
-import { Fragment, type PropsWithChildren, useState } from "react"
+import { Fragment, type PropsWithChildren, Suspense, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useWorldAuth } from "@radish-la/world-auth"
@@ -28,7 +28,7 @@ import { INVITE_REWARDS } from "@/lib/constants"
 import { Spinner } from "@/components/icons"
 import Button from "@/components/Button"
 
-export default function InvitePage() {
+function InvitePage() {
   const [isClaiming, setIsClaiming] = useState(false)
   const [isClaimed, setIsClaimed] = useState(false)
 
@@ -121,11 +121,8 @@ export default function InvitePage() {
     : INVITE_REWARDS.REGULAR
 
   if (isVerifyingHumanity || isCheckingForClaimedStatus) {
-    return (
-      <main className="max-w-md text-white h-dvh grid place-items-center p-5 mx-auto">
-        <Spinner />
-      </main>
-    )
+    // Show load state while verifying link metadata
+    return <PageLoadState />
   }
 
   return (
@@ -214,6 +211,12 @@ export default function InvitePage() {
   )
 }
 
+const PageLoadState = () => (
+  <main className="max-w-md text-white h-dvh grid place-items-center p-5 mx-auto">
+    <Spinner />
+  </main>
+)
+
 const IconContainer = ({
   className,
   ...props
@@ -228,3 +231,11 @@ const IconContainer = ({
     )}
   />
 )
+
+export default function WithSuspense() {
+  return (
+    <Suspense fallback={<PageLoadState />}>
+      <InvitePage />
+    </Suspense>
+  )
+}
