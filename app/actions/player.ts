@@ -1,6 +1,6 @@
 import type { Address } from "viem"
 
-import { getPlayerKey } from "@/components/Emulator/internals"
+import { getPlayerKey, KEY_LEADERBOARD } from "@/components/Emulator/internals"
 import { redis } from "@/lib/redis"
 
 export type RedisUserData = {
@@ -16,4 +16,11 @@ export const getPlayerData = async (address: Address) => {
 
 export const setPlayerData = async (address: Address, data: RedisUserData) => {
   return await redis.hset(getPlayerKey(address), data)
+}
+
+export const updateLeaderboard = async (address: Address, points: number) => {
+  return await redis.zadd(KEY_LEADERBOARD, {
+    score: points,
+    member: address,
+  })
 }
