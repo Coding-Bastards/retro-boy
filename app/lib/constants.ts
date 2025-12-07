@@ -13,3 +13,8 @@ export const BASE_REPO_URL =
 export const BASE_CDN_URL =
   "https://cdn.jsdelivr.net/gh/Coding-Bastards/retro-boy@master/" as const
 export const ONE_HOUR_IN_SECONDS = 60 * 60
+
+export const INVITE_REWARDS = {
+  REGULAR: 5,
+  VERIFIED: 15,
+}
