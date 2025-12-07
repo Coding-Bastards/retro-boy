@@ -1,6 +1,6 @@
 "use server"
 
-import { type Address, encodePacked, keccak256 } from "viem"
+import { type Address, encodePacked, keccak256, parseEther } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { worldchain } from "viem/chains"
 
@@ -14,7 +14,15 @@ const account = privateKeyToAccount(
   process.env.PK_OFFCHAIN_SIGNER as `0x${string}`
 )
 
-export async function getDispenserPayload(address: Address) {
+export async function getDispenserPayload(
+  address: Address,
+  {
+    forcedAmount,
+  }: {
+    /** Amount to be forcefully dispense */
+    forcedAmount?: number
+  } = {}
+) {
   const [playerData, claimed, nonce] = await Promise.all([
     getPlayerData(address),
     clientWorldchain.readContract({
@@ -33,7 +41,14 @@ export async function getDispenserPayload(address: Address) {
 
   // convert 6decimal to 18decimals
   const totalPoints = BigInt(playerData?.totalPoints || 0) * BigInt(1e12)
-  const claimableAmount = totalPoints > claimed ? totalPoints - claimed : ZERO
+
+  // claimed is 18decimals so we format accordingly
+  const claimableAmount = forcedAmount
+    ? parseEther(forcedAmount.toString())
+    : totalPoints > claimed
+    ? totalPoints - claimed
+    : ZERO
+
   const deadline = BigInt(Math.floor(Date.now() / 1000) + 300) // 5 minutes
   const encoded = encodePacked(
     [
