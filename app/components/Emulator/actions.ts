@@ -2,10 +2,12 @@
 
 import type { Address } from "viem"
 
-import { redis } from "@/lib/redis"
-import { setPlayerData } from "@/app/actions/player"
+import {
+  getPlayerData,
+  setPlayerData,
+  updateLeaderboard,
+} from "@/app/actions/player"
 import { parseUSDC } from "@/app/lib/usdc"
-import { KEY_LEADERBOARD } from "./internals"
 
 export async function updatePlayerData(
   address: Address,
@@ -15,13 +17,16 @@ export async function updatePlayerData(
   try {
     // 1RBC is formatted to 6 decimal places (easier for redis than floats)
     const totalPoints = Number(parseUSDC(points))
+    const currentData = await getPlayerData(address)
+
+    if (Number(currentData?.totalPoints || 0) > totalPoints) {
+      // Nothing to update
+      return
+    }
 
     await Promise.all([
       // Update leaderboard score
-      redis.zadd(KEY_LEADERBOARD, {
-        score: totalPoints,
-        member: address,
-      }),
+      updateLeaderboard(address, totalPoints),
       // Update player data
       setPlayerData(address, {
         lastUpdated: Date.now(),
