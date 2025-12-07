@@ -23,18 +23,22 @@ import { useProFeatures, useRemoteProStatus } from "@/hooks/pro"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { formatUSDC } from "@/lib/usdc"
 
+import { FaGift } from "react-icons/fa"
 import { MdPerson } from "react-icons/md"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
 import { ProBadge } from "./WalletConnect"
 import { useAlertModal } from "./Alert"
+import { useFriendsDialogAtom } from "./DialogFriends"
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
+  const { toggleOpen } = useFriendsDialogAtom()
+
   const { leaderboard, totalUniquePlayers } = useLeaderboard()
   const { data: accountData } = useAccountLeaderboardData()
-  const { address } = useWorldAuth()
+  const { address, isConnected } = useWorldAuth()
 
   const isInTopBoard = leaderboard.some((p) => p.address === address)
 
@@ -76,9 +80,11 @@ export default function DrawerBoard() {
               Leaderboard updates every 30-45 minutes based on RBC points
               earned.
             </p>
+
+            <div className="sticky pointer-events-none w-full shrink-0 h-4 z-1 bottom-0 bg-linear-to-b from-rb-darker/0 to-rb-darker" />
           </section>
         ) : (
-          <section className="grow flex gap-3 flex-col items-center px-4">
+          <section className="grow flex gap-3 flex-col items-center px-4 pb-3">
             <div className="bg-white/10 animate-pulse w-full h-18 rounded-lg" />
             <div className="bg-white/10 animate-pulse delay-150 w-full h-18 rounded-lg" />
             <div className="bg-white/10 animate-pulse delay-300 w-full h-18 rounded-lg" />
@@ -91,7 +97,18 @@ export default function DrawerBoard() {
           </section>
         )}
 
-        <div className="px-4 pt-3 pb-6">
+        <div className="px-4 flex flex-col pt-3 gap-3 pb-6">
+          {isConnected ? null : (
+            <Button
+              onClick={toggleOpen}
+              className="flex bg-linear-to-br from-rb-yellow/25 border-white/5 to-rb-yellow/0 items-center justify-center gap-3"
+              variant="secondary"
+            >
+              <span>INVITE FRIENDS</span>
+              <FaGift />
+            </Button>
+          )}
+
           <Button onClick={() => setOpen(false)}>CONTINUE PLAYING</Button>
         </div>
       </DrawerContent>

@@ -1,10 +1,13 @@
+import useSWRImmutable from "swr/immutable"
 import { useWorldAuth } from "@radish-la/world-auth"
 import { useAtom } from "jotai"
 import { atomWithStorage } from "jotai/utils"
 
+import { getInvites } from "@/app/actions/invites"
 import { updatePlayerData } from "@/components/Emulator/actions"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useGameStats } from "./games"
+import { DEV_ADDRESS } from "../lib/constants"
 
 const atomPoints = atomWithStorage(
   "rb.user-earned-rbc",
@@ -13,25 +16,31 @@ const atomPoints = atomWithStorage(
 
 export const useAccountPoints = () => {
   const { address } = useWorldAuth()
-  const [points, setPoints] = useAtom(atomPoints)
+  const [pointsBank, setPoints] = useAtom(atomPoints)
 
+  const { data: earnedInvitePoints = 0 } = useSWRImmutable(
+    address ? `user.invites.points.${address}` : null,
+    async () => {
+      if (!address) return 0
+      const { points } = await getInvites(address)
+      return points
+    }
+  )
+
+  const points = address ? pointsBank[address] + earnedInvitePoints : 0
   const { currentGame } = useEmulator()
   const { emulator } = useGameStats(currentGame?.gameCollectionId)
 
   async function syncPoints() {
-    // Only update when connected
-    if (address) {
+    // Only update when connected and have points to sync
+    if (address && points > 0) {
       console.debug("Updating user data...")
-      await updatePlayerData(
-        address,
-        points[address],
-        emulator.playTimeInSeconds
-      )
+      await updatePlayerData(address, points, emulator.playTimeInSeconds)
     }
   }
 
   return {
-    points: address ? points[address] : 0,
+    points,
     /** Sync points with backend */
     syncPoints,
     addPoints: (newPoints: number) => {

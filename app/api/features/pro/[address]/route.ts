@@ -7,14 +7,15 @@ import { getProPrice } from "@/app/lib/pro"
 
 type Params = { params: Promise<{ address: string }> }
 
-export const revalidate = 60 // Cache for 60 seconds
+export const revalidate = 120 // Cache for 2 minutes
 
 export async function GET(_: Request, { params }: Params) {
   const { address } = await params
 
   const price = getProPrice(address).toString()
-  const { transfers } = await alchemy.core.getAssetTransfers({
+  const { transfers: rawTransfers } = await alchemy.core.getAssetTransfers({
     fromAddress: address,
+    withMetadata: false,
     toAddress: PRO_PAYMENT_RECIPIENT,
     // This address is specific (one transfer for payment) but buffer it jic
     maxCount: 3,
@@ -22,10 +23,14 @@ export async function GET(_: Request, { params }: Params) {
     contractAddresses: [TOKENS.WLD.ADDRESS],
   })
 
-  const isProUser = transfers.some(
-    // User has made a payment matching the pro price
-    (transfer) => (transfer.value || "") == price
-  )
+  const transfers = rawTransfers.map(({ hash, value, blockNum }) => ({
+    hash,
+    value,
+    blockNum,
+  }))
+
+  // User has made a payment matching the pro price
+  const isProUser = transfers.some((t) => `${t.value}` == price)
 
   return Response.json({
     price,

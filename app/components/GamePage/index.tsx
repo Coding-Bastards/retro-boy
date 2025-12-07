@@ -175,14 +175,14 @@ export default function GamePage() {
           <button
             onClick={() => handleVote("dislike")}
             className={cn(
-              isSelfDisliked ? "text-red-400" : "text-white",
+              isSelfDisliked ? "text-rb-red" : "text-white",
               "flex items-center gap-2 active:scale-95"
             )}
           >
             {isSelfDisliked ? (
-              <AiFillDislike className="text-red-400 text-xl" />
+              <AiFillDislike className="text-rb-red text-xl" />
             ) : (
-              <AiOutlineDislike className="text-red-400 text-xl" />
+              <AiOutlineDislike className="text-rb-red text-xl" />
             )}
             <span className="font-black">{localizeNumber(game?.dislikes)}</span>
           </button>

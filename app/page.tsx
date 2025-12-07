@@ -8,6 +8,7 @@ import MarketPage from "@/components/MarketPage"
 import GamePage from "@/components/GamePage"
 
 import GameCatalogue from "./components/GameCatalogue"
+import DialogFriends from "./components/DialogFriends"
 import DrawerBoard from "./components/DrawerBoard"
 import QueryRouter from "./QueryRouter"
 
@@ -36,6 +37,7 @@ export default function Home() {
 
       <GameCatalogue />
       <DrawerBoard />
+      <DialogFriends />
 
       <main className="max-w-md h-dvh overflow-hidden p-5 mx-auto">
         <TopNavigation />

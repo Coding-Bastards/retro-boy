@@ -18,13 +18,14 @@ export default function Emulator() {
   const keyPressHistoryRef = useRef<number[]>([])
 
   const { address } = useWorldAuth()
-  const { addPoints } = useAccountPoints()
+  const { addPoints, syncPoints } = useAccountPoints()
 
   // Track current session (from app render) time played (in seconds)
   const [sessionTimePlayed, setSessionTimePlayed] = useState(0)
   const [, setTimePlayed] = useAtomTimePlayed()
 
   const { currentGame, sendJoyPadEvent } = useEmulator()
+  const GAME_ID = currentGame?.gameCollectionId
 
   const addActiveDirectionClsx = (direction: string) => {
     document.getElementById(direction)?.classList?.add("text-white/60")
@@ -44,8 +45,7 @@ export default function Emulator() {
 
   const trackActivity = (joyPadCode: number) => {
     // Don't track if no game is loaded or NO address
-    const gameId = currentGame?.gameCollectionId
-    if (!gameId || !address) return
+    if (!GAME_ID || !address) return
 
     // Get last key pressed from history
     const lastKeyPressed =
@@ -78,11 +78,11 @@ export default function Emulator() {
 
       // Update global time played
       setTimePlayed((prev) => {
-        const playerTime = prev?.[gameId]?.[address] || 0
+        const playerTime = prev?.[GAME_ID]?.[address] || 0
         return {
           ...prev,
-          [gameId]: {
-            ...prev[gameId],
+          [GAME_ID]: {
+            ...prev[GAME_ID],
             // Increment previous time played by seconds
             [address]: playerTime + activityWindowInSeconds,
           },
@@ -136,6 +136,11 @@ export default function Emulator() {
 
     return () => clearTimeout(timer)
   }, [sessionTimePlayed])
+
+  useEffect(() => {
+    // Sync when new game is loaded
+    if (GAME_ID) syncPoints()
+  }, [GAME_ID])
 
   return (
     <div className="flex flex-col h-full">

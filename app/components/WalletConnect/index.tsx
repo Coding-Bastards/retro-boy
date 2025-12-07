@@ -1,28 +1,31 @@
 "use client"
 
-import { useState, useEffect, Fragment } from "react"
-import { MiniKit } from "@worldcoin/minikit-js"
-import { useWorldAuth } from "@radish-la/world-auth"
+import { useState, useEffect } from "react"
 import { toast } from "sonner"
+import { useWorldAuth } from "@radish-la/world-auth"
+import useSWR from "swr"
 
 import { useAccountBalances, useClaimedRBCPoints } from "@/hooks/balances"
 import { useAccountPoints } from "@/hooks/points"
 import { useProFeatures } from "@/hooks/pro"
 import { useGameStats } from "@/hooks/games"
 
-import { getDispenserPayload } from "@/app/actions/dispenser"
 import { beautifyAddress } from "@/lib/utils"
 import { numberToShortWords } from "@/lib/numbers"
 import { formatTimePlayed } from "@/lib/date"
 
-import { ABI_DISPENSER } from "@/lib/abi"
-import { ADDRESS_DISPENSER, DEV_ADDRESS } from "@/lib/constants"
-import { isDevEnv } from "@/lib/env"
+import { FaUserFriends } from "react-icons/fa"
 
-import { initializeEruda } from "./ErudaProdiver"
-import AddressBlock from "./AddressBlock"
-import Dialog from "./Dialog"
-import Button from "./Button"
+import { DEV_ADDRESS } from "@/lib/constants"
+import { isDevEnv } from "@/lib/env"
+import { redeemRBCTokens } from "@/app/lib/rbc"
+import { getInvites } from "@/app/actions/invites"
+
+import { useFriendsDialogAtom } from "@/components/DialogFriends"
+import AddressBlock from "@/components/AddressBlock"
+import Dialog from "@/components/Dialog"
+import Button from "@/components/Button"
+import DeveloperGrid from "./DeveloperGrid"
 
 export default function WalletConnect({
   summaryToken = "RBC",
@@ -32,10 +35,20 @@ export default function WalletConnect({
   const [isDialogOpen, setDialogOpen] = useState(false)
   const [isClaimed, setIsClaimed] = useState(false)
 
+  const { toggleOpen } = useFriendsDialogAtom()
+
   const { points: RBC_POINTS, syncPoints } = useAccountPoints()
   const { address, isConnected, signOut, signIn } = useWorldAuth()
   const { isProUser } = useProFeatures()
   const { emulator } = useGameStats()
+
+  const { data: invitesSent = 0 } = useSWR(
+    address && isDialogOpen ? `invited.count.${address}` : null,
+    async () => {
+      if (!address) return 0
+      return (await getInvites(address)).invitesSent
+    }
+  )
 
   const { WLD, RBC } = useAccountBalances(address)
   const { claimed, isLoading: isLoadingClaimedPoints } =
@@ -58,19 +71,8 @@ export default function WalletConnect({
 
     // Sync claiming points with backend
     await syncPoints()
-    const { amount, deadline, signature } = await getDispenserPayload(address)
-    const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({
-      transaction: [
-        {
-          abi: ABI_DISPENSER,
-          address: ADDRESS_DISPENSER,
-          functionName: "claim",
-          args: [amount, deadline, signature],
-        },
-      ],
-    })
-
-    if (finalPayload.status === "success") {
+    const payload = await redeemRBCTokens(address)
+    if (payload.status === "success") {
       setIsClaimed(true)
       return toast.success(
         `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`
@@ -79,7 +81,7 @@ export default function WalletConnect({
 
     // Do not show error state if user denied the transaction
     // Only if there was an error when executing the transaction
-    const debugURL = (finalPayload as any)?.details?.debugUrl
+    const debugURL = (payload as any)?.details?.debugUrl
     const isErrored = Boolean(debugURL)
     if (isErrored) {
       toast.error("Failed to claim. Please try again.")
@@ -137,7 +139,7 @@ export default function WalletConnect({
     <Dialog open={isDialogOpen} onOpenChange={setDialogOpen} trigger={TRIGGER}>
       <div className="flex flex-col gap-6 text-white">
         {/* Profile Section */}
-        <div className="flex flex-col items-center gap-3 py-4">
+        <div className="flex flex-col items-center gap-3">
           <AddressBlock address={address} size={18} />
           <div className="text-center">
             <nav className="flex justify-center items-center gap-1.5">
@@ -156,7 +158,20 @@ export default function WalletConnect({
         </div>
 
         {/* Balances */}
-        <div className="flex flex-col gap-3 pt-4 border-t border-white/10">
+        <div className="flex mt-5 flex-col gap-3">
+          <button
+            onClick={toggleOpen}
+            className="bg-linear-to-br text-white/90 pl-5 pr-5 -mx-1 py-2.5 outline outline-rb-yellow/10 rounded-full flex items-center justify-between from-rb-yellow/20 to-white/5"
+          >
+            <span className="font-black text-sm">FRIENDS</span>
+            <div className="font-black flex items-center gap-1.5">
+              <span>{invitesSent}</span>
+              <FaUserFriends className="text-lg" />
+            </div>
+          </button>
+
+          <div className="h-px mt-2 mb-1 w-full bg-white/10" />
+
           <div className="flex justify-between items-center">
             <span className="text-white/60 text-sm">RBC Balance</span>
             <span className="font-black text-rb-green">
@@ -179,8 +194,6 @@ export default function WalletConnect({
           </div>
         </div>
 
-        <div className="my-1.5" />
-
         {showClaimAction && (
           <Button
             className="bg-linear-to-tr from-white/95 to-white/80 -mb-1"
@@ -196,18 +209,7 @@ export default function WalletConnect({
         </Button>
 
         {/* Developer Settings */}
-        {isDeveloper && (
-          <Fragment>
-            <div className="h-px bg-white/10 w-full" />
-            <Button
-              className="bg-transparent"
-              onClick={initializeEruda}
-              variant="secondary"
-            >
-              OPEN DEBUGGER
-            </Button>
-          </Fragment>
-        )}
+        {isDeveloper && <DeveloperGrid />}
       </div>
     </Dialog>
   )

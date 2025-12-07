@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils"
 import { useAtomIsCatalogueOpen } from "@/lib/store"
 import { useEmulator } from "@/lib/EmulatorContext"
 
+import { Spinner } from "@/components/icons"
 import { ImFolderDownload } from "react-icons/im"
 import { ASPECT_RATIO, CANVAS_HEIGHT, CANVAS_WIDTH } from "./internals"
 
@@ -45,7 +46,7 @@ export default function Screen() {
         {isLoading ? (
           <LoadingOverlay>
             <figure className="size-9 grid place-items-center">
-              <div className="inline-block size-7 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" />
+              <Spinner />
             </figure>
             <span className="text-sm font-black uppercase">LOADING NFT</span>
           </LoadingOverlay>

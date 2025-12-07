@@ -1,3 +1,4 @@
+import { hexToBase62 } from "./base62"
 import { isDevEnv } from "./env"
 
 const APP_ID = isDevEnv()
@@ -12,6 +13,6 @@ export const getInviteLink = ({
   address: string
 }) => {
   return `https://worldcoin.org/mini-app?app_id=${APP_ID}&path=${encodeURIComponent(
-    `/invite?code=${code}&from=${address}`
+    `/invite?seed=${code}${hexToBase62(address)}`
   )}`
 }

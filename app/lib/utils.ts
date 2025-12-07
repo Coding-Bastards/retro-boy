@@ -1,5 +1,5 @@
 import { type ClassValue, clsx } from "clsx"
-import type { Hash } from "viem"
+import { keccak256, toHex, type Hash } from "viem"
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -19,4 +19,9 @@ export const jsonify = <T>(response: Response | Promise<Response>) => {
   return response instanceof Response
     ? (response.json() as Promise<T>)
     : response.then((r) => r.json() as Promise<T>)
+}
+
+export function generateInviteCode(address: string) {
+  const hash = keccak256(toHex(address.toLowerCase() + "V1_INVITE_RBC"))
+  return BigInt(hash).toString(36).slice(0, 6).toUpperCase()
 }

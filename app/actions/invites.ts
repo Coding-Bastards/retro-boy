@@ -2,12 +2,11 @@
 
 import type { Address, Hash } from "viem"
 import ProtocolKit, { hashSafeMessage } from "@safe-global/protocol-kit"
-import { recoverAddress } from "viem"
 
 import { isWorldVerified } from "@/lib/world"
-import { generateInviteCode } from "@/components/DialogFriends"
 import { INVITE_REWARDS } from "@/lib/constants"
 import { ALCHEMY_RPC } from "@/lib/alchemy"
+import { generateInviteCode } from "@/lib/utils"
 import { redis } from "@/lib/redis"
 
 export type ClaimMessage = {
@@ -17,22 +16,51 @@ export type ClaimMessage = {
   nonce: number
 }
 
+const getAccountKey = (address: Address) => `rb.i.${address}`
 const getInviteKey = (inviter: Address, recipient: Address) =>
   `rb.i.${inviter}.invited.${recipient}`
-const getTotalInvitedKey = (address: Address) => `rb.i.${address}.totalInvited`
-const getPointsKey = (address: Address) => `rb.i.${address}.points`
 
-export const getAcceptedInvites = async (address: Address) =>
-  (await redis.get<number>(getTotalInvitedKey(address))) || 0
+const incrementInviteStats = async (
+  Address: Address,
+  {
+    sent,
+    accepted,
+    points,
+  }: {
+    sent?: number
+    accepted?: number
+    points?: number
+  }
+) => {
+  await Promise.all([
+    points && redis.hincrby(getAccountKey(Address), "points", points),
+    sent && redis.hincrby(getAccountKey(Address), "invitesSent", sent),
+    accepted &&
+      redis.hincrby(getAccountKey(Address), "invitesAccepted", accepted),
+  ])
+}
 
-export const incrementAcceptedInvites = async (address: Address) =>
-  await redis.incr(getTotalInvitedKey(address))
+export const getInvites = async (address: Address) => {
+  const data = await redis.hgetall<{
+    points: number
+    invitesSent: number
+    invitesAccepted: number
+  }>(getAccountKey(address))
 
-export const incrementInvitePoints = async (address: Address, points: number) =>
-  await redis.incrby(getPointsKey(address), points)
+  return {
+    /** Accumulated earned points from invites (non-USDC formatted) */
+    points: 0,
+    /** Invites given + accepted from recipient */
+    invitesSent: 0,
+    /** Invites you have accepted from others */
+    invitesAccepted: 0,
+    ...(data || {}),
+  }
+}
 
-export const getInvitePoints = async (address: Address) =>
-  (await redis.get<number>(getPointsKey(address))) || 0
+//////////////////////////////////////////
+// External Actions
+//////////////////////////////////////////
 
 export const inviteExits = async (person1: Address, person2: Address) => {
   // Check if either person has invited the other
@@ -55,17 +83,8 @@ export const claimFriendRewards = async ({
   const inviter = formattedMessage?.inviter?.toLowerCase() as Address
   const recipient = formattedMessage?.recipient?.toLowerCase() as Address
 
-  const originalSigner = await recoverAddress({
-    hash: hashSafeMessage(message) as Hash,
-    signature,
-  })
-
-  // Safe message sender should be the expected recipient
-  if (originalSigner.toLowerCase() !== recipient) {
-    return errorState("InvalidSigner")
-  }
-
   const Safe = await ProtocolKit.init({
+    // Initialize with recipient address (Load as Safe Wallet)
     safeAddress: recipient,
     provider: ALCHEMY_RPC.http,
   })
@@ -89,12 +108,14 @@ export const claimFriendRewards = async ({
     : INVITE_REWARDS.REGULAR
 
   // Can't self invite
-  if (inviter == recipient) {
+  if (
+    false &&
+    inviter == recipient) {
     return errorState("CantSelfInvite")
   }
 
-  // Use accepted invites as nonce
-  const nonce = await getAcceptedInvites(recipient)
+  // Use recipient's accepted invites as nonce
+  const { invitesAccepted: nonce } = await getInvites(recipient)
   if (formattedMessage.nonce !== nonce) {
     return errorState("InvalidNonce")
   }
@@ -106,12 +127,14 @@ export const claimFriendRewards = async ({
 
   const nowInSeconds = Math.floor(Date.now() / 1_000)
   await Promise.all([
+    // Set invite record to prevent re-invite
     redis.set(getInviteKey(inviter, recipient), nowInSeconds),
-    incrementInvitePoints(inviter, CLAIMABLE_AMOUNT),
+
+    // Update inviter stats
+    incrementInviteStats(inviter, { points: CLAIMABLE_AMOUNT, sent: 1 }),
 
     // Disburse recipient points + update accepted invites
-    incrementInvitePoints(recipient, CLAIMABLE_AMOUNT),
-    incrementAcceptedInvites(recipient),
+    incrementInviteStats(recipient, { points: CLAIMABLE_AMOUNT, accepted: 1 }),
   ])
 
   return {

@@ -25,10 +25,10 @@ a {
 }
 
 @theme {
-  --z-index-1: 1;
   --color-rb-green: #10f715;
   --color-rb-green-light: #d1ffb2;
   --color-rb-yellow: #ffcb00;
+  --color-rb-red: #e7000b;
   --color-rb-black: #161616;
   --color-rb-dark: #2a2a2a;
   --color-rb-darker: #1a1a1a;
