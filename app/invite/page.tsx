@@ -1,6 +1,6 @@
 "use client"
 
-import useSWR from "swr"
+import useSWRImmutable from "swr/immutable"
 import { isAddress, type Address } from "viem"
 import { Fragment, type PropsWithChildren, Suspense, useState } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -43,7 +43,7 @@ function InvitePage() {
   const inviter = seed ? (`0x${base62ToHex(seed.slice(6))}` as Address) : null
 
   const { data: isHumanVerified = false, isLoading: isVerifyingHumanity } =
-    useSWR(address ? `is.human.${address}` : null, async () => {
+    useSWRImmutable(address ? `is.human.${address}` : null, async () => {
       if (!address) return false
       return await isWorldVerified(address)
     })
@@ -51,7 +51,7 @@ function InvitePage() {
   const {
     data: isAlreadyclaimed = false,
     isLoading: isCheckingForClaimedStatus,
-  } = useSWR(
+  } = useSWRImmutable(
     address && inviter ? `is.claimed.${address}.${inviter}` : null,
     async () => {
       if (!address || !inviter) return false
