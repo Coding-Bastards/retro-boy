@@ -7,7 +7,6 @@ import { getInvites } from "@/app/actions/invites"
 import { updatePlayerData } from "@/components/Emulator/actions"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useGameStats } from "./games"
-import { DEV_ADDRESS } from "../lib/constants"
 
 const atomPoints = atomWithStorage(
   "rb.user-earned-rbc",

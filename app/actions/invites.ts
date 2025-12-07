@@ -4,7 +4,7 @@ import type { Address, Hash } from "viem"
 import ProtocolKit, { hashSafeMessage } from "@safe-global/protocol-kit"
 
 import { isWorldVerified } from "@/lib/world"
-import { INVITE_REWARDS } from "@/lib/constants"
+import { DEV_ADDRESS, INVITE_REWARDS } from "@/lib/constants"
 import { ALCHEMY_RPC } from "@/lib/alchemy"
 import { generateInviteCode } from "@/lib/utils"
 import { redis } from "@/lib/redis"
@@ -107,10 +107,8 @@ export const claimFriendRewards = async ({
     ? INVITE_REWARDS.VERIFIED
     : INVITE_REWARDS.REGULAR
 
-  // Can't self invite
-  if (
-    false &&
-    inviter == recipient) {
+  // Can't self invite (bypass for testing in prod with DEV_ADDRESS)
+  if (inviter == recipient && recipient !== DEV_ADDRESS.toLowerCase()) {
     return errorState("CantSelfInvite")
   }
 

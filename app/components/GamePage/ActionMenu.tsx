@@ -7,7 +7,7 @@ import { useWorldAuth } from "@radish-la/world-auth"
 import { MiniKit } from "@worldcoin/minikit-js"
 
 import { useOwnedTokenIds } from "@/hooks/nfts"
-import { ADDRESS_DEAD, DEV_ADDRESS } from "@/lib/constants"
+import { ADDRESS_DEAD } from "@/lib/constants"
 import { useAlertModal } from "@/components/Alert"
 
 import { RiExternalLinkLine, RiSettingsFill } from "react-icons/ri"
