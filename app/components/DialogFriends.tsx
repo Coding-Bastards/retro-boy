@@ -12,7 +12,7 @@ import { useIsFirstTimeOpen } from "./TopNavigation"
 import { IoCopyOutline } from "react-icons/io5"
 import { MdOutlineKeyboardDoubleArrowRight } from "react-icons/md"
 
-import { DEV_ADDRESS, INVITE_REWARDS } from "@/lib/constants"
+import { INVITE_REWARDS } from "@/lib/constants"
 import { generateInviteCode } from "@/lib/utils"
 import { getInviteLink } from "@/lib/deeplink"
 

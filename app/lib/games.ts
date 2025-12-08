@@ -9,7 +9,6 @@ import { erc721Abi, type Address } from "viem"
 import { clientWorldchain } from "./world"
 
 import { useTimePlayed } from "@/hooks/games"
-import { useEmulator } from "./EmulatorContext"
 import {
   ADDRESS_GAME_REGISTRY,
   BASE_CDN_URL,

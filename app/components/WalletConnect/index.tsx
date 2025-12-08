@@ -1,9 +1,9 @@
 "use client"
 
+import useSWR from "swr"
 import { useState, useEffect } from "react"
 import { toast } from "sonner"
 import { useWorldAuth } from "@radish-la/world-auth"
-import useSWR from "swr"
 
 import { useAccountBalances, useClaimedRBCPoints } from "@/hooks/balances"
 import { useAccountPoints } from "@/hooks/points"
