@@ -169,7 +169,6 @@ export const useOwnedGames = () => {
   // Fetch all games from registry
   const { address: connectedAddress, isMiniApp } = useWorldAuth()
   const { games: allGames } = useAllGames()
-  const { currentGame } = useEmulator()
 
   // Use dev address in (local dev) env + no wallet connected
   const shouldUseDevAddress = isDevEnv() && !connectedAddress && !isMiniApp
@@ -177,10 +176,7 @@ export const useOwnedGames = () => {
 
   const { getTimePlayed } = useTimePlayed(address)
 
-  const findGame = (collectionId: string) =>
-    allGames.find((g) => g.collectionId === collectionId) || null
-
-  const { data: games = [], mutate } = useSWR(
+  const { data: rawGames = [], mutate } = useSWR(
     address ? `games.owned.${address}.${allGames.length}` : null,
     async () => {
       if (!address) return []
@@ -210,26 +206,20 @@ export const useOwnedGames = () => {
   )
 
   // Decouple owned games data from SWR response
-  const ownedGames = games
-    .map(({ collectionId }) => findGame(collectionId))
+  const ownedGames = rawGames
+    .map(({ collectionId }) =>
+      allGames.find((g) => g.collectionId === collectionId)
+    )
     .filter(Boolean) as Game[]
 
-  const gameInEmulator = findGame(currentGame?.gameCollectionId || "")
-  const isZeroGamesOwned = ownedGames.length <= 0
+  const isEmpty = ownedGames.length <= 0
 
-  // Empty when no owned games + no game loaded
-  const isEmpty = isZeroGamesOwned && !gameInEmulator
   return {
     mutate,
     isEmpty,
-    games:
-      // If possible show at least the emulator cartridge
-      gameInEmulator && isZeroGamesOwned
-        ? [gameInEmulator]
-        : ownedGames.sort(
-            // Sort by most played
-            (a, b) =>
-              getTimePlayed(b.collectionId) - getTimePlayed(a.collectionId)
-          ),
+    games: ownedGames.sort(
+      // Sort by most played
+      (a, b) => getTimePlayed(b.collectionId) - getTimePlayed(a.collectionId)
+    ),
   }
 }

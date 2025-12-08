@@ -140,7 +140,12 @@ export default function GameCatalogue() {
         ) : isEmpty ? (
           <DrawerEmptyState
             onActionPress={pushMarketPage}
-            actionLabel="OPEN MARKET"
+            actionLabel={
+              <Fragment>
+                <span>OPEN MARKET</span>
+                <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
+              </Fragment>
+            }
             icon={<PiHandbagSimpleFill className="text-5xl text-white/90" />}
           >
             Your game library is empty.
@@ -189,7 +194,7 @@ function DrawerEmptyState({
   children,
 }: PropsWithChildren<{
   onActionPress: () => void
-  actionLabel: string
+  actionLabel: string | React.ReactNode
   icon: React.ReactNode
 }>) {
   return (
@@ -209,8 +214,7 @@ function DrawerEmptyState({
         className="border group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
         onClick={onActionPress}
       >
-        <span>{actionLabel}</span>
-        <IoMdArrowForward className="text-xl group-active:translate-x-px scale-105" />
+        {actionLabel}
       </button>
     </div>
   )

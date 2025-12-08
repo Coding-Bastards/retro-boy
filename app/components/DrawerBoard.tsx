@@ -69,13 +69,18 @@ export default function DrawerBoard() {
               </Fragment>
             )}
 
-            {leaderboard.map((player, index) => (
-              <PlayerItem
-                player={player}
-                key={`board-player-${player.address}-${index}`}
-                isConnectedUser={player.address === address}
-              />
-            ))}
+            {leaderboard.length <= 0 ? (
+              <PlayerSkeletonList />
+            ) : (
+              leaderboard.map((player, index) => (
+                <PlayerItem
+                  player={player}
+                  key={`board-player-${player.address}-${index}`}
+                  isConnectedUser={player.address === address}
+                />
+              ))
+            )}
+
             <p className="text-sm pt-8 pb-16 px-3 text-white/60 text-center">
               Leaderboard updates every 30-45 minutes based on RBC points
               earned.
@@ -85,12 +90,9 @@ export default function DrawerBoard() {
           </section>
         ) : (
           <section className="grow flex gap-3 flex-col items-center px-4 pb-3">
-            <div className="bg-white/10 animate-pulse w-full h-18 rounded-lg" />
-            <div className="bg-white/10 animate-pulse delay-150 w-full h-18 rounded-lg" />
-            <div className="bg-white/10 animate-pulse delay-300 w-full h-18 rounded-lg" />
+            <PlayerSkeletonList />
 
             <div className="bg-white/10 mt-8 mb-6 h-px w-full" />
-
             <p className="text-sm text-white/60 text-center max-w-72">
               Not enough data. Play more to get ranked on the leaderboard!
             </p>
@@ -115,6 +117,14 @@ export default function DrawerBoard() {
     </Drawer>
   )
 }
+
+const PlayerSkeletonList = () => (
+  <Fragment>
+    <div className="bg-white/10 animate-pulse w-full h-18 rounded-lg" />
+    <div className="bg-white/10 animate-pulse delay-150 w-full h-18 rounded-lg" />
+    <div className="bg-white/10 animate-pulse delay-300 w-full h-18 rounded-lg" />
+  </Fragment>
+)
 
 function PlayerItem({
   player,

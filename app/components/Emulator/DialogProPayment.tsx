@@ -19,7 +19,7 @@ export default function DialogProPayment({
   onOpenChange: (open: boolean) => void
 }) {
   const { isProUser, migrateToPro } = useProFeatures()
-  const { address, signIn } = useWorldAuth()
+  const { address, isConnected, signIn } = useWorldAuth()
 
   const AMOUNT = getProPrice(address)
   const closeDialog = () => onOpenChange(false)
@@ -50,17 +50,18 @@ export default function DialogProPayment({
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <p className="text-sm">
+      <p className="text-sm mb-9">
         Level up your gaming experience with <strong>PRO!</strong> Unlock
-        exclusive features, discounts, and get rid of ads.
+        exclusive features, discounts, and more.
       </p>
 
-      <Button
-        onClick={handleGoPro}
-        className="mt-9 border-2 rounded-xl border-black/20 bg-linear-[90deg,#ffd700,#10f715,#ffd700] w-full"
-        variant="secondary"
-      >
-        <style scoped>{`
+      {isConnected ? (
+        <Button
+          onClick={handleGoPro}
+          className="border-2 rounded-xl border-black/20 bg-linear-[90deg,#ffd700,#10f715,#ffd700] w-full"
+          variant="secondary"
+        >
+          <style scoped>{`
           @keyframes shine {
             to {
               background-position: 200% center;
@@ -72,10 +73,15 @@ export default function DialogProPayment({
             animation: shine 3s linear infinite;
           }
         `}</style>
-        <span className="text-black">
-          UPGRADE {"->"} {AMOUNT} WLD
-        </span>
-      </Button>
+          <span className="text-black">
+            UPGRADE {"->"} {AMOUNT} WLD
+          </span>
+        </Button>
+      ) : (
+        <Button variant="secondary" onClick={signIn}>
+          CONNECT WALLET
+        </Button>
+      )}
     </Dialog>
   )
 }
