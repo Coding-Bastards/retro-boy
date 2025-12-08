@@ -211,7 +211,7 @@ function DrawerEmptyState({
 
       <div className="grow" />
       <button
-        className="border group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
+        className="border active:scale-98 group rounded-lg bg-linear-to-bl from-white/5 to-white/3 border-white/5 py-4 w-full pl-9 pr-8 gap-4 text-white flex items-center justify-center font-black"
         onClick={onActionPress}
       >
         {actionLabel}
