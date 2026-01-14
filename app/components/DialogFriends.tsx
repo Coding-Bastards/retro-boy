@@ -69,6 +69,13 @@ export default function DialogFriends() {
     }
   }, [address, isFirstTimeOpen, isInvitesTutorialComplete])
 
+  useEffect(() => {
+    if (address) {
+      // Notify Oculus SDK of user auth
+      ;(window as any)?.oculus("setUserAddress", address)
+    }
+  }, [address])
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen} title="🎮 INVITE FRIENDS">
       <ul className="text-sm space-y-2 pt-2 text-white/80">

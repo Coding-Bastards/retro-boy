@@ -1,5 +1,6 @@
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
+import Script from "next/script"
 
 import { Geist_Mono } from "next/font/google"
 import { EmulatorProvider } from "@/lib/EmulatorContext"
@@ -31,6 +32,7 @@ export const viewport: Viewport = {
   userScalable: false,
 }
 
+const APP_ID = "app_a13136423b04187d0af66d74f5dd7eb6"
 export default function RootLayout({
   children,
 }: {
@@ -39,6 +41,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nextFont.className} antialiased`}>
+        <Script
+          src="https://oculus-sdk.humanlabs.world"
+          crossOrigin="anonymous"
+        />
+        <Script strategy="afterInteractive">
+          {`
+            window.oculusLayer = window.oculusLayer || [];
+            function oculus() { oculusLayer.push(arguments); }
+
+            oculus("app_id", "${APP_ID}");
+          `}
+        </Script>
+
         <Toaster
           swipeDirections={["left", "right", "bottom", "top"]}
           theme="light"
