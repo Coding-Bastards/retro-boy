@@ -5,8 +5,9 @@ import type { LeaderboardData } from "@/app/hooks/leaderboard"
 import { unstable_cache } from "next/cache"
 import { getPlayerKey, KEY_LEADERBOARD } from "@/components/Emulator/internals"
 import { redis } from "@/app/lib/redis"
+import { staledResponse } from "@/app/lib/server"
 
-export const revalidate = 300 // Cache for 5 minutes
+export const revalidate = 1_200 // Cache for 20 minutes
 
 const getLeaderBoard = unstable_cache(
   async () => {
@@ -54,13 +55,17 @@ const getLeaderBoard = unstable_cache(
 export async function GET() {
   try {
     const leaderboard = await getLeaderBoard()
-    return Response.json(leaderboard, {
-      headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-      },
+    return staledResponse(leaderboard, {
+      timeInSeconds: revalidate,
     })
-  } catch (error) {
-    console.error({ error })
-    return Response.json({ error: "Failed to fetch" }, { status: 500 })
-  }
+  } catch (_) {}
+
+  return staledResponse(
+    {
+      error: "Unable to fetch leaderboard data",
+    },
+    {
+      statusCode: 500,
+    }
+  )
 }

@@ -4,10 +4,11 @@ import type { LeaderboardData } from "@/hooks/leaderboard"
 import { redis } from "@/lib/redis"
 import { KEY_LEADERBOARD } from "@/app/components/Emulator/internals"
 import { getPlayerData } from "@/app/actions/player"
+import { staledResponse } from "@/app/lib/server"
 
 type Params = { params: Promise<{ address: string }> }
 
-export const revalidate = 300 // Cache for 5 minutes
+export const revalidate = 600 // Cache for 10 minutes
 
 export async function GET(_: Request, { params }: Params) {
   const { address } = await params
@@ -18,7 +19,7 @@ export async function GET(_: Request, { params }: Params) {
   // Get player's additional data
   const playerData = await getPlayerData(address as Address)
 
-  return Response.json(
+  return staledResponse(
     {
       address: address as Address,
       position: rank === null ? null : rank + 1,
@@ -26,9 +27,7 @@ export async function GET(_: Request, { params }: Params) {
       timePlayed: playerData?.totalTimePlayed || 0,
     } satisfies LeaderboardData,
     {
-      headers: {
-        "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600",
-      },
+      timeInSeconds: revalidate,
     }
   )
 }

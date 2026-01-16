@@ -1,10 +1,11 @@
 import type { TLikes } from "@/@types/game-nft"
+import { staledResponse } from "@/app/lib/server"
 import { redis } from "@/lib/redis"
 
 type Params = { params: Promise<{ address: string }> }
 
-export const revalidate = 60 // Cache for 60 seconds
-
+// Cache for some time since we do optimistic update in the client, no need to be real-time
+export const revalidate = 180 // Cache for 3 minutes
 export async function GET(_: Request, { params }: Params) {
   const { address } = await params
 
@@ -20,10 +21,15 @@ export async function GET(_: Request, { params }: Params) {
     console.error({ error })
   }
 
-  return Response.json({
-    likes,
-    dislikes,
-  })
+  return staledResponse(
+    {
+      likes,
+      dislikes,
+    },
+    {
+      timeInSeconds: revalidate,
+    }
+  )
 }
 
 export async function POST(request: Request, { params }: Params) {

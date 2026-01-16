@@ -1,15 +1,21 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import { atomWithStorage } from "jotai/utils"
 import { useAtom } from "jotai"
+
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useProFeatures } from "@/hooks/pro"
+import { getUnoDeeplinkUrl } from "@/lib/deeplinks"
 import { cn } from "@/lib/utils"
 
 import Dialog from "@/components/Dialog"
 import WalletConnect, { ProBadge } from "@/components/WalletConnect"
 import Button from "./Button"
+
+import { RiExternalLinkLine } from "react-icons/ri"
+import { TOKENS } from "@/lib/tokens"
 
 const atomFirstTimeOpen = atomWithStorage("rb.isFirstTimeOpened", true)
 /** Expose if it's the first time app is opened */
@@ -62,9 +68,20 @@ export default function TopNavigation() {
         </p>
 
         <p className="text-sm mt-4">
-          Earn <strong>RBC tokens</strong> by playing. RBC represents a
-          proof-of-gameplay. A memecoin, we do not promote speculation and/or
-          any form of investment.
+          Earn{" "}
+          <Link
+            className="inline-flex focus-within:scale-105 bg-rb-green/15 text-rb-green rounded pl-2 pr-1 py-px items-center gap-2"
+            target="_blank"
+            href={getUnoDeeplinkUrl({
+              fromToken: TOKENS.WLD.ADDRESS,
+              toToken: TOKENS.RBC.ADDRESS,
+            })}
+          >
+            <strong>RBC Tokens</strong>
+            <RiExternalLinkLine className="scale-130" />
+          </Link>{" "}
+          by playing. RBC represents a proof-of-gameplay. A memecoin, we do not
+          promote speculation and/or any form of investment.
         </p>
 
         <Button

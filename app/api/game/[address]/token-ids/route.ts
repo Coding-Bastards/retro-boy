@@ -1,14 +1,17 @@
 import type { CollectionWithTokenId } from "@/app/hooks/nfts"
+import { staledResponse } from "@/app/lib/server"
 import { alchemy } from "@/lib/alchemy"
 import { AssetTransfersCategory } from "alchemy-sdk"
 import { zeroAddress } from "viem"
 
 type Params = { params: Promise<{ address: string }> }
 
-export const revalidate = 30 // Cache for 30 seconds
+export const revalidate = 60 // Cache for 1 min
 
 export async function GET(request: Request, { params }: Params) {
+  // Token holder address
   const { address } = await params
+
   const searchParams = new URL(request.url).searchParams
   const contractAddresses = searchParams.get("addresses")?.split(",") || []
 
@@ -41,5 +44,7 @@ export async function GET(request: Request, { params }: Params) {
     }, {}) as Record<string, CollectionWithTokenId>
   )
 
-  return Response.json(keepLatestTokenIdPerCollection)
+  return staledResponse(keepLatestTokenIdPerCollection, {
+    timeInSeconds: revalidate,
+  })
 }
