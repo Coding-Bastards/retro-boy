@@ -80,8 +80,9 @@ export default function TopNavigation() {
             <strong>RBC Tokens</strong>
             <RiExternalLinkLine className="scale-130" />
           </Link>{" "}
-          by playing. RBC represents a proof-of-gameplay. A memecoin, we do not
-          promote speculation and/or any form of investment.
+          by playing.
+          <br /> RBC represents a proof-of-gameplay in the form of a memecoin.
+          We do not promote speculation and/or any form of investment.
         </p>
 
         <Button
