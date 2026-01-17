@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { atom, useAtom } from "jotai"
 import { formatEther } from "viem"
 
 import { type Game, useAllGames, useOwnedGames } from "@/lib/games"
 import { useAppRouter } from "@/lib/routes"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
+import { useScrollRestoration } from "@/hooks/scroll"
 import { cn } from "@/lib/utils"
 
 import { TfiLayoutColumn3Alt, TfiLayoutGrid2Alt } from "react-icons/tfi"
@@ -19,13 +20,24 @@ import PageContainer from "./PageContainer"
 type SortBy = "minted" | "score" | "price"
 type ViewMode = "grid" | "list"
 
+const atomViewMode = atom<ViewMode>("grid")
+const atomSortBy = atom<SortBy>("score")
+
 export default function MarketPage() {
   const { pushGamePage } = useAppRouter()
   const { games: allGames } = useAllGames()
   const { games: ownedGames } = useOwnedGames()
 
-  const [sortBy, setSortBy] = useState<SortBy>("score")
-  const [viewMode, setViewMode] = useState<ViewMode>("grid")
+  const [sortBy, setSortBy] = useAtom(atomSortBy)
+  const [viewMode, setViewMode] = useAtom(atomViewMode)
+
+  const { ref: scrollContainerRef, saveScrollPosition } =
+    useScrollRestoration("market-scroll")
+
+  const handleGameClick = (gameId: string) => {
+    saveScrollPosition()
+    pushGamePage(gameId)
+  }
 
   // Sort games
   const availableGames = allGames.sort((a, b) => {
@@ -99,7 +111,10 @@ export default function MarketPage() {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-5 pb-4">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto px-5 pb-4"
+      >
         <div className="bg-linear-to-b pointer-events-none from-rb-darker via-rb-darker/85 to-rb-darker/0 w-full h-4 sticky z-1 top-0" />
         <div
           className={cn(
@@ -118,7 +133,7 @@ export default function MarketPage() {
                 key={`game-cat-${game.collectionId}`}
                 game={game}
                 isOwned={isOwned}
-                onSelect={() => pushGamePage(game.collectionId)}
+                onSelect={() => handleGameClick(game.collectionId)}
               />
             )
           })}
