@@ -8,19 +8,29 @@ import MarketPage from "@/components/MarketPage"
 import GamePage from "@/components/GamePage"
 
 import GameCatalogue from "./components/GameCatalogue"
-import DialogFriends from "./components/DialogFriends"
 import DrawerBoard from "./components/DrawerBoard"
 import QueryRouter from "./QueryRouter"
 
 import Footer from "./Footer"
 
-const TopNavigation = dynamic(() => import("./components/TopNavigation"), {
+const TopNavigation = dynamic(() => import("@/components/TopNavigation"), {
   ssr: false,
   loading: () => (
     <div className="h-13 flex pb-5 px-px w-full">
       <div className="w-full animate-pulse rounded-lg bg-white/5" />
     </div>
   ),
+})
+
+const DialogProPayment = dynamic(
+  () => import("@/components/Emulator/DialogProPayment"),
+  {
+    ssr: false,
+  },
+)
+
+const DialogFriends = dynamic(() => import("@/components/DialogFriends"), {
+  ssr: false,
 })
 
 export default function Home() {
@@ -38,6 +48,7 @@ export default function Home() {
       <GameCatalogue />
       <DrawerBoard />
       <DialogFriends />
+      <DialogProPayment />
 
       <main className="max-w-md h-dvh overflow-hidden p-5 mx-auto">
         <TopNavigation />

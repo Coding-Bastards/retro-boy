@@ -2,6 +2,7 @@
 
 import { useWorldAuth } from "@radish-la/world-auth"
 import { toast } from "sonner"
+import { atom, useAtom } from "jotai"
 
 import { useProFeatures } from "@/hooks/pro"
 import { getProPrice } from "@/app/lib/pro"
@@ -11,18 +12,18 @@ import { executeWorldPayment } from "@/app/actions/payments"
 import Dialog from "@/components/Dialog"
 import Button from "@/components/Button"
 
-export default function DialogProPayment({
-  isOpen,
-  onOpenChange,
-}: {
-  isOpen: boolean
-  onOpenChange: (open: boolean) => void
-}) {
+const atomProDialogOpen = atom(false)
+export const useProDialogAtom = () => {
+  return useAtom(atomProDialogOpen)
+}
+
+export default function DialogProPayment() {
+  const [isOpen, setOpen] = useProDialogAtom()
   const { isProUser, migrateToPro } = useProFeatures()
   const { address, isConnected, signIn } = useWorldAuth()
 
   const AMOUNT = getProPrice(address)
-  const closeDialog = () => onOpenChange(false)
+  const closeDialog = () => setOpen(false)
 
   async function handleGoPro() {
     if (!address) return signIn()
@@ -45,14 +46,10 @@ export default function DialogProPayment({
   }
 
   return (
-    <Dialog
-      title="🖐️ PRO IS REQUIRED"
-      open={isOpen}
-      onOpenChange={onOpenChange}
-    >
+    <Dialog title="🖐️ PRO IS REQUIRED" open={isOpen} onOpenChange={setOpen}>
       <p className="text-sm mb-9">
         Level up your gaming experience with <strong>PRO!</strong> Unlock
-        exclusive features, discounts, and more.
+        exclusive features, no-ads, game discounts, and more.
       </p>
 
       {isConnected ? (
@@ -73,9 +70,13 @@ export default function DialogProPayment({
             animation: shine 3s linear infinite;
           }
         `}</style>
-          <span className="text-black">
-            UPGRADE {"->"} {AMOUNT} WLD
-          </span>
+          {isProUser ? (
+            <span className="text-black">LET'S PLAY</span>
+          ) : (
+            <span className="text-black">
+              UPGRADE {"->"} {AMOUNT} WLD
+            </span>
+          )}
         </Button>
       ) : (
         <Button variant="secondary" onClick={signIn}>

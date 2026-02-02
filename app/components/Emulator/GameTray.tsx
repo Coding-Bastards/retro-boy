@@ -9,8 +9,8 @@ import {
 } from "react"
 import { toast } from "sonner"
 import LZString from "lz-string"
-import dynamic from "next/dynamic"
 
+import { useProDialogAtom } from "@/components/Emulator/DialogProPayment"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useProFeatures } from "@/hooks/pro"
 import { useAtomIsCatalogueOpen } from "@/app/lib/store"
@@ -30,10 +30,6 @@ interface StateSlot {
   timestamp: number
 }
 
-const DialogProPayment = dynamic(() => import("./DialogProPayment"), {
-  ssr: false,
-})
-
 const atomIsTutorialDone = atomWithStorage("rb.isTrayDemoCompleted", false)
 export default function GameTray() {
   const [isTutorialDone, setIsTutorialDone] = useAtom(atomIsTutorialDone)
@@ -45,14 +41,14 @@ export default function GameTray() {
 
   // Pro Features - Save States
   const { isProUser } = useProFeatures()
-  const [isOpenProPaymentDialog, setIsOpenProPaymentDialog] = useState(false)
+  const [, setShowProDialog] = useProDialogAtom()
 
   const COLLECTION_ID = currentGame?.gameCollectionId
   const getSlotAt = useCallback(
     (slot: number) =>
       // NONE as deafult to avoid issues when no game is loaded
       getStateManager(COLLECTION_ID || "NONE", slot),
-    [COLLECTION_ID]
+    [COLLECTION_ID],
   )
 
   const openGamesCatalogue = () => setIsCatalogueOpen(true)
@@ -73,14 +69,14 @@ export default function GameTray() {
     if (!gameCanvas) return
     if (!isProUser) {
       // Show pro payment dialog
-      return setIsOpenProPaymentDialog(true)
+      return setShowProDialog(true)
     }
 
     const gb = getGameboyInstance()
     // Don't block the user - show solution: Games Catalogue
     if (!gb || !currentGame) {
       // Close slots tray so user learns about the "required" flow
-      return closeSlotsGrid(), openGamesCatalogue()
+      return (closeSlotsGrid(), openGamesCatalogue())
     }
 
     try {
@@ -129,10 +125,6 @@ export default function GameTray() {
 
   return (
     <Fragment>
-      <DialogProPayment
-        isOpen={isOpenProPaymentDialog}
-        onOpenChange={setIsOpenProPaymentDialog}
-      />
       {isOpenSlotsGrid ? (
         <Fragment>
           <div
@@ -231,13 +223,13 @@ function TickHandle({
       onClick={onClick}
       className={cn(
         "bg-rb-black w-9 h-5 grid place-items-center rounded-t-lg text-white border-t-black border-t",
-        className
+        className,
       )}
     >
       <TbChevronCompactUp
         className={cn(
           "text-amber-100/60 -translate-y-0.5 scale-x-105 text-xl",
-          isRotated && "rotate-180"
+          isRotated && "rotate-180",
         )}
       />
     </button>
@@ -261,7 +253,7 @@ function SlotItem({
       }}
       className={cn(
         state || "border",
-        "bg-cover border-white/10 relative flex flex-col items-center justify-center hover:bg-white/10 rounded-lg transition-colors"
+        "bg-cover border-white/10 relative flex flex-col items-center justify-center hover:bg-white/10 rounded-lg transition-colors",
       )}
     >
       {children}

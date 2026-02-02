@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from "next/dynamic"
 import { Fragment } from "react/jsx-runtime"
 import { useWorldAuth } from "@radish-la/world-auth"
 
@@ -23,23 +24,32 @@ import { useProFeatures, useRemoteProStatus } from "@/hooks/pro"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { formatUSDC } from "@/lib/usdc"
 
+import { IoCloseSharp } from "react-icons/io5"
 import { FaGift } from "react-icons/fa"
 import { MdPerson } from "react-icons/md"
+
+import { DEV_ADDRESS } from "@/lib/constants"
+import { useProDialogAtom } from "./Emulator/DialogProPayment"
+import { useFriendsDialogAtom } from "./DialogFriends"
 
 import Button from "./Button"
 import AddressBlock from "./AddressBlock"
 import { ProBadge } from "./WalletConnect"
 import { useAlertModal } from "./Alert"
-import { useFriendsDialogAtom } from "./DialogFriends"
+
+const AdMachine = dynamic(() => import("./AdMachine"), { ssr: false })
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
   const { toggleOpen } = useFriendsDialogAtom()
+  const [, setShowProDialog] = useProDialogAtom()
+  const { isProUser } = useProFeatures()
 
   const { leaderboard, totalUniquePlayers } = useLeaderboard()
   const { data: accountData } = useAccountLeaderboardData()
   const { address, isConnected } = useWorldAuth()
 
+  const isDeveloper = address === DEV_ADDRESS
   const isInTopBoard = leaderboard.some((p) => p.address === address)
 
   return (
@@ -73,11 +83,33 @@ export default function DrawerBoard() {
               <PlayerSkeletonList />
             ) : (
               leaderboard.map((player, index) => (
-                <PlayerItem
-                  player={player}
-                  key={`board-player-${player.address}-${index}`}
-                  isConnectedUser={player.address === address}
-                />
+                <Fragment key={`board-player-${player.address}-${index}`}>
+                  <PlayerItem
+                    player={player}
+                    isConnectedUser={player.address === address}
+                  />
+                  {isProUser && !isDeveloper
+                    ? null
+                    : // Show ad to non-pro users, or dev for testing
+                      index === 2 && (
+                        <div className="relative py-1 has-[.AdMachine.hidden]:hidden">
+                          <AdMachine
+                            className="rounded-lg peer bg-white/5 shrink-0"
+                            size="728x90"
+                          />
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setShowProDialog(true)
+                            }}
+                            className="absolute grid place-items-center bg-white/40 text-white backdrop-blur-lg size-5 -top-1 -right-1 rounded-md"
+                          >
+                            <IoCloseSharp className="scale-105" />
+                          </button>
+                        </div>
+                      )}
+                </Fragment>
               ))
             )}
 
@@ -139,12 +171,12 @@ function PlayerItem({
   const { showAlert } = useAlertModal()
   const { isProUser: isConnectedUserPro } = useProFeatures()
   const { status: remoteProStatus } = useRemoteProStatus(
-    isConnectedUser ? null : player.address
+    isConnectedUser ? null : player.address,
   )
 
   const showProBadge = Boolean(
     // Fetch from remote when not the connected user
-    isConnectedUser ? isConnectedUserPro : remoteProStatus?.isProUser
+    isConnectedUser ? isConnectedUserPro : remoteProStatus?.isProUser,
   )
 
   return (
@@ -153,7 +185,7 @@ function PlayerItem({
         "flex items-center gap-3 p-3 rounded-lg",
         isConnectedUser
           ? "bg-rb-green/10 border border-rb-green/30"
-          : "bg-rb-dark"
+          : "bg-rb-dark",
       )}
     >
       <div>
@@ -164,7 +196,7 @@ function PlayerItem({
           className={cn(
             "font-black shrink-0 whitespace-nowrap text-center",
             isConnectedUser ? "text-rb-green" : "text-white/40",
-            isOutsideBoard ? "text-base -mt-1 mr-2" : "text-xl w-8"
+            isOutsideBoard ? "text-base -mt-1 mr-2" : "text-xl w-8",
           )}
         >
           #{player.position || ">999"}
@@ -206,7 +238,7 @@ function PlayerItem({
         <div
           className={cn(
             "font-black text-sm",
-            isConnectedUser ? "text-rb-green" : "text-white"
+            isConnectedUser ? "text-rb-green" : "text-white",
           )}
         >
           {localizeNumber(formatUSDC(player.points))}

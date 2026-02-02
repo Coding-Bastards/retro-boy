@@ -40,6 +40,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://www.highperformanceformat.com" />
+      </head>
+
       <body className={`${nextFont.className} antialiased`}>
         <Script
           src="https://oculus-sdk.humanlabs.world"
