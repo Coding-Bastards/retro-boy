@@ -46,7 +46,11 @@ export default function DialogProPayment() {
   }
 
   return (
-    <Dialog title="🖐️ PRO IS REQUIRED" open={isOpen} onOpenChange={setOpen}>
+    <Dialog
+      title={isProUser ? "😎 PRO UNLOCKED" : "🖐️ PRO IS REQUIRED"}
+      open={isOpen}
+      onOpenChange={setOpen}
+    >
       <p className="text-sm mb-9">
         Level up your gaming experience with <strong>PRO!</strong> Unlock
         exclusive features, no-ads, game discounts, and more.
@@ -71,7 +75,7 @@ export default function DialogProPayment() {
           }
         `}</style>
           {isProUser ? (
-            <span className="text-black">LET'S PLAY</span>
+            <span className="text-black">GAME ON</span>
           ) : (
             <span className="text-black">
               UPGRADE {"->"} {AMOUNT} WLD
