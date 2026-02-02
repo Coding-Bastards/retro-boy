@@ -37,7 +37,12 @@ import AddressBlock from "./AddressBlock"
 import { ProBadge } from "./WalletConnect"
 import { useAlertModal } from "./Alert"
 
-const AdMachine = dynamic(() => import("./AdMachine"), { ssr: false })
+const AdMachine = dynamic(() => import("./AdMachine"), {
+  ssr: false,
+  loading() {
+    return <div className="AdMachine hidden" />
+  },
+})
 
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
