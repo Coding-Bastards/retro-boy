@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import dynamic from "next/dynamic"
 import { MiniKit } from "@worldcoin/minikit-js"
 import { useSearchParams } from "next/navigation"
 import { formatEther } from "viem"
@@ -27,6 +28,7 @@ import { runParty } from "@/lib/party"
 import { appendSignatureResult, cn } from "@/lib/utils"
 import { useAlertModal } from "@/components/Alert"
 import { useLikesEngine } from "@/hooks/likes"
+import { useProFeatures } from "@/app/hooks/pro"
 
 import { ABI_REGISTRY, type WriteParameters } from "@/lib/abi"
 import { ADDRESS_GAME_REGISTRY, ONE_HOUR_IN_SECONDS } from "@/lib/constants"
@@ -38,11 +40,17 @@ import PageContainer from "@/components/PageContainer"
 import Dialog from "@/components/Dialog"
 import ActionMenu from "./ActionMenu"
 
+const AdSquared = dynamic(() => import("@/components/AdSquared"), {
+  ssr: false,
+  loading: () => <div className="AdSquared hidden" />,
+})
+
 export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
   const { showAlert } = useAlertModal()
 
   const { isConnected, signIn } = useWorldAuth()
+  const { isProUser, showProBanner } = useProFeatures()
   const { loadGame } = useEmulator()
   const { WLD } = useAccountBalances()
   const { navigateHome } = useAppRouter()
@@ -51,7 +59,7 @@ export default function GamePage() {
   const collectionId = searchParams.get("game")
   const { game, isOwned, markAsOwned } = useGame(collectionId || "")
   const { vote, isSelfDisliked, isSelfLiked } = useLikesEngine(
-    collectionId || ""
+    collectionId || "",
   )
 
   if (!game) return null
@@ -161,7 +169,7 @@ export default function GamePage() {
             onClick={() => handleVote("like")}
             className={cn(
               isSelfLiked ? "text-rb-green" : "text-white",
-              "flex items-center gap-2 active:scale-95"
+              "flex items-center gap-2 active:scale-95",
             )}
           >
             {isSelfLiked ? (
@@ -176,7 +184,7 @@ export default function GamePage() {
             onClick={() => handleVote("dislike")}
             className={cn(
               isSelfDisliked ? "text-rb-red" : "text-white",
-              "flex items-center gap-2 active:scale-95"
+              "flex items-center gap-2 active:scale-95",
             )}
           >
             {isSelfDisliked ? (
@@ -225,7 +233,7 @@ export default function GamePage() {
                       className={cn(
                         isNFTImage &&
                           "drop-shadow-[2px_2px_8px_rgba(255,255,0,0.4)]",
-                        "aspect-square rounded-3xl overflow-hidden bg-white/7"
+                        "aspect-square rounded-3xl overflow-hidden bg-white/7",
                       )}
                     >
                       <img
@@ -244,6 +252,25 @@ export default function GamePage() {
             })}
           </div>
         </div>
+
+        {/* Ads */}
+        {isProUser ? null : (
+          <div className="pt-4 has-[.AdSquared.hidden]:hidden mb-4">
+            <nav className="flex items-center justify-between">
+              <h3 className="text-white font-black uppercase text-sm tracking-wider">
+                Sponsored
+              </h3>
+              <button
+                onClick={showProBanner}
+                className="text-rb-green text-xs underline underline-offset-2"
+              >
+                HIDE
+              </button>
+            </nav>
+
+            <AdSquared className="text-white mt-2 **:text-xs!" />
+          </div>
+        )}
 
         {/* Licenses */}
         {Object.keys(game.licenses).length > 0 && (
@@ -290,8 +317,8 @@ export default function GamePage() {
             ? isOwned
               ? "PLAY NOW"
               : isFreeMint
-              ? "MINT (FREE)"
-              : `MINT (${formatEther(PRICE)} WLD)`
+                ? "MINT (FREE)"
+                : `MINT (${formatEther(PRICE)} WLD)`
             : "CONNECT WALLET"}
         </Button>
       </div>

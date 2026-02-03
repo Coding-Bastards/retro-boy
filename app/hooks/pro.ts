@@ -5,20 +5,22 @@ import { useAtom } from "jotai"
 import { useWorldAuth } from "@radish-la/world-auth"
 import { atomWithStorage } from "jotai/utils"
 
+import { useProDialogAtom } from "@/components/Emulator/DialogProPayment"
 import { isDevEnv } from "@/lib/env"
 import { jsonify } from "@/lib/utils"
 
 const atomIsFeatureStatesEnabled = atomWithStorage(
   "rb.feature.save-states.enabled",
-  false
+  false,
 )
 
 export const useProFeatures = () => {
+  const [, setIsProBannerOpen] = useProDialogAtom()
   const { address } = useWorldAuth()
   const { status: remoteData } = useRemoteProStatus(address)
 
   const [isFeatureEnabled, setIsFeatureEnabled] = useAtom(
-    atomIsFeatureStatesEnabled
+    atomIsFeatureStatesEnabled,
   )
 
   // Pro when in local env, or user bought it
@@ -26,6 +28,7 @@ export const useProFeatures = () => {
   return {
     migrateToPro: () => setIsFeatureEnabled(true),
     isProUser,
+    showProBanner: () => setIsProBannerOpen(true),
   }
 }
 
@@ -40,7 +43,7 @@ export const useRemoteProStatus = (address?: string | null) => {
         isProUser: boolean
         price: string
       }>(fetch(`/api/features/pro/${address}`))
-    }
+    },
   )
 
   return {

@@ -29,7 +29,6 @@ import { FaGift } from "react-icons/fa"
 import { MdPerson } from "react-icons/md"
 
 import { DEV_ADDRESS } from "@/lib/constants"
-import { useProDialogAtom } from "./Emulator/DialogProPayment"
 import { useFriendsDialogAtom } from "./DialogFriends"
 
 import Button from "./Button"
@@ -47,8 +46,7 @@ const AdMachine = dynamic(() => import("./AdMachine"), {
 export default function DrawerBoard() {
   const [open, setOpen] = useAtomIsBoardOpen()
   const { toggleOpen } = useFriendsDialogAtom()
-  const [, setShowProDialog] = useProDialogAtom()
-  const { isProUser } = useProFeatures()
+  const { isProUser, showProBanner } = useProFeatures()
 
   const { leaderboard, totalUniquePlayers } = useLeaderboard()
   const { data: accountData } = useAccountLeaderboardData()
@@ -106,7 +104,7 @@ export default function DrawerBoard() {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
-                              setShowProDialog(true)
+                              showProBanner()
                             }}
                             className="absolute grid place-items-center bg-white/40 text-white backdrop-blur-lg size-5 -top-1 -right-1 rounded-md"
                           >

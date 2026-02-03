@@ -10,7 +10,6 @@ import {
 import { toast } from "sonner"
 import LZString from "lz-string"
 
-import { useProDialogAtom } from "@/components/Emulator/DialogProPayment"
 import { useEmulator } from "@/lib/EmulatorContext"
 import { useProFeatures } from "@/hooks/pro"
 import { useAtomIsCatalogueOpen } from "@/app/lib/store"
@@ -40,8 +39,7 @@ export default function GameTray() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
 
   // Pro Features - Save States
-  const { isProUser } = useProFeatures()
-  const [, setShowProDialog] = useProDialogAtom()
+  const { isProUser, showProBanner } = useProFeatures()
 
   const COLLECTION_ID = currentGame?.gameCollectionId
   const getSlotAt = useCallback(
@@ -69,7 +67,7 @@ export default function GameTray() {
     if (!gameCanvas) return
     if (!isProUser) {
       // Show pro payment dialog
-      return setShowProDialog(true)
+      return showProBanner()
     }
 
     const gb = getGameboyInstance()
