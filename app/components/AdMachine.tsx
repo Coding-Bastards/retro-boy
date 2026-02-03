@@ -3,9 +3,10 @@
 import { cn } from "@/lib/utils"
 import { useEffect } from "react"
 
-type Sizes = "728x90"
+type Sizes = "728x90" | "468x60"
 const KEYS: Record<Sizes, string> = {
   "728x90": "c63ef51e51a3cef9bb66dad94789f5c4",
+  "468x60": "79828058f3fecde7fcd5883b8b2a6f59",
 }
 
 const AD_CONTAINER_ID = "ad-machine"
@@ -70,7 +71,7 @@ export default function AdMachine({
       }}
       id={AD_CONTAINER_ID}
       className={cn(
-        "hidden AdMachine overflow-hidden [&_img]:w-full! bg-black/3 animate-in fade-in",
+        "hidden shrink-0 AdMachine overflow-hidden [&_img]:w-full! bg-white/5 animate-in fade-in",
         className,
       )}
     />

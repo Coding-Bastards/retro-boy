@@ -17,6 +17,7 @@ import {
 
 import { FaCheck, FaGift } from "react-icons/fa"
 import { FaLinkSlash } from "react-icons/fa6"
+import { RiExternalLinkLine } from "react-icons/ri"
 
 import { isWorldVerified } from "@/lib/world"
 import { cn, generateInviteCode } from "@/lib/utils"
@@ -26,6 +27,7 @@ import { base62ToHex } from "@/lib/base62"
 
 import { INVITE_REWARDS } from "@/lib/constants"
 import { Spinner } from "@/components/icons"
+import AdMachine from "@/components/AdMachine"
 import Button from "@/components/Button"
 
 function InvitePage() {
@@ -57,7 +59,7 @@ function InvitePage() {
       if (!address || !inviter) return false
       // Check if any cross-invite exists
       return await inviteExits(address, inviter)
-    }
+    },
   )
 
   async function handleClaim() {
@@ -126,7 +128,15 @@ function InvitePage() {
   }
 
   return (
-    <main className="max-w-md text-white h-dvh flex flex-col p-5 mx-auto">
+    <main className="max-w-md text-white h-dvh flex flex-col p-5 pb-0 mx-auto">
+      <section
+        className="-mx-2.5 -mt-2.5"
+        style={{
+          aspectRatio: "468 / 60",
+        }}
+      >
+        <AdMachine className="rounded-lg" size="468x60" />
+      </section>
       {isValidLink ? (
         <div className="text-center h-full flex gap-3 flex-col">
           <div className="space-y-1 grow flex flex-col items-center justify-center">
@@ -207,6 +217,18 @@ function InvitePage() {
           </Button>
         </div>
       )}
+
+      <a
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs active:scale-98 px-1 flex items-center justify-between pt-4 pb-5 opacity-70"
+        href="https://www.effectivegatecpm.com/xkwvfag1?key=eb961c0b7a18270e849230b4ae6ba76b"
+      >
+        <div>
+          Trade assets on Solana? <span className="opacity-50">(ad)</span>
+        </div>
+        <RiExternalLinkLine className="scale-110" />
+      </a>
     </main>
   )
 }
@@ -227,7 +249,7 @@ const IconContainer = ({
     {...props}
     className={cn(
       "size-24 grid place-items-center rounded-3xl bg-linear-to-bl from-rb-yellow/10 to-rb-yellow/5 border border-rb-yellow/7",
-      className
+      className,
     )}
   />
 )

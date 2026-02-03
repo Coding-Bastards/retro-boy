@@ -99,7 +99,7 @@ export default function DrawerBoard() {
                       index === 2 && (
                         <div className="relative py-1 has-[.AdMachine.hidden]:hidden">
                           <AdMachine
-                            className="rounded-lg peer bg-white/5 shrink-0"
+                            className="rounded-lg peer"
                             size="728x90"
                           />
                           <button
