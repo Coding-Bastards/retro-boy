@@ -16,8 +16,7 @@ import { formatTimePlayed } from "@/lib/date"
 
 import { FaUserFriends } from "react-icons/fa"
 
-import { DEV_ADDRESS } from "@/lib/constants"
-import { isDevEnv } from "@/lib/env"
+import { isDeveloper, isDevEnv } from "@/lib/env"
 import { redeemRBCTokens } from "@/app/lib/rbc"
 import { getInvites } from "@/app/actions/invites"
 
@@ -47,7 +46,7 @@ export default function WalletConnect({
     async () => {
       if (!address) return 0
       return (await getInvites(address)).invitesSent
-    }
+    },
   )
 
   const { WLD, RBC } = useAccountBalances(address)
@@ -75,7 +74,7 @@ export default function WalletConnect({
     if (payload.status === "success") {
       setIsClaimed(true)
       return toast.success(
-        `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`
+        `${numberToShortWords(POINTS_TO_COLLECT)} RBC claimed!`,
       )
     }
 
@@ -97,7 +96,6 @@ export default function WalletConnect({
   }, [isDialogOpen])
 
   const isWLDSummary = summaryToken === "WLD"
-  const isDeveloper = address === DEV_ADDRESS
 
   // Show claim action when diff >= 1 RBC
   const showClaimAction =
@@ -209,7 +207,7 @@ export default function WalletConnect({
         </Button>
 
         {/* Developer Settings */}
-        {isDeveloper && <DeveloperGrid />}
+        {isDeveloper(address) && <DeveloperGrid />}
       </div>
     </Dialog>
   )

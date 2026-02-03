@@ -23,12 +23,12 @@ import {
 import { useProFeatures, useRemoteProStatus } from "@/hooks/pro"
 import { localizeNumber, numberToShortWords } from "@/lib/numbers"
 import { formatUSDC } from "@/lib/usdc"
+import { isDeveloper } from "@/lib/env"
 
 import { IoCloseSharp } from "react-icons/io5"
 import { FaGift } from "react-icons/fa"
 import { MdPerson } from "react-icons/md"
 
-import { DEV_ADDRESS } from "@/lib/constants"
 import { useFriendsDialogAtom } from "./DialogFriends"
 
 import Button from "./Button"
@@ -52,7 +52,6 @@ export default function DrawerBoard() {
   const { data: accountData } = useAccountLeaderboardData()
   const { address, isConnected } = useWorldAuth()
 
-  const isDeveloper = address === DEV_ADDRESS
   const isInTopBoard = leaderboard.some((p) => p.address === address)
 
   return (
@@ -91,7 +90,7 @@ export default function DrawerBoard() {
                     player={player}
                     isConnectedUser={player.address === address}
                   />
-                  {isProUser && !isDeveloper
+                  {isProUser && !isDeveloper(address)
                     ? null
                     : // Show ad to non-pro users, or dev for testing
                       index === 2 && (

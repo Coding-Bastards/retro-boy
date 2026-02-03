@@ -39,6 +39,7 @@ import Button from "@/components/Button"
 import PageContainer from "@/components/PageContainer"
 import Dialog from "@/components/Dialog"
 import ActionMenu from "./ActionMenu"
+import { isDeveloper } from "@/app/lib/env"
 
 const AdSquared = dynamic(() => import("@/components/AdSquared"), {
   ssr: false,
@@ -49,7 +50,7 @@ export default function GamePage() {
   const [, setIsCatalogueOpen] = useAtomIsCatalogueOpen()
   const { showAlert } = useAlertModal()
 
-  const { isConnected, signIn } = useWorldAuth()
+  const { isConnected, signIn, address } = useWorldAuth()
   const { isProUser, showProBanner } = useProFeatures()
   const { loadGame } = useEmulator()
   const { WLD } = useAccountBalances()
@@ -254,7 +255,7 @@ export default function GamePage() {
         </div>
 
         {/* Ads */}
-        {isProUser ? null : (
+        {isProUser && !isDeveloper(address) ? null : (
           <div className="pt-4 has-[.AdSquared.hidden]:hidden mb-4">
             <nav className="flex items-center justify-between">
               <h3 className="text-white font-black uppercase text-sm tracking-wider">
