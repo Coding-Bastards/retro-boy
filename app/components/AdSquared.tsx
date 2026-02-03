@@ -6,6 +6,8 @@ import { useEffect } from "react"
 const AD_THROTTLE_MS = 2_500 // 2.5s
 const CONTAINER_ID = "navite-ad-container"
 const LAST_RENDER_KEY = "rb.adsquared.lastrender"
+
+// Ad Config
 const UNIT_CODE = "73bf6ccc84a287eef83208628f87116d"
 const PLACEMENT_CODE = "pl28635668"
 
