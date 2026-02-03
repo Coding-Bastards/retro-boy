@@ -5,7 +5,7 @@ import { useEffect } from "react"
 
 const AD_THROTTLE_MS = 2_500 // 2.5s
 const CONTAINER_ID = "navite-ad-container"
-const LAST_RENDER_KEY = "juz.adsquared.lastrender"
+const LAST_RENDER_KEY = "rb.adsquared.lastrender"
 const UNIT_CODE = "73bf6ccc84a287eef83208628f87116d"
 const PLACEMENT_CODE = "pl28635668"
 
@@ -28,6 +28,13 @@ export default function AdSquared({ className }: { className?: string }) {
     const container = document.getElementById(CONTAINER_ID)
     if (!container) return
 
+    const isAdPresent = () =>
+      // Look for ad image container
+      container.querySelector('[class*="__img-container"] > div')
+
+    // Nothing to do
+    if (isAdPresent()) return
+
     // Reset state
     container.classList.add("hidden")
     container.replaceChildren()
@@ -43,10 +50,41 @@ export default function AdSquared({ className }: { className?: string }) {
       ;(window as any)[adArrayKey] = []
     }
 
+    const originalCall = window.addEventListener
+    window.addEventListener = function (
+      type: string,
+      listener: EventListenerOrEventListenerObject,
+      options?: boolean | AddEventListenerOptions,
+    ) {
+      if (type === "popstate") {
+        console.debug("[AdSquared] Blocked")
+        return
+      }
+      return originalCall.call(this, type, listener, options)
+    }
+
+    const originalPushState = history.pushState
+    history.pushState = function () {
+      console.debug("[AdSquared] pushState blocked")
+    }
+
+    function resetOriginalHandlers() {
+      // Restore original event handlers
+      window.addEventListener = originalCall
+      history.pushState = originalPushState
+    }
+
     const script = document.createElement("script")
     script.onerror = (error) => {
-      console.debug({ error })
+      resetOriginalHandlers()
+
+      console.debug("[AdSquared] Script failed", { error })
       container.classList.add("hidden")
+    }
+
+    script.onload = () => {
+      resetOriginalHandlers()
+      console.debug("[AdSquared] Script loaded")
     }
 
     script.src = `https://${PLACEMENT_CODE}.effectivegatecpm.com/${UNIT_CODE}/invoke.js`
@@ -62,12 +100,9 @@ export default function AdSquared({ className }: { className?: string }) {
       // Clear-up previous timer
       clearTimeout(debounceTimer)
 
-      // Wait 300ms from last mutation
+      // Wait some time since last mutation
       debounceTimer = setTimeout(() => {
-        const img = container.querySelector('[class*="__img-container"] > div')
-        if (img) {
-          // Ad found - show container
-
+        if (isAdPresent()) {
           localStorage.setItem(LAST_RENDER_KEY, Date.now().toString())
           container.classList.remove("hidden")
           observer.disconnect() // Stop observing once ad is found
@@ -81,6 +116,7 @@ export default function AdSquared({ className }: { className?: string }) {
     })
 
     return () => {
+      resetOriginalHandlers()
       clearTimeout(debounceTimer)
       observer.disconnect()
     }
@@ -92,28 +128,32 @@ export default function AdSquared({ className }: { className?: string }) {
       {/* Holding all together here to make it easy to re-use :p */}
       <style global>
         {`
-          #navite-ad-container [class*="__bn"] {
+          #${CONTAINER_ID} [class*="__bn"] {
             max-width: none !important;
           }
 
-          #navite-ad-container [class*="__img-container"] {
+          #${CONTAINER_ID} [class*="__img-container"] {
             border-radius: 1rem !important;
           }
 
-          #navite-ad-container [class*="__cancel-btn"] {
+          #${CONTAINER_ID} [class*="__cancel-btn"] {
             display: none !important;
           }
 
-          #navite-ad-container [class*="__bn-container"] {
+          #${CONTAINER_ID} [class*="__bn-container"] {
             padding: 0.5rem !important;
           }
 
-          #navite-ad-container [class*="__link"] {
+          #${CONTAINER_ID} [class*="__link"] {
             z-index: 0 !important;
           }
 
-          #navite-ad-container [class*="__title"] {
+          #${CONTAINER_ID} [class*="__title"] {
             pointer-events: none !important;
+          }
+
+          #${CONTAINER_ID} [class*="__stand"] {
+            flex-flow: nowrap !important;
           }
         `}
       </style>
